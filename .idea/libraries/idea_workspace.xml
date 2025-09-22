@@ -1,0 +1,47 @@
+<component name="libraryTable">
+  <library name="idea-workspace">
+    <CLASSES>
+      <root url="file://D:/idea-workspace" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://D:/idea-workspace/bleach/bleach-compatible/src/main/java" />
+      <root url="file://D:/idea-workspace/bleach/bleach-infrastructure/src/main/java" />
+      <root url="file://D:/idea-workspace/bleach/bleach-spi/src/main/java" />
+      <root url="file://D:/idea-workspace/bleach/bleach-start/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/adapter/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/agent/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/athena/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/common/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/common/src/test/java" />
+      <root url="file://D:/idea-workspace/lassen/commonservice/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/court/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/dal/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/dal/src/test/java" />
+      <root url="file://D:/idea-workspace/lassen/dictionary/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/filingassign/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/hephaistos/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/lassen-account-spi/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/lassen-shared-spi/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/mercury/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/mercury/src/test/java" />
+      <root url="file://D:/idea-workspace/lassen/oauth2/oauth2-web/src/test/java" />
+      <root url="file://D:/idea-workspace/lassen/platform/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/prosecute/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/spi/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/suit/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/web/src/main/java" />
+      <root url="file://D:/idea-workspace/lassen/web/src/test/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-common/src/main/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-dal/src/main/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-dal/src/test/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-oppugn-plantform/src/main/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-prosecute/src/main/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-prosecute/src/test/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-service/src/main/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-spi/src/main/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-start/src/main/java" />
+      <root url="file://D:/idea-workspace/pamir/pamir-start/src/test/java" />
+    </SOURCES>
+  </library>
+</component>
