@@ -52,7 +52,7 @@ public class ExpoTemplateConverter extends Model<ExpoTemplateConverter> {
     private String updateBy;
 
     /**
-     * 工具编号
+     * 工具编号 (MCP工具ID)
      */
     private Long toolNum;
 
@@ -60,6 +60,16 @@ public class ExpoTemplateConverter extends Model<ExpoTemplateConverter> {
      * 工具版本
      */
     private Long toolVersion;
+
+    /**
+     * expo app class
+     */
+    private Integer appClass;
+
+    /**
+     * expo command id
+     */
+    private Integer commandId;
 
     /**
      * 输入参数 jinja2 模板
@@ -76,10 +86,6 @@ public class ExpoTemplateConverter extends Model<ExpoTemplateConverter> {
      */
     private Long providerToolNum;
 
-    /**
-     * MCP工具ID
-     */
-    private Long mcpToolId;
 
     /**
      * 主键值，ActiveRecord 模式这个必须有
@@ -91,3 +97,4 @@ public class ExpoTemplateConverter extends Model<ExpoTemplateConverter> {
         return this.id;
     }
 }
+

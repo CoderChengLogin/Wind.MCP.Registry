@@ -1,3 +1,4 @@
+
 package cn.com.wind.mcp.registry.entity;
 
 import java.io.Serializable;
@@ -52,7 +53,7 @@ public class HttpTemplateConverter extends Model<HttpTemplateConverter> {
     private String updateBy;
 
     /**
-     * 工具编号
+     * 工具编号 (MCP工具ID)
      */
     private Long toolNum;
 
@@ -90,11 +91,6 @@ public class HttpTemplateConverter extends Model<HttpTemplateConverter> {
      * 提供者工具编号
      */
     private Long providerToolNum;
-
-    /**
-     * MCP工具ID
-     */
-    private Long mcpToolId;
 
     /**
      * 主键值，ActiveRecord 模式这个必须有

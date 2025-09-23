@@ -1,10 +1,10 @@
+
 package cn.com.wind.mcp.registry.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -55,7 +55,6 @@ public class OriginToolExpo extends Model<OriginToolExpo> {
     /**
      * 提供者工具编号
      */
-    @TableField(exist = false)
     private Long providerToolNum;
 
     /**
@@ -64,7 +63,7 @@ public class OriginToolExpo extends Model<OriginToolExpo> {
     private String providerToolName;
 
     /**
-     * 名称显示
+     * 名称
      */
     private String nameDisplay;
 
@@ -89,53 +88,19 @@ public class OriginToolExpo extends Model<OriginToolExpo> {
     private String functionName;
 
     /**
-     * API描述 XML格式
+     * API描述，xml
      */
     private String expoApiDefine;
 
     /**
-     * 提供者应用编号
+     * 提供者app编号
      */
-    @TableField(exist = false)
     private Long providerAppNum;
 
     /**
      * 提供者ID
      */
     private Long providerId;
-
-    /**
-     * 工具名称（用于验证，映射到nameDisplay）
-     */
-    public String getName() {
-        return this.nameDisplay;
-    }
-
-    public void setName(String name) {
-        this.nameDisplay = name;
-    }
-
-    /**
-     * 工具类型（Expo工具固定为"expo"）
-     */
-    public String getType() {
-        return "expo";
-    }
-
-    public void setType(String type) {
-        // Expo工具类型固定，忽略设置
-    }
-
-    /**
-     * 工具描述（映射到descDisplay）
-     */
-    public String getDescription() {
-        return this.descDisplay;
-    }
-
-    public void setDescription(String description) {
-        this.descDisplay = description;
-    }
 
     /**
      * 主键值，ActiveRecord 模式这个必须有
@@ -147,3 +112,4 @@ public class OriginToolExpo extends Model<OriginToolExpo> {
         return this.id;
     }
 }
+
