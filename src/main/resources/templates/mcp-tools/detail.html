@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${tool.name} + ' - MCP工具注册中心'">工具详情 - MCP工具注册中心</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Prism.js for code highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">
+                        <i class="fas fa-home me-1"></i>首页
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/mcp-tools}">
+                        <i class="fas fa-cogs me-1"></i>MCP工具
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/origin-http-tools}">
+                        <i class="fas fa-globe me-1"></i>HTTP工具
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}">
+                        <i class="fas fa-info-circle me-1"></i>关于
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 主要内容区域 -->
+<main class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/mcp-tools}">MCP工具</a></li>
+            <li class="breadcrumb-item active" th:text="${tool.name}">工具详情</li>
+        </ol>
+    </nav>
+
+    <!-- 工具标题和操作 -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-cogs me-2"></i>
+                <span th:text="${tool.name}">工具名称</span>
+            </h1>
+            <div class="mb-2">
+                    <span class="badge me-2"
+                          th:classappend="${tool.status == 'ACTIVE' ? 'bg-success' : (tool.status == 'DEPRECATED' ? 'bg-warning' : 'bg-secondary')}"
+                          th:text="${tool.status == 'ACTIVE' ? '活跃' : (tool.status == 'DEPRECATED' ? '已弃用' : '非活跃')}">状态</span>
+                <span class="badge bg-info me-2" th:if="${tool.type}" th:text="${tool.type}">类型</span>
+                <span class="badge bg-secondary" th:if="${tool.toolVersion}"
+                      th:text="'v' + ${tool.toolVersion}">版本</span>
+            </div>
+        </div>
+
+        <div class="btn-group" role="group">
+            <a class="btn btn-outline-primary" th:href="@{/mcp-tools/edit/{id}(id=${tool.id})}">
+                <i class="fas fa-edit me-1"></i>编辑
+            </a>
+            <a class="btn btn-outline-secondary" th:href="@{/mcp-tools}">
+                <i class="fas fa-arrow-left me-1"></i>返回列表
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 主要信息 -->
+        <div class="col-md-8">
+            <!-- 工具描述 -->
+            <div class="card mb-4" th:if="${tool.description}">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>工具描述</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0" th:text="${tool.description}">工具描述内容</p>
+                </div>
+            </div>
+
+            <!-- 工具配置 -->
+            <div class="card mb-4" th:if="${tool.config}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-cog me-2"></i>工具配置</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyConfig()">
+                        <i class="fas fa-copy me-1"></i>复制
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre><code class="language-json" id="toolConfig" th:text="${tool.config}">配置内容</code></pre>
+                </div>
+            </div>
+
+            <!-- 工具文档 -->
+            <div class="card mb-4" th:if="${tool.documentation}">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-book me-2"></i>使用文档</h5>
+                </div>
+                <div class="card-body">
+                    <div th:utext="${#strings.replace(#strings.escapeXml(tool.documentation), T(System).lineSeparator(), '<br/>')}">
+                        文档内容
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 侧边栏信息 -->
+        <div class="col-md-4">
+            <!-- 基本信息 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info me-2"></i>基本信息</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">ID:</dt>
+                        <dd class="col-sm-8" th:text="${tool.id}">1</dd>
+
+                        <dt class="col-sm-4" th:if="${tool.author}">作者:</dt>
+                        <dd class="col-sm-8" th:if="${tool.author}" th:text="${tool.author}">作者名称</dd>
+
+                        <dt class="col-sm-4" th:if="${tool.url}">链接:</dt>
+                        <dd class="col-sm-8" th:if="${tool.url}">
+                            <a class="text-decoration-none" target="_blank" th:href="${tool.url}">
+                                <i class="fas fa-external-link-alt me-1"></i>访问
+                            </a>
+                        </dd>
+
+                        <dt class="col-sm-4">创建时间:</dt>
+                        <dd class="col-sm-8" th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm:ss')}">
+                            2024-01-01 12:00:00
+                        </dd>
+
+                        <dt class="col-sm-4" th:if="${tool.createBy}">创建者:</dt>
+                        <dd class="col-sm-8" th:if="${tool.createBy}" th:text="${tool.createBy}">创建者</dd>
+
+                        <dt class="col-sm-4" th:if="${tool.updateTime}">更新时间:</dt>
+                        <dd class="col-sm-8" th:if="${tool.updateTime}"
+                            th:text="${#temporals.format(tool.updateTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- 工具标签 -->
+            <div class="card mb-4" th:if="${tool.tags}">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tags me-2"></i>标签</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-inline-block" th:each="tag : ${#strings.listSplit(tool.tags, ',')}">
+                        <span class="badge bg-light text-dark me-1 mb-1" th:text="${#strings.trim(tag)}">标签</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tools me-2"></i>操作</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" th:href="@{/mcp-tools/edit/{id}(id=${tool.id})}">
+                            <i class="fas fa-edit me-1"></i>编辑工具
+                        </a>
+                        <button class="btn btn-danger" onclick="confirmDelete([[${tool.id}]], '[[${tool.name}]]')"
+                                type="button">
+                            <i class="fas fa-trash me-1"></i>删除工具
+                        </button>
+                        <a class="btn btn-outline-secondary" th:href="@{/mcp-tools}">
+                            <i class="fas fa-list me-1"></i>返回列表
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除工具 "<span id="deleteToolName"></span>" 吗？</p>
+                <p class="text-danger">此操作不可撤销！</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button class="btn btn-danger" type="submit">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Prism.js for code highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+
+<script>
+    function confirmDelete(toolId, toolName) {
+        document.getElementById('deleteToolName').textContent = toolName;
+        document.getElementById('deleteForm').action = '/mcp-tools/delete/' + toolId;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    function copyConfig() {
+        const configElement = document.getElementById('toolConfig');
+        const text = configElement.textContent;
+
+        navigator.clipboard.writeText(text).then(function () {
+            // 显示复制成功提示
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check me-1"></i>已复制';
+            button.classList.remove('btn-outline-secondary');
+            button.classList.add('btn-success');
+
+            setTimeout(function () {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-secondary');
+            }, 2000);
+        }).catch(function (err) {
+            console.error('复制失败: ', err);
+        });
+    }
+</script>
+</body>
+</html>

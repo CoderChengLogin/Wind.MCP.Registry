@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${tool.id != null ? '编辑工具 - ' + tool.name : '添加新工具'} + ' - MCP工具注册中心'">添加新工具 - MCP工具注册中心</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .json-editor {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mcp-tools">MCP工具</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/origin-tools">原始HTTP工具</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item"><a href="/origin-tools">原始HTTP工具</a></li>
+            <li class="breadcrumb-item active" th:text="${tool.id != null ? '编辑工具' : '添加新工具'}">添加新工具</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-globe me-2"></i>
+            <span th:text="${tool.id != null ? '编辑工具' : '添加新工具'}">添加新工具</span>
+        </h1>
+        <a class="btn btn-outline-secondary" href="/origin-tools">
+            <i class="fas fa-arrow-left me-2"></i>返回列表
+        </a>
+    </div>
+
+    <!-- 工具表单 -->
+    <form id="toolForm"
+          method="post" th:action="${tool.id != null ? '/origin-tools/' + tool.id + '/save' : '/origin-tools/save'}">
+        <input th:field="${tool.id}" type="hidden">
+
+        <!-- 基本信息 -->
+        <div class="form-section">
+            <h4 class="mb-3"><i class="fas fa-info-circle me-2"></i>基本信息</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="name">工具名称 <span class="required">*</span></label>
+                        <input class="form-control" id="name" required th:field="${tool.name}" type="text">
+                        <div class="form-text">请输入工具的名称</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="method">HTTP方法 <span class="required">*</span></label>
+                        <select class="form-select" id="method" required th:field="${tool.method}">
+                            <option value="">请选择HTTP方法</option>
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="PATCH">PATCH</option>
+                            <option value="HEAD">HEAD</option>
+                            <option value="OPTIONS">OPTIONS</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="url">URL地址 <span class="required">*</span></label>
+                <input class="form-control" id="url" required th:field="${tool.url}" type="url">
+                <div class="form-text">请输入完整的HTTP URL地址</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="description">工具描述</label>
+                <textarea class="form-control" id="description" rows="3" th:field="${tool.description}"></textarea>
+                <div class="form-text">请描述这个工具的功能和用途</div>
+            </div>
+        </div>
+
+        <!-- HTTP配置 -->
+        <div class="form-section">
+            <h4 class="mb-3"><i class="fas fa-cog me-2"></i>HTTP配置</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="headers">请求头 (JSON格式)</label>
+                        <textarea class="form-control json-editor" id="headers"
+                                  placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token"}'
+                                  rows="6"
+                                  th:field="${tool.headers}"></textarea>
+                        <div class="form-text">请输入有效的JSON格式请求头</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="parameters">请求参数 (JSON格式)</label>
+                        <textarea class="form-control json-editor" id="parameters"
+                                  placeholder='{"param1": "value1", "param2": "value2"}' rows="6"
+                                  th:field="${tool.parameters}"></textarea>
+                        <div class="form-text">请输入有效的JSON格式请求参数</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="requestBody">请求体 (JSON格式)</label>
+                <textarea class="form-control json-editor" id="requestBody"
+                          placeholder='{"key": "value", "data": {...}}' rows="8"
+                          th:field="${tool.requestBody}"></textarea>
+                <div class="form-text">请输入有效的JSON格式请求体（适用于POST、PUT、PATCH方法）</div>
+            </div>
+        </div>
+
+        <!-- 其他配置 -->
+        <div class="form-section">
+            <h4 class="mb-3"><i class="fas fa-sliders-h me-2"></i>其他配置</h4>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label" for="timeout">超时时间 (秒)</label>
+                        <input class="form-control" id="timeout" max="300" min="1"
+                               th:field="${tool.timeout}" type="number" value="30">
+                        <div class="form-text">请求超时时间，默认30秒</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label" for="retryCount">重试次数</label>
+                        <input class="form-control" id="retryCount" max="10" min="0"
+                               th:field="${tool.retryCount}" type="number" value="0">
+                        <div class="form-text">失败时的重试次数，默认0次</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label" for="status">状态</label>
+                        <select class="form-select" id="status" th:field="${tool.status}">
+                            <option value="ACTIVE">启用</option>
+                            <option value="INACTIVE">禁用</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="tags">标签</label>
+                <input class="form-control" id="tags" placeholder="API, HTTP, 工具" th:field="${tool.tags}"
+                       type="text">
+                <div class="form-text">多个标签请用逗号分隔</div>
+            </div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-secondary" href="/origin-tools">
+                <i class="fas fa-times me-2"></i>取消
+            </a>
+            <button class="btn btn-info" onclick="testTool()" type="button">
+                <i class="fas fa-play me-2"></i>测试工具
+            </button>
+            <button class="btn btn-success" type="submit">
+                <i class="fas fa-save me-2"></i>保存工具
+            </button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 表单验证
+    document.getElementById('toolForm').addEventListener('submit', function (e) {
+        // 验证JSON格式
+        const jsonFields = ['headers', 'parameters', 'requestBody'];
+        for (let field of jsonFields) {
+            const element = document.getElementById(field);
+            if (element.value.trim()) {
+                try {
+                    JSON.parse(element.value);
+                } catch (error) {
+                    e.preventDefault();
+                    alert(`${field} 字段的JSON格式不正确: ${error.message}`);
+                    element.focus();
+                    return;
+                }
+            }
+        }
+    });
+
+    // 测试工具功能
+    function testTool() {
+        const form = document.getElementById('toolForm');
+        const formData = new FormData(form);
+
+        // 这里可以添加测试工具的逻辑
+        alert('测试功能开发中...');
+    }
+
+    // JSON格式化
+    function formatJson(fieldId) {
+        const element = document.getElementById(fieldId);
+        try {
+            const json = JSON.parse(element.value);
+            element.value = JSON.stringify(json, null, 2);
+        } catch (error) {
+            alert('JSON格式不正确: ' + error.message);
+        }
+    }
+
+    // 为JSON编辑器添加格式化按钮
+    document.addEventListener('DOMContentLoaded', function () {
+        const jsonEditors = document.querySelectorAll('.json-editor');
+        jsonEditors.forEach(editor => {
+            editor.addEventListener('blur', function () {
+                if (this.value.trim()) {
+                    try {
+                        const json = JSON.parse(this.value);
+                        this.value = JSON.stringify(json, null, 2);
+                    } catch (error) {
+                        // 静默处理，不打断用户输入
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

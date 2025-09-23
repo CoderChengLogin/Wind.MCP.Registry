@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>提供者登录 - MCP工具注册中心</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px 15px 0 0;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="login-card">
+                <div class="login-header">
+                    <i class="fas fa-building fa-3x mb-3"></i>
+                    <h2>MCP工具注册中心</h2>
+                    <p class="mb-0">提供者登录</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- 错误提示 -->
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${param.error}">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:text="${param.error[0]}">登录失败，请检查用户名和密码</span>
+                        <button class="btn-close" data-bs-dismiss="alert" type="button"></button>
+                    </div>
+
+                    <!-- 成功提示 -->
+                    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${param.success}">
+                        <i class="fas fa-check-circle"></i>
+                        <span th:text="${param.success[0]}">操作成功</span>
+                        <button class="btn-close" data-bs-dismiss="alert" type="button"></button>
+                    </div>
+
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label class="form-label" for="username">
+                                <i class="fas fa-user me-2"></i>用户名
+                            </label>
+                            <input class="form-control" id="username" name="username" placeholder="请输入用户名"
+                                   required type="text">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="password">
+                                <i class="fas fa-lock me-2"></i>密码
+                            </label>
+                            <input class="form-control" id="password" name="password" placeholder="请输入密码"
+                                   required type="password">
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input class="form-check-input" id="rememberMe" type="checkbox">
+                            <label class="form-check-label" for="rememberMe">
+                                记住我
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" type="submit">
+                                <i class="fas fa-sign-in-alt me-2"></i>登录
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <p class="mb-0">还没有账号？</p>
+                        <a class="btn btn-outline-primary mt-2" href="/provider/register">
+                            <i class="fas fa-user-plus me-2"></i>立即注册
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a class="text-decoration-none" href="/">
+                            <i class="fas fa-home me-1"></i>返回首页
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#loginForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var username = $('#username').val();
+            var password = $('#password').val();
+
+            if (!username || !password) {
+                showMessage('请填写完整的登录信息', 'danger');
+                return;
+            }
+
+            // 禁用提交按钮
+            var submitBtn = $(this).find('button[type="submit"]');
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>登录中...');
+
+            $.post('/provider/login', {
+                username: username,
+                password: password
+            })
+                .done(function (data) {
+                    if (data.success) {
+                        showMessage('登录成功，正在跳转...', 'success');
+                        setTimeout(function () {
+                            window.location.href = '/';
+                        }, 1000);
+                    } else {
+                        showMessage(data.message || '登录失败', 'danger');
+                    }
+                })
+                .fail(function () {
+                    showMessage('登录失败，请稍后重试', 'danger');
+                })
+                .always(function () {
+                    // 恢复提交按钮
+                    submitBtn.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>登录');
+                });
+        });
+    });
+
+    function showMessage(message, type) {
+        var alertClass = 'alert-' + type;
+        var icon = type === 'success' ? 'check-circle' : 'exclamation-triangle';
+        var alert = $('<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert">' +
+            '<i class="fas fa-' + icon + '"></i> ' + message +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+            '</div>');
+
+        // 移除现有的alert
+        $('.alert').remove();
+
+        // 添加新的alert
+        $('#loginForm').before(alert);
+    }
+</script>
+</body>
+</html>

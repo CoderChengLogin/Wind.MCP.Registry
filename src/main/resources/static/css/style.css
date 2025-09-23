@@ -1,0 +1,467 @@
+/* MCP工具注册中心 - 自定义样式 */
+
+/* 全局样式 */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --border-radius: 8px;
+    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* 导航栏样式 */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.navbar-nav .nav-link:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 卡片样式 */
+.card {
+    border: none;
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: var(--light-color);
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+/* 工具卡片特殊样式 */
+.tool-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+.tool-card.mcp-tool {
+    border-left-color: var(--success-color);
+}
+
+.tool-card.http-tool {
+    border-left-color: var(--info-color);
+}
+
+/* 按钮样式 */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-group .btn {
+    border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+
+.btn-group .btn:last-child {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+/* 表单样式 */
+.form-control, .form-select {
+    border-radius: var(--border-radius);
+    border: 1px solid #ced4da;
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-section {
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+}
+
+.form-section h4 {
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* 搜索框样式 */
+.search-box {
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+}
+
+/* 工具头部样式 */
+.tool-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    color: white;
+    border-radius: var(--border-radius);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--box-shadow);
+}
+
+.tool-header h1 {
+    margin-bottom: 15px;
+}
+
+/* 信息卡片样式 */
+.info-card {
+    margin-bottom: 25px;
+}
+
+.info-card .card-header {
+    background: linear-gradient(90deg, var(--light-color), #ffffff);
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+/* JSON显示样式 */
+.json-display {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    font-family: 'Courier New', Monaco, monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+    line-height: 1.4;
+}
+
+.json-editor {
+    font-family: 'Courier New', Monaco, monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* 状态徽章样式 */
+.status-badge {
+    font-size: 0.85em;
+    padding: 0.4em 0.8em;
+}
+
+.method-badge {
+    font-size: 0.75em;
+    padding: 0.3em 0.6em;
+    font-weight: 600;
+}
+
+/* 侧边栏样式 */
+.sidebar-card {
+    position: sticky;
+    top: 20px;
+}
+
+/* 统计卡片样式 */
+.stats-card {
+    text-align: center;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    color: white;
+    margin-bottom: 20px;
+}
+
+.stats-card.primary {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+}
+
+.stats-card.success {
+    background: linear-gradient(135deg, var(--success-color), #1e7e34);
+}
+
+.stats-card.info {
+    background: linear-gradient(135deg, var(--info-color), #117a8b);
+}
+
+.stats-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* 功能介绍样式 */
+.feature-card {
+    text-align: center;
+    padding: 30px 20px;
+    height: 100%;
+}
+
+.feature-card .feature-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.feature-card h5 {
+    color: var(--dark-color);
+    margin-bottom: 15px;
+}
+
+/* 欢迎横幅样式 */
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    color: white;
+    border-radius: var(--border-radius);
+    padding: 50px 30px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.welcome-banner h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.welcome-banner p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* 页脚样式 */
+.footer {
+    background: var(--dark-color);
+    color: white;
+    padding: 40px 0;
+    margin-top: 60px;
+}
+
+.footer h5 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.footer a {
+    color: #adb5bd;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer a:hover {
+    color: white;
+}
+
+/* 面包屑导航样式 */
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+/* 分页样式 */
+.pagination .page-link {
+    border-radius: var(--border-radius);
+    margin: 0 2px;
+    border: 1px solid #dee2e6;
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* 测试结果样式 */
+.test-result {
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.test-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.test-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* 空状态样式 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--secondary-color);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: 15px;
+}
+
+/* 加载动画 */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, .3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .welcome-banner h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-banner p {
+        font-size: 1rem;
+    }
+
+    .stats-card h3 {
+        font-size: 2rem;
+    }
+
+    .feature-card .feature-icon {
+        font-size: 2.5rem;
+    }
+
+    .tool-header {
+        padding: 20px;
+    }
+
+    .form-section {
+        padding: 20px;
+    }
+
+    .search-box {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .btn-group .btn {
+        border-radius: var(--border-radius) !important;
+        margin-bottom: 5px;
+    }
+
+    .pagination {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .navbar,
+    .btn,
+    .pagination,
+    .modal {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+    }
+
+    .tool-header {
+        background: #f8f9fa !important;
+        color: #333 !important;
+    }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --light-color: #2d3748;
+        --dark-color: #e2e8f0;
+    }
+
+    body {
+        background-color: #1a202c;
+        color: #e2e8f0;
+    }
+
+    .card {
+        background-color: #2d3748;
+        color: #e2e8f0;
+    }
+
+    .form-control,
+    .form-select {
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .json-display {
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+}

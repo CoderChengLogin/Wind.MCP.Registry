@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${tool.name} + ' - 工具详情 - MCP工具注册中心'">工具详情 - MCP工具注册中心</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-card .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: bold;
+        }
+
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .status-badge {
+            font-size: 0.9em;
+        }
+
+        .method-badge {
+            font-size: 0.8em;
+            padding: 0.3em 0.6em;
+        }
+
+        .sidebar-card {
+            position: sticky;
+            top: 20px;
+        }
+
+        .test-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .test-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .test-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mcp-tools">MCP工具</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/origin-tools">原始HTTP工具</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item"><a href="/origin-tools">原始HTTP工具</a></li>
+            <li class="breadcrumb-item active" th:text="${tool.name}">工具名称</li>
+        </ol>
+    </nav>
+
+    <!-- 工具标题和操作 -->
+    <div class="tool-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-globe me-2"></i>
+                    <span th:text="${tool.name}">工具名称</span>
+                    <span class="badge method-badge ms-2"
+                          th:classappend="${tool.method == 'GET' ? 'bg-primary' :
+                                             tool.method == 'POST' ? 'bg-success' : 
+                                             tool.method == 'PUT' ? 'bg-warning' : 
+                                             tool.method == 'DELETE' ? 'bg-danger' : 'bg-secondary'}"
+                          th:text="${tool.method}">GET</span>
+                    <span class="badge status-badge ms-2"
+                          th:classappend="${tool.status == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
+                          th:text="${tool.status == 'ACTIVE' ? '启用' : '禁用'}">启用</span>
+                </h1>
+                <p class="mb-2 opacity-75" th:text="${tool.url}">http://example.com/api</p>
+                <p class="mb-0 opacity-75" th:text="${tool.description}">工具描述</p>
+            </div>
+            <div class="text-end">
+                <a class="btn btn-light me-2" th:href="@{/origin-tools/{id}/edit(id=${tool.id})}">
+                    <i class="fas fa-edit me-2"></i>编辑
+                </a>
+                <button class="btn btn-outline-light" onclick="testTool()" type="button">
+                    <i class="fas fa-play me-2"></i>测试
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 主要内容 -->
+        <div class="col-lg-8">
+            <!-- 描述信息 -->
+            <div class="info-card card" th:if="${tool.description}">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>工具描述
+                </div>
+                <div class="card-body">
+                    <p class="mb-0" th:text="${tool.description}">工具的详细描述信息</p>
+                </div>
+            </div>
+
+            <!-- HTTP配置 -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-cog me-2"></i>HTTP配置
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>请求方法:</strong></div>
+                        <div class="col-sm-9">
+                                <span class="badge method-badge"
+                                      th:classappend="${tool.method == 'GET' ? 'bg-primary' : 
+                                                     tool.method == 'POST' ? 'bg-success' : 
+                                                     tool.method == 'PUT' ? 'bg-warning' : 
+                                                     tool.method == 'DELETE' ? 'bg-danger' : 'bg-secondary'}"
+                                      th:text="${tool.method}">GET</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>URL地址:</strong></div>
+                        <div class="col-sm-9">
+                            <code th:text="${tool.url}">http://example.com/api</code>
+                        </div>
+                    </div>
+                    <div class="row mb-3" th:if="${tool.timeout}">
+                        <div class="col-sm-3"><strong>超时时间:</strong></div>
+                        <div class="col-sm-9" th:text="${tool.timeout} + '秒'">30秒</div>
+                    </div>
+                    <div class="row mb-3" th:if="${tool.retryCount != null and tool.retryCount > 0}">
+                        <div class="col-sm-3"><strong>重试次数:</strong></div>
+                        <div class="col-sm-9" th:text="${tool.retryCount} + '次'">3次</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 请求头 -->
+            <div class="info-card card" th:if="${tool.headers}">
+                <div class="card-header">
+                    <i class="fas fa-list me-2"></i>请求头
+                </div>
+                <div class="card-body">
+                    <div class="json-display" th:text="${tool.headers}">{"Content-Type": "application/json"}</div>
+                </div>
+            </div>
+
+            <!-- 请求参数 -->
+            <div class="info-card card" th:if="${tool.parameters}">
+                <div class="card-header">
+                    <i class="fas fa-sliders-h me-2"></i>请求参数
+                </div>
+                <div class="card-body">
+                    <div class="json-display" th:text="${tool.parameters}">{"param1": "value1"}</div>
+                </div>
+            </div>
+
+            <!-- 请求体 -->
+            <div class="info-card card" th:if="${tool.requestBody}">
+                <div class="card-header">
+                    <i class="fas fa-file-code me-2"></i>请求体
+                </div>
+                <div class="card-body">
+                    <div class="json-display" th:text="${tool.requestBody}">{"key": "value"}</div>
+                </div>
+            </div>
+
+            <!-- 测试结果 -->
+            <div class="test-result" id="testResult">
+                <h5><i class="fas fa-flask me-2"></i>测试结果</h5>
+                <div id="testContent"></div>
+            </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="col-lg-4">
+            <div class="info-card card sidebar-card">
+                <div class="card-header">
+                    <i class="fas fa-info me-2"></i>基本信息
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">工具ID</small>
+                        <div th:text="${tool.id}">1</div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">创建时间</small>
+                        <div th:text="${#temporals.format(tool.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
+                        </div>
+                    </div>
+                    <div class="mb-3" th:if="${tool.updatedAt}">
+                        <small class="text-muted">更新时间</small>
+                        <div th:text="${#temporals.format(tool.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">状态</small>
+                        <div>
+                                <span class="badge"
+                                      th:classappend="${tool.status == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
+                                      th:text="${tool.status == 'ACTIVE' ? '启用' : '禁用'}">启用</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 标签 -->
+            <div class="info-card card" th:if="${tool.tags}">
+                <div class="card-header">
+                    <i class="fas fa-tags me-2"></i>标签
+                </div>
+                <div class="card-body">
+                    <div class="d-inline-block" th:each="tag : ${#strings.listSplit(tool.tags, ',')}">
+                        <span class="badge bg-secondary me-1 mb-1" th:text="${#strings.trim(tag)}">标签</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-tools me-2"></i>操作
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="testTool()" type="button">
+                            <i class="fas fa-play me-2"></i>测试工具
+                        </button>
+                        <a class="btn btn-outline-secondary" th:href="@{/origin-tools/{id}/edit(id=${tool.id})}">
+                            <i class="fas fa-edit me-2"></i>编辑工具
+                        </a>
+                        <button class="btn btn-outline-danger" data-bs-target="#deleteModal"
+                                data-bs-toggle="modal" type="button">
+                            <i class="fas fa-trash me-2"></i>删除工具
+                        </button>
+                        <a class="btn btn-outline-primary" href="/origin-tools">
+                            <i class="fas fa-arrow-left me-2"></i>返回列表
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除工具 "<span th:text="${tool.name}">工具名称</span>" 吗？</p>
+                <p class="text-danger">此操作不可撤销！</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+                <form method="post" style="display: inline;" th:action="@{/origin-tools/{id}/delete(id=${tool.id})}">
+                    <button class="btn btn-danger" type="submit">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+    // 测试工具功能
+    function testTool() {
+        const testResult = document.getElementById('testResult');
+        const testContent = document.getElementById('testContent');
+
+        // 显示加载状态
+        testResult.className = 'test-result';
+        testResult.style.display = 'block';
+        testContent.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>正在测试工具...';
+
+        // 构建测试请求
+        const toolData = {
+            method: /*[[${tool.method}]]*/ 'GET',
+            url: /*[[${tool.url}]]*/ 'http://example.com',
+            headers: /*[[${tool.headers}]]*/ '{}',
+            parameters: /*[[${tool.parameters}]]*/ '{}',
+            requestBody: /*[[${tool.requestBody}]]*/ '{}'
+        };
+
+        // 发送测试请求
+        fetch('/api/origin-tools/test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(toolData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    testResult.className = 'test-result test-success';
+                    testContent.innerHTML = `
+                        <strong>测试成功！</strong><br>
+                        <strong>响应状态:</strong> ${data.status}<br>
+                        <strong>响应时间:</strong> ${data.responseTime}ms<br>
+                        <strong>响应内容:</strong><br>
+                        <pre class="mt-2">${JSON.stringify(data.response, null, 2)}</pre>
+                    `;
+                } else {
+                    testResult.className = 'test-result test-error';
+                    testContent.innerHTML = `
+                        <strong>测试失败！</strong><br>
+                        <strong>错误信息:</strong> ${data.error}<br>
+                        ${data.details ? '<strong>详细信息:</strong> ' + data.details : ''}
+                    `;
+                }
+            })
+            .catch(error => {
+                testResult.className = 'test-result test-error';
+                testContent.innerHTML = `
+                    <strong>测试失败！</strong><br>
+                    <strong>错误信息:</strong> ${error.message}
+                `;
+            });
+    }
+
+    // 格式化JSON显示
+    document.addEventListener('DOMContentLoaded', function () {
+        const jsonDisplays = document.querySelectorAll('.json-display');
+        jsonDisplays.forEach(display => {
+            try {
+                const json = JSON.parse(display.textContent);
+                display.textContent = JSON.stringify(json, null, 2);
+            } catch (error) {
+                // 如果不是有效的JSON，保持原样
+            }
+        });
+    });
+</script>
+</body>
+</html>

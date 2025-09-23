@@ -1,16 +1,10 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://192.168.248.208:3306/mcp_registry?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
-    initialization-mode: always
-    continue-on-error: true
-    schema:
-      - "classpath:db/schema.sql"
-    data:
-      - "classpath:db/data.sql"
     hikari:
       minimum-idle: 5
       connection-test-query: SELECT 1
@@ -20,10 +14,34 @@ spring:
       pool-name: WindMcpRegistryHikariCP
       max-lifetime: 60000
       connection-timeout: 30000
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  # Redis配置
+  redis:
+    host: 192.168.248.208
+    port: 6379
+    database: 0
+    timeout: 5000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+  # Flyway配置
+  flyway:
+    enabled: true
+    # 迁移前校验 SQL 文件是否存在问题
+    validate-on-migrate: false
+    # 生产环境一定要关闭
+    clean-disabled: false
+    # 校验路径下是否存在 SQL 文件
+    # 最开始已经存在表结构，且不存在 flyway_schema_history 表时，需要设置为 true
+    baseline-on-migrate: true
+    # 基础版本 0
+    baseline-version: 0
+    fail-on-missing-locations: false
+  sql:
+    init:
+      mode: always
 logging:
   level:
     cn.com.wind.mcp.registry: debug
@@ -46,7 +64,7 @@ mybatis-plus:
       #逻辑删除配置
       #logic-delete-value: 1
       #logic-not-delete-value: 0
-      db-type: h2
+      db-type: mysql
     #刷新mapper 调试神器
     refresh: true
   # 原生配置

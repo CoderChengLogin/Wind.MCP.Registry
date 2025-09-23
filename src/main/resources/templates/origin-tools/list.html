@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>原始HTTP工具列表 - MCP工具注册中心</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .card {
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .tool-card {
+            border-left: 4px solid #28a745;
+        }
+
+        .search-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mcp-tools">MCP工具</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/origin-tools">原始HTTP工具</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item active">原始HTTP工具</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题和操作 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-globe me-2"></i>原始HTTP工具</h1>
+        <a class="btn btn-success" href="/origin-tools/new">
+            <i class="fas fa-plus me-2"></i>添加新工具
+        </a>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-box">
+        <form action="/origin-tools" method="get">
+            <div class="row">
+                <div class="col-md-4">
+                    <input class="form-control" name="name" placeholder="工具名称" th:value="${param.name}" type="text">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="method">
+                        <option value="">所有方法</option>
+                        <option th:selected="${param.method == 'GET'}" value="GET">GET</option>
+                        <option th:selected="${param.method == 'POST'}" value="POST">POST</option>
+                        <option th:selected="${param.method == 'PUT'}" value="PUT">PUT</option>
+                        <option th:selected="${param.method == 'DELETE'}" value="DELETE">DELETE</option>
+                        <option th:selected="${param.method == 'PATCH'}" value="PATCH">PATCH</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input class="form-control" name="url" placeholder="URL地址" th:value="${param.url}" type="text">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" type="submit">
+                        <i class="fas fa-search me-2"></i>搜索
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 工具列表 -->
+    <div class="row" th:if="${not #lists.isEmpty(tools)}">
+        <div class="col-md-6 col-lg-4 mb-4" th:each="tool : ${tools}">
+            <div class="card tool-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0" th:text="${tool.name}">工具名称</h5>
+                        <span class="badge bg-success" th:text="${tool.method}">GET</span>
+                    </div>
+                    <p class="card-text text-muted small mb-2" th:text="${tool.url}">http://example.com/api</p>
+                    <p class="card-text" th:text="${#strings.abbreviate(tool.description, 100)}">工具描述...</p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            <span th:text="${#temporals.format(tool.createdAt, 'yyyy-MM-dd')}">2024-01-01</span>
+                        </small>
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-primary" th:href="@{/origin-tools/{id}(id=${tool.id})}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn btn-outline-secondary" th:href="@{/origin-tools/{id}/edit(id=${tool.id})}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-outline-danger" data-bs-target="#deleteModal"
+                                    data-bs-toggle="modal" th:data-tool-id="${tool.id}"
+                                    th:data-tool-name="${tool.name}" type="button">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 空状态 -->
+    <div class="text-center py-5" th:if="${#lists.isEmpty(tools)}">
+        <i class="fas fa-globe fa-4x text-muted mb-3"></i>
+        <h3 class="text-muted">暂无原始HTTP工具</h3>
+        <p class="text-muted">开始添加您的第一个HTTP工具吧！</p>
+        <a class="btn btn-success" href="/origin-tools/new">
+            <i class="fas fa-plus me-2"></i>添加新工具
+        </a>
+    </div>
+
+    <!-- 分页 -->
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/origin-tools(page=${currentPage - 1}, name=${param.name}, method=${param.method}, url=${param.url})}">上一页</a>
+            </li>
+            <li class="page-item" th:classappend="${i == currentPage} ? 'active'"
+                th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a class="page-link"
+                   th:href="@{/origin-tools(page=${i}, name=${param.name}, method=${param.method}, url=${param.url})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/origin-tools(page=${currentPage + 1}, name=${param.name}, method=${param.method}, url=${param.url})}">下一页</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除工具 "<span id="deleteToolName"></span>" 吗？</p>
+                <p class="text-danger">此操作不可撤销！</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button class="btn btn-danger" type="submit">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 删除确认模态框处理
+    document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const toolId = button.getAttribute('data-tool-id');
+        const toolName = button.getAttribute('data-tool-name');
+
+        document.getElementById('deleteToolName').textContent = toolName;
+        document.getElementById('deleteForm').action = '/origin-tools/' + toolId + '/delete';
+    });
+</script>
+</body>
+</html>

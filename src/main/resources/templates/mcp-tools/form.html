@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${tool.id != null ? '编辑工具' : '添加工具'} + ' - MCP工具注册中心'">添加工具 - MCP工具注册中心</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">
+                        <i class="fas fa-home me-1"></i>首页
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/mcp-tools}">
+                        <i class="fas fa-cogs me-1"></i>MCP工具
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/origin-http-tools}">
+                        <i class="fas fa-globe me-1"></i>HTTP工具
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}">
+                        <i class="fas fa-info-circle me-1"></i>关于
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 主要内容区域 -->
+<main class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/mcp-tools}">MCP工具</a></li>
+            <li class="breadcrumb-item active" th:text="${tool.id != null ? '编辑工具' : '添加工具'}">添加工具</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-cogs me-2"></i>
+            <span th:text="${tool.id != null ? '编辑工具' : '添加工具'}">添加工具</span>
+        </h1>
+        <a class="btn btn-outline-secondary" th:href="@{/mcp-tools}">
+            <i class="fas fa-arrow-left me-1"></i>返回列表
+        </a>
+    </div>
+
+    <!-- 工具表单 -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" th:action="@{/mcp-tools/save}" th:object="${tool}">
+                        <input th:field="*{id}" type="hidden">
+
+                        <!-- 基础信息 -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>基础信息</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolNum">工具编号 <span class="text-danger">*</span></label>
+                                        <input class="form-control" id="toolNum" placeholder="请输入工具编号" required
+                                               th:field="*{id}" type="number">
+                                        <div class="form-text">唯一标识工具的编号</div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolVersion">工具版本 <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control" id="toolVersion" placeholder="请输入版本号，如：1.0.0"
+                                               required
+                                               th:field="*{toolVersion}" type="text">
+                                        <div class="form-text">工具的版本号</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolName">工具英文名 <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control" id="toolName" placeholder="请输入工具英文名称" required
+                                               th:field="*{name}" type="text">
+                                        <div class="form-text">工具的英文标识名称</div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolType">工具类型</label>
+                                        <select class="form-select" id="toolType" th:field="*{type}">
+                                            <option value="">请选择工具类型</option>
+                                            <option value="HTTP">HTTP工具</option>
+                                            <option value="DATABASE">数据库工具</option>
+                                            <option value="FILE">文件工具</option>
+                                            <option value="SYSTEM">系统工具</option>
+                                            <option value="NETWORK">网络工具</option>
+                                            <option value="SECURITY">安全工具</option>
+                                            <option value="DEVELOPMENT">开发工具</option>
+                                            <option value="MONITORING">监控工具</option>
+                                            <option value="OTHER">其他</option>
+                                        </select>
+                                        <div class="form-text">选择工具的分类类型</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolStatus">工具状态</label>
+                                        <select class="form-select" id="toolStatus" th:field="*{status}">
+                                            <option value="">请选择状态</option>
+                                            <option value="ACTIVE">活跃</option>
+                                            <option value="INACTIVE">非活跃</option>
+                                            <option value="DEPRECATED">已弃用</option>
+                                            <option value="BETA">测试版</option>
+                                            <option value="ALPHA">内测版</option>
+                                        </select>
+                                        <div class="form-text">工具的当前状态</div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolAuthor">工具作者</label>
+                                        <input class="form-control" id="toolAuthor" placeholder="请输入作者名称"
+                                               th:field="*{author}"
+                                               type="text">
+                                        <div class="form-text">工具的开发者或维护者</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="toolDesc">工具描述</label>
+                                    <textarea class="form-control" id="toolDesc" placeholder="请输入工具的详细描述"
+                                              rows="3" th:field="*{description}"></textarea>
+                                    <div class="form-text">详细描述工具的功能和用途</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 多语言显示 -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-language me-2"></i>多语言显示</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="nameDisplay">显示名称（多语言）</label>
+                                    <textarea class="form-control" id="nameDisplay"
+                                              placeholder='{"zh": "中文名称", "en": "English Name"}'
+                                              rows="3" th:field="*{nameDisplay}"></textarea>
+                                    <div class="form-text">JSON格式的多语言名称配置</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="descriptionDisplay">显示描述（多语言）</label>
+                                    <textarea class="form-control" id="descriptionDisplay"
+                                              placeholder='{"zh": "中文描述", "en": "English Description"}'
+                                              rows="4" th:field="*{descriptionDisplay}"></textarea>
+                                    <div class="form-text">JSON格式的多语言描述配置</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schema定义 -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-code me-2"></i>Schema定义</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="inputSchema">输入Schema</label>
+                                    <textarea class="form-control" id="inputSchema"
+                                              placeholder="请输入符合JSON Schema规范的输入定义"
+                                              rows="6" th:field="*{inputSchema}"></textarea>
+                                    <div class="form-text">定义工具输入参数的JSON Schema</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="outputSchema">输出Schema</label>
+                                    <textarea class="form-control" id="outputSchema" placeholder="请输入输出数据的Schema定义"
+                                              rows="6" th:field="*{outputSchema}"></textarea>
+                                    <div class="form-text">定义工具输出数据的Schema</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="streamOutput">输出类型</label>
+                                    <select class="form-select" id="streamOutput" th:field="*{streamOutput}">
+                                        <option value="0">非流式输出</option>
+                                        <option value="1">流式输出</option>
+                                    </select>
+                                    <div class="form-text">选择工具的输出方式</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 工具配置 -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>工具配置</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="toolConfig">工具配置</label>
+                                    <textarea class="form-control" id="toolConfig" placeholder="请输入JSON格式的工具配置"
+                                              rows="5" th:field="*{config}"></textarea>
+                                    <div class="form-text">工具运行时的配置参数</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 作者和链接信息 -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-user me-2"></i>作者和链接信息</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolAuthor">工具作者</label>
+                                        <input class="form-control" id="toolAuthor" placeholder="请输入作者名称"
+                                               th:field="*{author}"
+                                               type="text">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="toolUrl">工具URL</label>
+                                        <input class="form-control" id="toolUrl" placeholder="https://example.com"
+                                               th:field="*{url}"
+                                               type="url">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="toolTags">工具标签</label>
+                                    <input class="form-control" id="toolTags"
+                                           placeholder="用逗号分隔多个标签，例如: api,utility,converter" th:field="*{tags}"
+                                           type="text">
+                                    <div class="form-text">多个标签请用逗号分隔</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="toolDoc">工具文档</label>
+                                    <textarea class="form-control" id="toolDoc" placeholder="请输入工具使用文档"
+                                              rows="4" th:field="*{documentation}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a class="btn btn-secondary" th:href="@{/mcp-tools}">
+                                <i class="fas fa-times me-1"></i>取消
+                            </a>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-save me-1"></i>
+                                <span th:text="${tool.id != null ? '更新' : '保存'}">保存</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 表单验证
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // JSON配置验证
+    function validateJsonField(fieldId) {
+        var field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('blur', function () {
+                var content = this.value.trim();
+                if (content && content !== '') {
+                    try {
+                        JSON.parse(content);
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } catch (e) {
+                        this.classList.remove('is-valid');
+                        this.classList.add('is-invalid');
+                    }
+                } else {
+                    this.classList.remove('is-invalid', 'is-valid');
+                }
+            });
+        }
+    }
+
+    // 为所有JSON字段添加验证
+    validateJsonField('toolConfig');
+    validateJsonField('nameDisplay');
+    validateJsonField('descriptionDisplay');
+    validateJsonField('inputSchema');
+    validateJsonField('outputSchema');
+</script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package cn.com.wind.mcp.registry;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @date Created in 2018-11-08 16:48
  */
 @SpringBootApplication
+@MapperScan("cn.com.wind.mcp.registry.mapper")
 public class WindMcpRegistryApplication {
 
     /**
