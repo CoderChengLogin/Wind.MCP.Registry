@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>工具录入向导 - MCP工具注册中心</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+    </div>
+</nav>
+
+<!-- 主要内容区域 -->
+<main class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item active">工具录入向导</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">
+            <i class="fas fa-magic text-primary me-2"></i>工具录入向导
+        </h1>
+        <a class="btn btn-outline-secondary" th:href="@{/}">
+            <i class="fas fa-arrow-left me-1"></i>返回首页
+        </a>
+    </div>
+
+    <!-- 流程说明 -->
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">
+            <i class="fas fa-info-circle me-2"></i>录入流程说明
+        </h4>
+        <p>为了确保工具信息的完整性和一致性，请按照以下顺序进行工具录入：</p>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-globe fa-3x text-success mb-3"></i>
+                    <h5>第一步：录入源工具</h5>
+                    <p class="text-muted">首先录入HTTP工具等源工具信息，这是其他步骤的基础。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+                    <h5>第二步：创建工具信息</h5>
+                    <p class="text-muted">基于源工具创建MCP工具信息，建立工具间的关联关系。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-exchange-alt fa-3x text-warning mb-3"></i>
+                    <h5>第三步：设置转换模板</h5>
+                    <p class="text-muted">最后设置转换模板，定义源工具到MCP工具的转换规则。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 开始向导 -->
+    <div class="card">
+        <div class="card-body text-center">
+            <h3 class="card-title">准备开始录入工具？</h3>
+            <p class="card-text">点击下面的按钮开始工具录入向导，我们将引导您完成整个录入过程。</p>
+            <a class="btn btn-primary btn-lg" th:href="@{/tool-wizard/unified-add}">
+                <i class="fas fa-play me-2"></i>开始向导
+            </a>
+        </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-globe text-success me-2"></i>直接录入HTTP工具
+                    </h5>
+                    <p class="card-text">如果您只需要录入HTTP源工具，可以直接跳转到HTTP工具管理页面。</p>
+                    <a class="btn btn-success" th:href="@{/origin-http-tools/add}">
+                        <i class="fas fa-plus me-1"></i>录入HTTP工具
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="body">
+                    <h5 class="card-title">
+                        <i class="fas fa-list text-info me-2"></i>查看现有工具
+                    </h5>
+                    <p class="card-text">查看已录入的源工具，基于现有源工具创建MCP工具。</p>
+                    <a class="btn btn-info" th:href="@{/origin-http-tools}">
+                        <i class="fas fa-eye me-1"></i>查看HTTP工具
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 页脚 -->
+<footer class="bg-light mt-5 py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>MCP工具注册中心</h5>
+                <p class="text-muted">统一管理和注册MCP工具的平台</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-muted">
+                    &copy; 2024 MCP工具注册中心. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 自定义JS -->
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

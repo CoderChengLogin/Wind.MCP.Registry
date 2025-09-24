@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>一体化工具录入 - MCP工具注册中心</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+    </div>
+</nav>
+
+<!-- 主要内容区域 -->
+<main class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/tool-wizard}">工具录入向导</a></li>
+            <li class="breadcrumb-item active">一体化工具录入</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">
+            <i class="fas fa-magic text-primary me-2"></i>一体化工具录入
+        </h1>
+        <a class="btn btn-outline-secondary" th:href="@{/tool-wizard}">
+            <i class="fas fa-arrow-left me-1"></i>返回向导首页
+        </a>
+    </div>
+
+    <!-- 进度指示器 -->
+    <div class="progress-container mb-4">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="progress-step active" id="step1-indicator">
+                    <div class="step-circle">1</div>
+                    <div class="step-title">源工具录入</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="progress-step" id="step2-indicator">
+                    <div class="step-circle">2</div>
+                    <div class="step-title">工具信息</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="progress-step" id="step3-indicator">
+                    <div class="step-circle">3</div>
+                    <div class="step-title">转换模板</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 表单 -->
+    <form id="unifiedForm" method="post" th:action="@{/tool-wizard/save-unified}">
+
+        <!-- ===== 第一部分：源工具录入 (HTTP工具) ===== -->
+        <div class="card mb-4" id="section1">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-globe me-2"></i>第一步：源工具录入 (HTTP工具)
+                </h5>
+                <small>请填写HTTP工具的基本信息</small>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">工具名称 <span class="text-danger">*</span></label>
+                            <input class="form-control" id="httpToolName" name="httpToolName" placeholder="请输入HTTP工具名称"
+                                   required type="text">
+                            <div class="form-text">工具的标识名称，用于系统识别</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">API地址 <span class="text-danger">*</span></label>
+                            <input class="form-control" id="httpToolUrl" name="httpToolUrl"
+                                   placeholder="https://api.example.com/endpoint"
+                                   required type="url">
+                            <div class="form-text">完整的API调用地址</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">请求方法 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="httpMethod" name="httpMethod" required>
+                                <option value="">请选择请求方法</option>
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                                <option value="PATCH">PATCH</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">请求头信息</label>
+                            <textarea class="form-control" id="httpHeaders" name="httpHeaders"
+                                      placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token"}'
+                                      rows="3"></textarea>
+                            <div class="form-text">JSON格式的请求头信息（可选）</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">请求参数</label>
+                            <textarea class="form-control" id="httpParams" name="httpParams"
+                                      placeholder='{"param1": "value1", "param2": "value2"}'
+                                      rows="4"></textarea>
+                            <div class="form-text">JSON格式的请求参数（可选）</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">工具描述 <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="httpDescription" name="httpDescription"
+                                      placeholder="请描述这个HTTP工具的功能和用途"
+                                      required rows="4"></textarea>
+                            <div class="form-text">详细说明工具的功能和使用场景</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第一部分完成提示 -->
+                <div class="alert alert-success" id="section1-completed" style="display: none;">
+                    <i class="fas fa-check-circle me-2"></i>源工具信息录入完成！现在可以继续填写工具信息。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 第二部分：MCP工具信息 ===== -->
+        <div class="card mb-4 section-locked" id="section2">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-cogs me-2"></i>第二步：MCP工具信息
+                    <span class="badge bg-warning ms-2" id="section2-lock">
+                        <i class="fas fa-lock"></i> 请先完成源工具录入
+                    </span>
+                </h5>
+                <small>基于源工具创建MCP工具信息</small>
+            </div>
+            <div class="card-body section-content-locked" style="opacity: 0.5; pointer-events: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">工具英文名 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="mcpToolEnglishName" name="mcpToolEnglishName"
+                                   placeholder="tool_english_name" required type="text">
+                            <div class="form-text">英文标识名称，用于MCP协议识别</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">工具中文名</label>
+                            <input class="form-control" disabled id="mcpToolChineseName" name="mcpToolChineseName"
+                                   placeholder="工具的中文名称" type="text">
+                            <div class="form-text">便于理解的中文名称（可选）</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">工具类型 <span class="text-danger">*</span></label>
+                            <select class="form-select" disabled id="mcpToolType" name="mcpToolType" required>
+                                <option value="">请选择工具类型</option>
+                                <option value="HTTP工具">HTTP工具</option>
+                                <option value="数据库工具">数据库工具</option>
+                                <option value="文件工具">文件工具</option>
+                                <option value="系统工具">系统工具</option>
+                                <option value="网络工具">网络工具</option>
+                                <option value="安全工具">安全工具</option>
+                                <option value="开发工具">开发工具</option>
+                                <option value="监控工具">监控工具</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">工具用法 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="mcpToolUsage" name="mcpToolUsage"
+                                   placeholder="tool_name(param1, param2)" required type="text">
+                            <div class="form-text">MCP工具的调用语法</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label required">工具描述 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" disabled id="mcpToolDescription" name="mcpToolDescription"
+                              placeholder="详细描述MCP工具的功能和用途" required rows="3"></textarea>
+                    <div class="form-text">用于MCP协议的工具说明</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">参数说明</label>
+                            <textarea class="form-control" disabled id="mcpToolParameters" name="mcpToolParameters"
+                                      placeholder="param1: 参数1说明&#10;param2: 参数2说明" rows="4"></textarea>
+                            <div class="form-text">每个参数的详细说明（可选）</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">返回值说明</label>
+                            <textarea class="form-control" disabled id="mcpToolReturns" name="mcpToolReturns"
+                                      placeholder="描述工具执行后的返回结果格式和含义" rows="4"></textarea>
+                            <div class="form-text">返回值的格式和含义说明（可选）</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">使用示例</label>
+                    <textarea class="form-control" disabled id="mcpToolExamples" name="mcpToolExamples"
+                              placeholder="提供一些使用示例，帮助用户理解工具用法" rows="4"></textarea>
+                    <div class="form-text">工具的使用示例和说明（可选）</div>
+                </div>
+
+                <!-- 第二部分完成提示 -->
+                <div class="alert alert-success" id="section2-completed" style="display: none;">
+                    <i class="fas fa-check-circle me-2"></i>MCP工具信息录入完成！现在可以继续设置转换模板。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 第三部分：转换模板设置 ===== -->
+        <div class="card mb-4 section-locked" id="section3">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-exchange-alt me-2"></i>第三步：转换模板设置
+                    <span class="badge bg-secondary ms-2" id="section3-lock">
+                        <i class="fas fa-lock"></i> 请先完成工具信息录入
+                    </span>
+                </h5>
+                <small>设置源工具到MCP工具的转换规则</small>
+            </div>
+            <div class="card-body section-content-locked" style="opacity: 0.5; pointer-events: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">模板名称 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="templateName" name="templateName"
+                                   placeholder="转换模板名称" required type="text">
+                            <div class="form-text">用于标识这个转换模板</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">映射规则</label>
+                            <textarea class="form-control" disabled id="mappingRules" name="mappingRules"
+                                      placeholder="描述参数映射和转换规则" rows="3"></textarea>
+                            <div class="form-text">参数映射和数据转换规则（可选）</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label required">模板内容 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" disabled id="templateContent" name="templateContent"
+                              placeholder="请输入转换模板的具体内容" required rows="8"></textarea>
+                    <div class="form-text">定义源工具如何转换为MCP工具的模板内容</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">模板描述</label>
+                    <textarea class="form-control" disabled id="templateDescription" name="templateDescription"
+                              placeholder="描述这个转换模板的作用和特点" rows="3"></textarea>
+                    <div class="form-text">模板的详细说明和使用场景（可选）</div>
+                </div>
+
+                <!-- 第三部分完成提示 -->
+                <div class="alert alert-success" id="section3-completed" style="display: none;">
+                    <i class="fas fa-check-circle me-2"></i>转换模板设置完成！所有信息已录入完整，可以保存了。
+                </div>
+            </div>
+        </div>
+
+        <!-- 保存按钮 -->
+        <div class="card">
+            <div class="card-body text-center">
+                <button class="btn btn-success btn-lg" disabled id="saveBtn" type="submit">
+                    <i class="fas fa-save me-2"></i>一键保存工具信息
+                </button>
+                <div class="form-text mt-2">
+                    <i class="fas fa-info-circle me-1"></i>
+                    请完成所有必填项后才能保存
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<!-- 页脚 -->
+<footer class="bg-light mt-5 py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>MCP工具注册中心</h5>
+                <p class="text-muted">统一管理和注册MCP工具的平台</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-muted">
+                    &copy; 2024 MCP工具注册中心. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 自定义JS -->
+<script th:src="@{/js/app.js}"></script>
+
+<!-- 页面专用样式 -->
+<style>
+    .progress-container {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+    }
+
+    .progress-step {
+        position: relative;
+    }
+
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #6c757d;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin: 0 auto 10px;
+        transition: all 0.3s ease;
+    }
+
+    .progress-step.active .step-circle {
+        background-color: #198754;
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.25);
+    }
+
+    .progress-step.completed .step-circle {
+        background-color: #0d6efd;
+    }
+
+    .step-title {
+        font-weight: 600;
+        color: #6c757d;
+        transition: color 0.3s ease;
+    }
+
+    .progress-step.active .step-title {
+        color: #198754;
+    }
+
+    .progress-step.completed .step-title {
+        color: #0d6efd;
+    }
+
+    .section-locked .card-header {
+        opacity: 0.7;
+    }
+
+    .required {
+        font-weight: 600;
+    }
+
+    .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    }
+
+    .section-content-locked {
+        transition: all 0.3s ease;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 10px;
+    }
+
+    #saveBtn {
+        min-width: 250px;
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    #saveBtn:enabled {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+</style>
+
+<!-- 页面专用JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 必填字段配置
+        const requiredFields = {
+            section1: ['httpToolName', 'httpToolUrl', 'httpMethod', 'httpDescription'],
+            section2: ['mcpToolEnglishName', 'mcpToolType', 'mcpToolUsage', 'mcpToolDescription'],
+            section3: ['templateName', 'templateContent']
+        };
+
+        // 检查每个部分的完成状态
+        function checkSectionCompletion(sectionId) {
+            const fields = requiredFields[sectionId];
+            return fields.every(fieldId => {
+                const field = document.getElementById(fieldId);
+                return field && field.value.trim() !== '';
+            });
+        }
+
+        // 解锁下一个部分
+        function unlockNextSection(currentSection) {
+            const nextSection = currentSection + 1;
+            if (nextSection <= 3) {
+                const nextSectionElement = document.getElementById(`section${nextSection}`);
+                const nextLockElement = document.getElementById(`section${nextSection}-lock`);
+                const nextContentElement = nextSectionElement.querySelector('.section-content-locked');
+                const nextIndicator = document.getElementById(`step${nextSection}-indicator`);
+
+                // 移除锁定状态
+                nextSectionElement.classList.remove('section-locked');
+                nextLockElement.style.display = 'none';
+                nextContentElement.style.opacity = '1';
+                nextContentElement.style.pointerEvents = 'auto';
+
+                // 启用字段
+                const fields = requiredFields[`section${nextSection}`];
+                fields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.disabled = false;
+                });
+
+                // 启用其他字段
+                const allInputs = nextSectionElement.querySelectorAll('input, textarea, select');
+                allInputs.forEach(input => input.disabled = false);
+
+                // 更新进度指示器
+                nextIndicator.classList.add('active');
+
+                // 显示完成提示
+                const completedAlert = document.getElementById(`section${currentSection}-completed`);
+                if (completedAlert) {
+                    completedAlert.style.display = 'block';
+                }
+
+                // 平滑滚动到下一部分
+                nextSectionElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+            }
+        }
+
+        // 检查是否可以启用保存按钮
+        function checkSaveButton() {
+            const allCompleted = Object.keys(requiredFields).every(section => checkSectionCompletion(section));
+            const saveBtn = document.getElementById('saveBtn');
+
+            if (allCompleted) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>一键保存工具信息';
+
+                // 显示最终完成提示
+                const section3Completed = document.getElementById('section3-completed');
+                if (section3Completed) {
+                    section3Completed.style.display = 'block';
+                }
+
+                // 更新所有进度指示器为完成状态
+                for (let i = 1; i <= 3; i++) {
+                    const indicator = document.getElementById(`step${i}-indicator`);
+                    indicator.classList.add('completed');
+                    indicator.classList.remove('active');
+                }
+            } else {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-lock me-2"></i>请完成所有必填项';
+            }
+        }
+
+        // 为所有输入字段添加事件监听器
+        const allInputs = document.querySelectorAll('input, textarea, select');
+        allInputs.forEach(input => {
+            input.addEventListener('input', function () {
+                // 检查当前字段所属的部分
+                let currentSection = 1;
+                if (this.name.startsWith('mcp')) currentSection = 2;
+                else if (this.name.startsWith('template')) currentSection = 3;
+
+                // 检查当前部分是否完成
+                if (checkSectionCompletion(`section${currentSection}`)) {
+                    // 如果当前部分完成，解锁下一部分
+                    if (currentSection < 3) {
+                        unlockNextSection(currentSection);
+                    }
+
+                    // 检查是否可以启用保存按钮
+                    checkSaveButton();
+                }
+            });
+        });
+
+        // 表单提交处理
+        document.getElementById('unifiedForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            // 显示保存中状态
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>保存中...';
+
+            // 发送数据到后端
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(data)
+            })
+                .then(response => response.text())
+                .then(result => {
+                    if (result === 'success') {
+                        saveBtn.innerHTML = '<i class="fas fa-check me-2"></i>保存成功！';
+                        saveBtn.classList.remove('btn-success');
+                        saveBtn.classList.add('btn-outline-success');
+
+                        // 显示成功提示
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-success alert-dismissible fade show';
+                        alert.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>保存成功！</strong> 工具信息已成功录入系统。
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                        document.querySelector('main').insertBefore(alert, document.querySelector('main').firstChild);
+
+                        // 3秒后跳转
+                        setTimeout(() => {
+                            window.location.href = '/mcp-tools';
+                        }, 3000);
+                    } else {
+                        throw new Error('保存失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>保存失败，请重试';
+                    saveBtn.classList.remove('btn-success');
+                    saveBtn.classList.add('btn-danger');
+                });
+        });
+    });
+</script>
+</body>
+</html>
