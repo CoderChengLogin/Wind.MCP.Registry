@@ -33,11 +33,11 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
         QueryWrapper<McpTool> queryWrapper = new QueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            queryWrapper.like("name", keyword)
+            queryWrapper.like("tool_name", keyword)
                 .or()
-                .like("description", keyword)
+                .like("tool_description", keyword)
                 .or()
-                .like("tags", keyword);
+                .like("name_display", keyword);
         }
 
         return list(queryWrapper);
@@ -54,18 +54,18 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
 
         // 设置唯一标识和其他元数据
         if (result.getUniqueId() != null) {
-            // 可以将唯一标识存储在配置字段中
-            String config = tool.getConfiguration();
-            if (config == null) {
-                config = "{\"uniqueId\":\"" + result.getUniqueId() + "\"}";
-            } else if (!config.contains("uniqueId")) {
+            // 可以将唯一标识存储在输入schema字段中作为元数据
+            String schema = tool.getInputSchema();
+            if (schema == null) {
+                schema = "{\"uniqueId\":\"" + result.getUniqueId() + "\"}";
+            } else if (!schema.contains("uniqueId")) {
                 // 简单地在JSON中添加uniqueId字段
-                config = config.replace("}", ",\"uniqueId\":\"" + result.getUniqueId() + "\"}");
-                if (config.startsWith(",")) {
-                    config = "{" + config.substring(1);
+                schema = schema.replace("}", ",\"uniqueId\":\"" + result.getUniqueId() + "\"}");
+                if (schema.startsWith(",")) {
+                    schema = "{" + schema.substring(1);
                 }
             }
-            tool.setConfiguration(config);
+            tool.setInputSchema(schema);
         }
 
         // 执行保存或更新

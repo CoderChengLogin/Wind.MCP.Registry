@@ -59,9 +59,14 @@
     <!-- 页面标题和操作 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-cogs me-2"></i>MCP工具列表</h1>
-        <a class="btn btn-primary" th:href="@{/mcp-tools/add}">
-            <i class="fas fa-plus me-1"></i>添加新工具
-        </a>
+        <div class="btn-group">
+            <a class="btn btn-success" th:href="@{/mcp-tools/wizard}">
+                <i class="fas fa-magic me-1"></i>分步向导添加
+            </a>
+            <a class="btn btn-primary" th:href="@{/mcp-tools/add}">
+                <i class="fas fa-plus me-1"></i>快速添加
+            </a>
+        </div>
     </div>
 
     <!-- 搜索框 -->

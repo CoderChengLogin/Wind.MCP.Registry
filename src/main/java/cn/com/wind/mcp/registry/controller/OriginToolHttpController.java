@@ -51,7 +51,7 @@ public class OriginToolHttpController {
         model.addAttribute("totalPages", result.getPages());
         model.addAttribute("totalRecords", result.getTotal());
 
-        return "origin-http-tools/list";
+        return "origin-tools/list";
     }
 
     /**
@@ -67,7 +67,7 @@ public class OriginToolHttpController {
         }
 
         model.addAttribute("tool", tool);
-        return "origin-http-tools/detail";
+        return "origin-tools/detail";
     }
 
     /**
@@ -76,7 +76,7 @@ public class OriginToolHttpController {
     @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("tool", new OriginToolHttp());
-        return "origin-http-tools/form";
+        return "origin-tools/form";
     }
 
     /**
@@ -92,7 +92,7 @@ public class OriginToolHttpController {
         }
 
         model.addAttribute("tool", tool);
-        return "origin-http-tools/form";
+        return "origin-tools/form";
     }
 
     /**
@@ -152,6 +152,6 @@ public class OriginToolHttpController {
         model.addAttribute("totalRecords", result.getTotal());
         model.addAttribute("keyword", keyword);
 
-        return "origin-http-tools/list";
+        return "origin-tools/list";
     }
 }

@@ -55,7 +55,6 @@ public class OriginToolHttp extends Model<OriginToolHttp> {
     /**
      * 提供者工具编号
      */
-    @TableField(exist = false)
     private Long providerToolNum;
 
     /**
@@ -102,6 +101,7 @@ public class OriginToolHttp extends Model<OriginToolHttp> {
     /**
      * 提供者ID
      */
+    @TableField(exist = false)
     private Long providerId;
 
     /**

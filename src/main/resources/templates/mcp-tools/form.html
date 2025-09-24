@@ -92,19 +92,17 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="toolNum">工具编号 <span class="text-danger">*</span></label>
-                                        <input class="form-control" id="toolNum" placeholder="请输入工具编号" required
-                                               th:field="*{id}" type="number">
-                                        <div class="form-text">唯一标识工具的编号</div>
+                                        <label class="form-label" for="toolNum">工具编号</label>
+                                        <input class="form-control" id="toolNum" placeholder="系统自动生成" readonly
+                                               th:field="*{toolNum}" type="number">
+                                        <div class="form-text">系统自动生成的唯一编号</div>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="toolVersion">工具版本 <span
-                                                class="text-danger">*</span></label>
-                                        <input class="form-control" id="toolVersion" placeholder="请输入版本号，如：1.0.0"
-                                               required
+                                        <label class="form-label" for="toolVersion">工具版本</label>
+                                        <input class="form-control" id="toolVersion" placeholder="系统自动生成" readonly
                                                th:field="*{toolVersion}" type="text">
-                                        <div class="form-text">工具的版本号</div>
+                                        <div class="form-text">系统自动生成的版本号</div>
                                     </div>
                                 </div>
 
@@ -113,13 +111,13 @@
                                         <label class="form-label" for="toolName">工具英文名 <span
                                                 class="text-danger">*</span></label>
                                         <input class="form-control" id="toolName" placeholder="请输入工具英文名称" required
-                                               th:field="*{name}" type="text">
+                                               th:field="*{toolName}" type="text">
                                         <div class="form-text">工具的英文标识名称</div>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label" for="toolType">工具类型</label>
-                                        <select class="form-select" id="toolType" th:field="*{type}">
+                                        <select class="form-select" id="toolType" th:field="*{toolType}">
                                             <option value="">请选择工具类型</option>
                                             <option value="HTTP">HTTP工具</option>
                                             <option value="DATABASE">数据库工具</option>
@@ -136,32 +134,29 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <!-- <div class="col-md-6 mb-3">
                                         <label class="form-label" for="toolStatus">工具状态</label>
-                                        <select class="form-select" id="toolStatus" th:field="*{status}">
+                                        <select class="form-select" id="toolStatus" th:field="*{valid}">
                                             <option value="">请选择状态</option>
-                                            <option value="ACTIVE">活跃</option>
-                                            <option value="INACTIVE">非活跃</option>
-                                            <option value="DEPRECATED">已弃用</option>
-                                            <option value="BETA">测试版</option>
-                                            <option value="ALPHA">内测版</option>
+                                            <option value="1">有效</option>
+                                            <option value="0">无效</option>
                                         </select>
                                         <div class="form-text">工具的当前状态</div>
-                                    </div>
+                                    </div> -->
 
-                                    <div class="col-md-6 mb-3">
+                                    <!-- <div class="col-md-6 mb-3">
                                         <label class="form-label" for="toolAuthor">工具作者</label>
                                         <input class="form-control" id="toolAuthor" placeholder="请输入作者名称"
                                                th:field="*{author}"
                                                type="text">
                                         <div class="form-text">工具的开发者或维护者</div>
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label" for="toolDesc">工具描述</label>
                                     <textarea class="form-control" id="toolDesc" placeholder="请输入工具的详细描述"
-                                              rows="3" th:field="*{description}"></textarea>
+                                              rows="3" th:field="*{toolDescription}"></textarea>
                                     <div class="form-text">详细描述工具的功能和用途</div>
                                 </div>
                             </div>

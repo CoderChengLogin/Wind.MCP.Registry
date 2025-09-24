@@ -4,6 +4,7 @@ package cn.com.wind.mcp.registry.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -65,6 +66,7 @@ public class VirtualServer extends Model<VirtualServer> {
     /**
      * 描述
      */
+    @TableField("`desc`")
     private String desc;
 
     /**

@@ -3,7 +3,16 @@ package cn.com.wind.mcp.registry.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import cn.com.wind.mcp.registry.dto.ToolWizardDto;
+import cn.com.wind.mcp.registry.entity.ExpoTemplateConverter;
+import cn.com.wind.mcp.registry.entity.HttpTemplateConverter;
 import cn.com.wind.mcp.registry.entity.McpTool;
+import cn.com.wind.mcp.registry.entity.OriginToolExpo;
+import cn.com.wind.mcp.registry.entity.OriginToolHttp;
+import cn.com.wind.mcp.registry.mapper.ExpoTemplateConverterMapper;
+import cn.com.wind.mcp.registry.mapper.HttpTemplateConverterMapper;
+import cn.com.wind.mcp.registry.mapper.OriginToolExpoMapper;
+import cn.com.wind.mcp.registry.mapper.OriginToolHttpMapper;
 import cn.com.wind.mcp.registry.service.McpToolService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -37,6 +46,18 @@ public class McpToolController {
 
     @Autowired
     private McpToolService mcpToolService;
+
+    @Autowired
+    private OriginToolExpoMapper originToolExpoMapper;
+
+    @Autowired
+    private OriginToolHttpMapper originToolHttpMapper;
+
+    @Autowired
+    private ExpoTemplateConverterMapper expoTemplateConverterMapper;
+
+    @Autowired
+    private HttpTemplateConverterMapper httpTemplateConverterMapper;
 
     /**
      * 工具列表页面
@@ -74,6 +95,14 @@ public class McpToolController {
     public String newForm(Model model) {
         model.addAttribute("tool", new McpTool());
         return "mcp-tools/form";
+    }
+
+    /**
+     * 分步向导添加工具页面
+     */
+    @GetMapping("/wizard")
+    public String wizardForm(Model model) {
+        return "mcp-tools/wizard";
     }
 
     /**
@@ -117,7 +146,9 @@ public class McpToolController {
 
         try {
             if (tool.getId() == null) {
-                // 新增
+                // 新增 - 自动生成工具编号和版本号
+                tool.setToolNum(System.currentTimeMillis()); // 使用时间戳作为工具编号
+                tool.setToolVersion(1L); // 默认版本为1
                 tool.setCreateTime(LocalDateTime.now());
                 tool.setCreateBy("system");
                 tool.setUpdateTime(LocalDateTime.now());
@@ -146,7 +177,9 @@ public class McpToolController {
 
         try {
             if (tool.getId() == null) {
-                // 新增
+                // 新增 - 自动生成工具编号和版本号
+                tool.setToolNum(System.currentTimeMillis()); // 使用时间戳作为工具编号
+                tool.setToolVersion(1L); // 默认版本为1
                 tool.setCreateTime(LocalDateTime.now());
                 tool.setCreateBy("system");
                 tool.setUpdateTime(LocalDateTime.now());
@@ -242,6 +275,108 @@ public class McpToolController {
         } catch (Exception e) {
             log.error("查找MCP工具失败", e);
             return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * 分步向导保存工具
+     */
+    @PostMapping("/wizard/save")
+    public String saveWizard(@ModelAttribute ToolWizardDto wizardDto) {
+        log.info("分步向导保存工具: {}", wizardDto);
+
+        try {
+            // 1. 保存原始工具
+            Long providerToolNum = System.currentTimeMillis(); // 生成提供者工具编号
+
+            if ("expo".equals(wizardDto.getToolType())) {
+                // 保存Expo工具
+                OriginToolExpo expoTool = new OriginToolExpo();
+                expoTool.setProviderToolNum(providerToolNum);
+                expoTool.setNameDisplay(wizardDto.getOriginTool().getName());
+                expoTool.setDescDisplay(wizardDto.getOriginTool().getDescription());
+                expoTool.setAppClass(wizardDto.getOriginTool().getAppClass());
+                expoTool.setCommandId(wizardDto.getOriginTool().getCommandId());
+                expoTool.setCreateTime(LocalDateTime.now());
+                expoTool.setCreateBy("system");
+                expoTool.setUpdateTime(LocalDateTime.now());
+                expoTool.setUpdateBy("system");
+
+                originToolExpoMapper.insert(expoTool);
+
+                // 保存Expo模板转换器
+                if (wizardDto.getConverter() != null) {
+                    ExpoTemplateConverter converter = new ExpoTemplateConverter();
+                    converter.setProviderToolNum(providerToolNum);
+                    converter.setToolVersion(1L);
+                    converter.setAppClass(wizardDto.getOriginTool().getAppClass());
+                    converter.setCommandId(wizardDto.getOriginTool().getCommandId());
+                    converter.setInputArgs(wizardDto.getConverter().getInputArgs());
+                    converter.setOutputArgs(wizardDto.getConverter().getOutputArgs());
+                    converter.setCreateTime(LocalDateTime.now());
+                    converter.setCreateBy("system");
+                    converter.setUpdateTime(LocalDateTime.now());
+                    converter.setUpdateBy("system");
+
+                    expoTemplateConverterMapper.insert(converter);
+                }
+
+            } else if ("http".equals(wizardDto.getToolType())) {
+                // 保存HTTP工具
+                OriginToolHttp httpTool = new OriginToolHttp();
+                httpTool.setProviderToolNum(providerToolNum);
+                httpTool.setNameDisplay(wizardDto.getOriginTool().getName());
+                httpTool.setDescDisplay(wizardDto.getOriginTool().getDescription());
+                httpTool.setReqUrl(wizardDto.getOriginTool().getUrl());
+                httpTool.setReqMethod(wizardDto.getOriginTool().getMethod());
+                httpTool.setReqHeaders(wizardDto.getOriginTool().getHeaders());
+                httpTool.setCreateTime(LocalDateTime.now());
+                httpTool.setCreateBy("system");
+                httpTool.setUpdateTime(LocalDateTime.now());
+                httpTool.setUpdateBy("system");
+
+                originToolHttpMapper.insert(httpTool);
+
+                // 保存HTTP模板转换器
+                if (wizardDto.getConverter() != null) {
+                    HttpTemplateConverter converter = new HttpTemplateConverter();
+                    converter.setToolNum(providerToolNum);
+                    converter.setProviderToolNum(providerToolNum);
+                    converter.setReqUrl(wizardDto.getOriginTool().getUrl());
+                    converter.setReqMethod(wizardDto.getOriginTool().getMethod());
+                    converter.setReqHeaders(wizardDto.getConverter().getInputSchema());
+                    converter.setReqBody(wizardDto.getConverter().getOutputSchema());
+                    converter.setRespBody(wizardDto.getConverter().getOutputSchema());
+                    converter.setCreateTime(LocalDateTime.now());
+                    converter.setCreateBy("system");
+                    converter.setUpdateTime(LocalDateTime.now());
+                    converter.setUpdateBy("system");
+
+                    httpTemplateConverterMapper.insert(converter);
+                }
+            }
+
+            // 2. 保存MCP工具
+            McpTool mcpTool = new McpTool();
+            mcpTool.setToolNum(System.currentTimeMillis()); // 生成工具编号
+            mcpTool.setToolVersion(1L); // 默认版本为1
+            mcpTool.setToolName(wizardDto.getMcpTool().getToolName());
+            mcpTool.setToolType(wizardDto.getMcpTool().getToolType());
+            mcpTool.setToolDescription(wizardDto.getMcpTool().getToolDescription());
+            mcpTool.setNameDisplay(wizardDto.getMcpTool().getNameDisplay());
+            mcpTool.setDescriptionDisplay(wizardDto.getMcpTool().getDescriptionDisplay());
+            mcpTool.setCreateTime(LocalDateTime.now());
+            mcpTool.setCreateBy("system");
+            mcpTool.setUpdateTime(LocalDateTime.now());
+            mcpTool.setUpdateBy("system");
+
+            mcpToolService.saveOrUpdateWithValidation(mcpTool);
+
+            return "redirect:/mcp-tools?success=向导保存成功";
+
+        } catch (Exception e) {
+            log.error("分步向导保存工具失败", e);
+            return "redirect:/mcp-tools/wizard?error=" + e.getMessage();
         }
     }
 }

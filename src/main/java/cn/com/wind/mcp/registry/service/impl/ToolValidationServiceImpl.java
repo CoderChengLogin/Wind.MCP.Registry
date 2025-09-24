@@ -38,41 +38,40 @@ public class ToolValidationServiceImpl implements ToolValidationService {
     @Override
     public ValidationResult validateMcpTool(McpTool tool) {
         // 基本字段验证
-        if (StrUtil.isBlank(tool.getName())) {
+        if (StrUtil.isBlank(tool.getToolName())) {
             return new ValidationResult(false, "工具名称不能为空");
         }
 
-        if (!validateToolName(tool.getName())) {
+        if (!validateToolName(tool.getToolName())) {
             return new ValidationResult(false, "工具名称格式不正确，只允许字母、数字、连字符和下划线，长度3-50字符");
         }
 
-        if (StrUtil.isBlank(tool.getType())) {
+        if (StrUtil.isBlank(tool.getToolType())) {
             return new ValidationResult(false, "工具类型不能为空");
         }
 
-        if (StrUtil.isBlank(tool.getDescription())) {
+        if (StrUtil.isBlank(tool.getToolDescription())) {
             return new ValidationResult(false, "工具描述不能为空");
         }
 
-        if (tool.getDescription().length() < 10) {
+        if (tool.getToolDescription().length() < 10) {
             return new ValidationResult(false, "工具描述至少需要10个字符");
         }
 
-        if (tool.getDescription().length() > 2000) {
+        if (tool.getToolDescription().length() > 2000) {
             return new ValidationResult(false, "工具描述不能超过2000个字符");
         }
 
         // 版本验证
-        String version = StrUtil.isBlank(tool.getVersion()) ? "1.0.0" : tool.getVersion();
-        if (!validateVersion(version)) {
-            return new ValidationResult(false, "版本号格式不正确，请使用语义化版本格式 (如: 1.0.0)");
+        String version = tool.getToolVersion() == null ? "1" : tool.getToolVersion().toString();
+        if (tool.getToolVersion() == null) {
+            tool.setToolVersion(1L);
         }
-        tool.setVersion(version);
 
-        // 检查唯一性 (name + version)
+        // 检查唯一性 (toolName + toolVersion)
         QueryWrapper<McpTool> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("name", tool.getName())
-            .eq("version", version);
+        queryWrapper.eq("tool_name", tool.getToolName())
+            .eq("tool_version", tool.getToolVersion());
         if (tool.getId() != null) {
             queryWrapper.ne("id", tool.getId());
         }
@@ -83,7 +82,7 @@ public class ToolValidationServiceImpl implements ToolValidationService {
         }
 
         // 生成唯一标识
-        String uniqueId = generateUniqueIdentifier(tool.getName(), version, tool.getType());
+        String uniqueId = generateUniqueIdentifier(tool.getToolName(), version, tool.getToolType());
 
         return new ValidationResult(true, "验证通过", uniqueId);
     }
