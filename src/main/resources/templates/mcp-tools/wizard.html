@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>添加MCP工具 - 分步向导</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 1rem;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .step.active .step-number {
+            background: #0d6efd;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #198754;
+            color: white;
+        }
+
+        .step.pending .step-number {
+            background: #6c757d;
+            color: white;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">
+                        <i class="fas fa-home me-1"></i>首页
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/mcp-tools}">
+                        <i class="fas fa-cogs me-1"></i>MCP工具
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 主要内容区域 -->
+<main class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/mcp-tools}">MCP工具</a></li>
+            <li class="breadcrumb-item active">添加工具</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-magic me-2"></i>添加MCP工具 - 分步向导
+        </h1>
+        <a class="btn btn-outline-secondary" th:href="@{/mcp-tools}">
+            <i class="fas fa-arrow-left me-1"></i>返回列表
+        </a>
+    </div>
+
+    <!-- 步骤指示器 -->
+    <div class="step-indicator">
+        <div class="step active" id="step-1">
+            <div class="step-number">1</div>
+            <span>选择原始工具类型</span>
+        </div>
+        <i class="fas fa-arrow-right text-muted mx-2"></i>
+        <div class="step pending" id="step-2">
+            <div class="step-number">2</div>
+            <span>填写原始工具信息</span>
+        </div>
+        <i class="fas fa-arrow-right text-muted mx-2"></i>
+        <div class="step pending" id="step-3">
+            <div class="step-number">3</div>
+            <span>填写MCP工具信息</span>
+        </div>
+        <i class="fas fa-arrow-right text-muted mx-2"></i>
+        <div class="step pending" id="step-4">
+            <div class="step-number">4</div>
+            <span>配置模板转换器</span>
+        </div>
+    </div>
+
+    <!-- 表单内容 -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-body">
+                    <form id="wizard-form" method="post" th:action="@{/mcp-tools/wizard/save}">
+
+                        <!-- 步骤1: 选择原始工具类型 -->
+                        <div class="step-content active" id="step-content-1">
+                            <h4 class="mb-4"><i class="fas fa-layer-group me-2"></i>选择原始工具类型</h4>
+
+                            <div class="row justify-content-center">
+                                <div class="col-md-8">
+                                    <div class="mb-4">
+                                        <label class="form-label">工具类型 <span class="text-danger">*</span></label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card tool-type-card" data-type="expo">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-server fa-3x text-primary mb-3"></i>
+                                                        <h5>Expo工具</h5>
+                                                        <p class="text-muted">用于Expo应用的工具，支持应用级别的操作</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card tool-type-card" data-type="http">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-globe fa-3x text-success mb-3"></i>
+                                                        <h5>HTTP工具</h5>
+                                                        <p class="text-muted">基于HTTP协议的Web API工具</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input id="selectedToolType" name="toolType" type="hidden">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 步骤2: 填写原始工具信息 -->
+                        <div class="step-content" id="step-content-2">
+                            <h4 class="mb-4"><i class="fas fa-tools me-2"></i>原始工具信息</h4>
+
+                            <!-- Expo工具表单 -->
+                            <div id="expo-form" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="expo-name">工具名称 <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control" id="expo-name" name="originTool.name"
+                                               placeholder="请输入工具名称" type="text">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="expo-version">工具版本 <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control" id="expo-version" name="originTool.version"
+                                               placeholder="1.0.0" type="text">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="expo-app-class">应用类别</label>
+                                        <select class="form-select" id="expo-app-class" name="originTool.appClass">
+                                            <option value="">请选择应用类别</option>
+                                            <option value="1">Web应用</option>
+                                            <option value="2">移动应用</option>
+                                            <option value="3">桌面应用</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="expo-command-id">命令ID</label>
+                                        <input class="form-control" id="expo-command-id" name="originTool.commandId"
+                                               placeholder="100" type="number">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="expo-description">工具描述</label>
+                                    <textarea class="form-control" id="expo-description" name="originTool.description"
+                                              placeholder="请描述工具的功能..." rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- HTTP工具表单 -->
+                            <div id="http-form" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="http-name">工具名称 <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control" id="http-name" name="originTool.name"
+                                               placeholder="请输入工具名称" type="text">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="http-method">请求方法 <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" id="http-method" name="originTool.method">
+                                            <option value="">请选择请求方法</option>
+                                            <option value="GET">GET</option>
+                                            <option value="POST">POST</option>
+                                            <option value="PUT">PUT</option>
+                                            <option value="DELETE">DELETE</option>
+                                            <option value="PATCH">PATCH</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="http-url">请求URL <span
+                                            class="text-danger">*</span></label>
+                                    <input class="form-control" id="http-url" name="originTool.url"
+                                           placeholder="https://api.example.com/endpoint" type="url">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="http-headers">请求头</label>
+                                    <textarea class="form-control" id="http-headers" name="originTool.headers"
+                                              placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token"}'
+                                              rows="3"></textarea>
+                                    <div class="form-text">JSON格式的请求头配置</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="http-description">工具描述</label>
+                                    <textarea class="form-control" id="http-description" name="originTool.description"
+                                              placeholder="请描述工具的功能..." rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 步骤3: MCP工具信息 -->
+                        <div class="step-content" id="step-content-3">
+                            <h4 class="mb-4"><i class="fas fa-cogs me-2"></i>MCP工具信息</h4>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="mcp-tool-name">工具英文名 <span
+                                            class="text-danger">*</span></label>
+                                    <input class="form-control" id="mcp-tool-name" name="mcpTool.toolName"
+                                           placeholder="my_awesome_tool" type="text">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="mcp-tool-type">工具类型</label>
+                                    <select class="form-select" id="mcp-tool-type" name="mcpTool.toolType">
+                                        <option value="">请选择工具类型</option>
+                                        <option value="HTTP">HTTP工具</option>
+                                        <option value="DATABASE">数据库工具</option>
+                                        <option value="FILE">文件工具</option>
+                                        <option value="SYSTEM">系统工具</option>
+                                        <option value="OTHER">其他</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="mcp-tool-desc">工具描述</label>
+                                <textarea class="form-control" id="mcp-tool-desc" name="mcpTool.toolDescription"
+                                          placeholder="详细描述工具的功能和用途..." rows="3"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="mcp-name-display">显示名称（多语言）</label>
+                                <textarea class="form-control" id="mcp-name-display" name="mcpTool.nameDisplay"
+                                          placeholder='{"zh": "中文名称", "en": "English Name"}' rows="2"></textarea>
+                                <div class="form-text">JSON格式的多语言名称配置</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="mcp-desc-display">显示描述（多语言）</label>
+                                <textarea class="form-control" id="mcp-desc-display" name="mcpTool.descriptionDisplay"
+                                          placeholder='{"zh": "中文描述", "en": "English Description"}' rows="3"></textarea>
+                                <div class="form-text">JSON格式的多语言描述配置</div>
+                            </div>
+                        </div>
+
+                        <!-- 步骤4: 模板转换器配置 -->
+                        <div class="step-content" id="step-content-4">
+                            <h4 class="mb-4"><i class="fas fa-exchange-alt me-2"></i>模板转换器配置</h4>
+
+                            <div id="expo-converter-form" style="display: none;">
+                                <h5 class="mb-3">Expo模板转换器</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="expo-input-args">输入参数模板</label>
+                                        <textarea class="form-control" id="expo-input-args" name="converter.inputArgs"
+                                                  placeholder='{"param1": "{{value1}}", "param2": "{{value2}}"}'
+                                                  rows="4"></textarea>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="expo-output-args">输出参数模板</label>
+                                        <textarea class="form-control" id="expo-output-args" name="converter.outputArgs"
+                                                  placeholder='{"result": "{{output}}", "status": "{{status}}"}'
+                                                  rows="4"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="http-converter-form" style="display: none;">
+                                <h5 class="mb-3">HTTP模板转换器</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="http-input-schema">输入Schema</label>
+                                        <textarea class="form-control" id="http-input-schema"
+                                                  name="converter.inputSchema"
+                                                  placeholder='{"type": "object", "properties": {"name": {"type": "string"}}}'
+                                                  rows="6"></textarea>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="http-output-schema">输出Schema</label>
+                                        <textarea class="form-control" id="http-output-schema"
+                                                  name="converter.outputSchema"
+                                                  placeholder='{"type": "object", "properties": {"result": {"type": "string"}}}'
+                                                  rows="6"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 导航按钮 -->
+                        <div class="form-navigation">
+                            <button class="btn btn-secondary" id="prev-btn" style="display: none;" type="button">
+                                <i class="fas fa-arrow-left me-1"></i>上一步
+                            </button>
+                            <div class="ms-auto">
+                                <button class="btn btn-primary" id="next-btn" type="button">
+                                    下一步<i class="fas fa-arrow-right ms-1"></i>
+                                </button>
+                                <button class="btn btn-success" id="submit-btn" style="display: none;" type="submit">
+                                    <i class="fas fa-save me-1"></i>保存
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let currentStep = 1;
+    let totalSteps = 4;
+    let selectedToolType = '';
+
+    // 工具类型卡片点击事件
+    document.querySelectorAll('.tool-type-card').forEach(card => {
+        card.addEventListener('click', function () {
+            // 移除其他卡片的选中状态
+            document.querySelectorAll('.tool-type-card').forEach(c => c.classList.remove('border-primary'));
+
+            // 添加选中状态
+            this.classList.add('border-primary');
+
+            // 设置选中的工具类型
+            selectedToolType = this.dataset.type;
+            document.getElementById('selectedToolType').value = selectedToolType;
+
+            // 启用下一步按钮
+            document.getElementById('next-btn').disabled = false;
+        });
+    });
+
+    // 下一步按钮点击事件
+    document.getElementById('next-btn').addEventListener('click', function () {
+        if (validateCurrentStep()) {
+            nextStep();
+        }
+    });
+
+    // 上一步按钮点击事件
+    document.getElementById('prev-btn').addEventListener('click', function () {
+        prevStep();
+    });
+
+    function nextStep() {
+        if (currentStep < totalSteps) {
+            // 隐藏当前步骤
+            document.getElementById(`step-content-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${currentStep}`).classList.add('completed');
+
+            // 显示下一步
+            currentStep++;
+            document.getElementById(`step-content-${currentStep}`).classList.add('active');
+            document.getElementById(`step-${currentStep}`).classList.remove('pending');
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            // 根据步骤显示对应的表单
+            if (currentStep === 2) {
+                showOriginToolForm();
+            } else if (currentStep === 4) {
+                showConverterForm();
+            }
+
+            updateNavigationButtons();
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 1) {
+            // 隐藏当前步骤
+            document.getElementById(`step-content-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${currentStep}`).classList.add('pending');
+
+            // 显示上一步
+            currentStep--;
+            document.getElementById(`step-content-${currentStep}`).classList.add('active');
+            document.getElementById(`step-${currentStep}`).classList.remove('completed');
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            updateNavigationButtons();
+        }
+    }
+
+    function showOriginToolForm() {
+        if (selectedToolType === 'expo') {
+            document.getElementById('expo-form').style.display = 'block';
+            document.getElementById('http-form').style.display = 'none';
+        } else if (selectedToolType === 'http') {
+            document.getElementById('expo-form').style.display = 'none';
+            document.getElementById('http-form').style.display = 'block';
+        }
+    }
+
+    function showConverterForm() {
+        if (selectedToolType === 'expo') {
+            document.getElementById('expo-converter-form').style.display = 'block';
+            document.getElementById('http-converter-form').style.display = 'none';
+        } else if (selectedToolType === 'http') {
+            document.getElementById('expo-converter-form').style.display = 'none';
+            document.getElementById('http-converter-form').style.display = 'block';
+        }
+    }
+
+    function updateNavigationButtons() {
+        // 上一步按钮
+        if (currentStep > 1) {
+            document.getElementById('prev-btn').style.display = 'inline-block';
+        } else {
+            document.getElementById('prev-btn').style.display = 'none';
+        }
+
+        // 下一步/保存按钮
+        if (currentStep < totalSteps) {
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('submit-btn').style.display = 'none';
+        } else {
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+        }
+    }
+
+    function validateCurrentStep() {
+        switch (currentStep) {
+            case 1:
+                if (!selectedToolType) {
+                    alert('请选择工具类型');
+                    return false;
+                }
+                break;
+            case 2:
+                if (selectedToolType === 'expo') {
+                    if (!document.getElementById('expo-name').value) {
+                        alert('请输入工具名称');
+                        return false;
+                    }
+                } else if (selectedToolType === 'http') {
+                    if (!document.getElementById('http-name').value || !document.getElementById('http-method').value || !document.getElementById('http-url').value) {
+                        alert('请填写HTTP工具的必填信息');
+                        return false;
+                    }
+                }
+                break;
+            case 3:
+                if (!document.getElementById('mcp-tool-name').value) {
+                    alert('请输入MCP工具英文名');
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
+    // 初始化按钮状态
+    document.getElementById('next-btn').disabled = true;
+</script>
+</body>
+</html>
