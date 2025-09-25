@@ -133,7 +133,25 @@ public class McpToolController {
             return "redirect:/mcp-tools";
         }
 
+        // 查询关联的源工具信息
+        OriginToolHttp httpTool = null;
+        if (tool.getToolNum() != null) {
+            QueryWrapper<OriginToolHttp> httpWrapper = new QueryWrapper<>();
+            httpWrapper.eq("provider_tool_num", tool.getToolNum());
+            httpTool = originToolHttpMapper.selectOne(httpWrapper);
+        }
+
+        // 查询关联的转换模板信息
+        HttpTemplateConverter converter = null;
+        if (tool.getToolNum() != null) {
+            QueryWrapper<HttpTemplateConverter> converterWrapper = new QueryWrapper<>();
+            converterWrapper.eq("tool_num", tool.getToolNum());
+            converter = httpTemplateConverterMapper.selectOne(converterWrapper);
+        }
+
         model.addAttribute("tool", tool);
+        model.addAttribute("httpTool", httpTool);
+        model.addAttribute("converter", converter);
         return "mcp-tools/detail";
     }
 

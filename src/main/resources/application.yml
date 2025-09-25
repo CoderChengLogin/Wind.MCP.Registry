@@ -33,6 +33,11 @@ spring:
   sql:
     init:
       mode: always
+  # Thymeleaf配置
+  thymeleaf:
+    cache: false
+    mode: HTML
+    encoding: UTF-8
 logging:
   level:
     cn.com.wind.mcp.registry: debug

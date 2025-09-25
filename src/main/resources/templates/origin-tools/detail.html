@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title th:text="${tool.name} + ' - 工具详情 - MCP工具注册中心'">工具详情 - MCP工具注册中心</title>
+    <title th:text="${tool.nameDisplay} + ' - 工具详情 - MCP工具注册中心'">工具详情 - MCP工具注册中心</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
@@ -111,7 +111,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">首页</a></li>
             <li class="breadcrumb-item"><a href="/origin-tools">原始HTTP工具</a></li>
-            <li class="breadcrumb-item active" th:text="${tool.name}">工具名称</li>
+            <li class="breadcrumb-item active" th:text="${tool.nameDisplay}">工具名称</li>
         </ol>
     </nav>
 
@@ -121,19 +121,16 @@
             <div>
                 <h1 class="mb-2">
                     <i class="fas fa-globe me-2"></i>
-                    <span th:text="${tool.name}">工具名称</span>
+                    <span th:text="${tool.nameDisplay}">工具名称</span>
                     <span class="badge method-badge ms-2"
-                          th:classappend="${tool.method == 'GET' ? 'bg-primary' :
-                                             tool.method == 'POST' ? 'bg-success' : 
-                                             tool.method == 'PUT' ? 'bg-warning' : 
-                                             tool.method == 'DELETE' ? 'bg-danger' : 'bg-secondary'}"
-                          th:text="${tool.method}">GET</span>
-                    <span class="badge status-badge ms-2"
-                          th:classappend="${tool.status == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
-                          th:text="${tool.status == 'ACTIVE' ? '启用' : '禁用'}">启用</span>
+                          th:classappend="${tool.reqMethod == 'GET' ? 'bg-primary' :
+                                             tool.reqMethod == 'POST' ? 'bg-success' : 
+                                             tool.reqMethod == 'PUT' ? 'bg-warning' : 
+                                             tool.reqMethod == 'DELETE' ? 'bg-danger' : 'bg-secondary'}"
+                          th:text="${tool.reqMethod}">GET</span>
                 </h1>
-                <p class="mb-2 opacity-75" th:text="${tool.url}">http://example.com/api</p>
-                <p class="mb-0 opacity-75" th:text="${tool.description}">工具描述</p>
+                <p class="mb-2 opacity-75" th:text="${tool.reqUrl}">http://example.com/api</p>
+                <p class="mb-0 opacity-75" th:text="${tool.descDisplay}">工具描述</p>
             </div>
             <div class="text-end">
                 <a class="btn btn-light me-2" th:href="@{/origin-tools/{id}/edit(id=${tool.id})}">
@@ -150,12 +147,12 @@
         <!-- 主要内容 -->
         <div class="col-lg-8">
             <!-- 描述信息 -->
-            <div class="info-card card" th:if="${tool.description}">
+            <div class="info-card card" th:if="${tool.descDisplay}">
                 <div class="card-header">
                     <i class="fas fa-info-circle me-2"></i>工具描述
                 </div>
                 <div class="card-body">
-                    <p class="mb-0" th:text="${tool.description}">工具的详细描述信息</p>
+                    <p class="mb-0" th:text="${tool.descDisplay}">工具的详细描述信息</p>
                 </div>
             </div>
 
@@ -169,57 +166,49 @@
                         <div class="col-sm-3"><strong>请求方法:</strong></div>
                         <div class="col-sm-9">
                                 <span class="badge method-badge"
-                                      th:classappend="${tool.method == 'GET' ? 'bg-primary' : 
-                                                     tool.method == 'POST' ? 'bg-success' : 
-                                                     tool.method == 'PUT' ? 'bg-warning' : 
-                                                     tool.method == 'DELETE' ? 'bg-danger' : 'bg-secondary'}"
-                                      th:text="${tool.method}">GET</span>
+                                      th:classappend="${tool.reqMethod == 'GET' ? 'bg-primary' : 
+                                                     tool.reqMethod == 'POST' ? 'bg-success' : 
+                                                     tool.reqMethod == 'PUT' ? 'bg-warning' : 
+                                                     tool.reqMethod == 'DELETE' ? 'bg-danger' : 'bg-secondary'}"
+                                      th:text="${tool.reqMethod}">GET</span>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-3"><strong>URL地址:</strong></div>
                         <div class="col-sm-9">
-                            <code th:text="${tool.url}">http://example.com/api</code>
+                            <code th:text="${tool.reqUrl}">http://example.com/api</code>
                         </div>
-                    </div>
-                    <div class="row mb-3" th:if="${tool.timeout}">
-                        <div class="col-sm-3"><strong>超时时间:</strong></div>
-                        <div class="col-sm-9" th:text="${tool.timeout} + '秒'">30秒</div>
-                    </div>
-                    <div class="row mb-3" th:if="${tool.retryCount != null and tool.retryCount > 0}">
-                        <div class="col-sm-3"><strong>重试次数:</strong></div>
-                        <div class="col-sm-9" th:text="${tool.retryCount} + '次'">3次</div>
                     </div>
                 </div>
             </div>
 
             <!-- 请求头 -->
-            <div class="info-card card" th:if="${tool.headers}">
+            <div class="info-card card" th:if="${tool.reqHeaders}">
                 <div class="card-header">
                     <i class="fas fa-list me-2"></i>请求头
                 </div>
                 <div class="card-body">
-                    <div class="json-display" th:text="${tool.headers}">{"Content-Type": "application/json"}</div>
+                    <div class="json-display" th:text="${tool.reqHeaders}">{"Content-Type": "application/json"}</div>
                 </div>
             </div>
 
             <!-- 请求参数 -->
-            <div class="info-card card" th:if="${tool.parameters}">
+            <div class="info-card card" th:if="${tool.inputSchema}">
                 <div class="card-header">
                     <i class="fas fa-sliders-h me-2"></i>请求参数
                 </div>
                 <div class="card-body">
-                    <div class="json-display" th:text="${tool.parameters}">{"param1": "value1"}</div>
+                    <div class="json-display" th:text="${tool.inputSchema}">{"param1": "value1"}</div>
                 </div>
             </div>
 
             <!-- 请求体 -->
-            <div class="info-card card" th:if="${tool.requestBody}">
+            <div class="info-card card" th:if="${tool.outputSchema}">
                 <div class="card-header">
                     <i class="fas fa-file-code me-2"></i>请求体
                 </div>
                 <div class="card-body">
-                    <div class="json-display" th:text="${tool.requestBody}">{"key": "value"}</div>
+                    <div class="json-display" th:text="${tool.outputSchema}">{"key": "value"}</div>
                 </div>
             </div>
 
@@ -241,38 +230,23 @@
                         <small class="text-muted">工具ID</small>
                         <div th:text="${tool.id}">1</div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" th:if="${tool.createTime}">
                         <small class="text-muted">创建时间</small>
-                        <div th:text="${#temporals.format(tool.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
+                        <div th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
                         </div>
                     </div>
-                    <div class="mb-3" th:if="${tool.updatedAt}">
+                    <div class="mb-3" th:if="${tool.updateTime}">
                         <small class="text-muted">更新时间</small>
-                        <div th:text="${#temporals.format(tool.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
+                        <div th:text="${#temporals.format(tool.updateTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <small class="text-muted">状态</small>
-                        <div>
-                                <span class="badge"
-                                      th:classappend="${tool.status == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
-                                      th:text="${tool.status == 'ACTIVE' ? '启用' : '禁用'}">启用</span>
-                        </div>
+                    <div class="mb-3" th:if="${tool.providerToolNum}">
+                        <small class="text-muted">工具编号</small>
+                        <div th:text="${tool.providerToolNum}">123456789</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 标签 -->
-            <div class="info-card card" th:if="${tool.tags}">
-                <div class="card-header">
-                    <i class="fas fa-tags me-2"></i>标签
-                </div>
-                <div class="card-body">
-                    <div class="d-inline-block" th:each="tag : ${#strings.listSplit(tool.tags, ',')}">
-                        <span class="badge bg-secondary me-1 mb-1" th:text="${#strings.trim(tag)}">标签</span>
-                    </div>
-                </div>
-            </div>
 
             <!-- 操作按钮 -->
             <div class="info-card card">
@@ -310,7 +284,7 @@
                 <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-                <p>您确定要删除工具 "<span th:text="${tool.name}">工具名称</span>" 吗？</p>
+                <p>您确定要删除工具 "<span th:text="${tool.nameDisplay}">工具名称</span>" 吗？</p>
                 <p class="text-danger">此操作不可撤销！</p>
             </div>
             <div class="modal-footer">
@@ -339,11 +313,11 @@
 
         // 构建测试请求
         const toolData = {
-            method: /*[[${tool.method}]]*/ 'GET',
-            url: /*[[${tool.url}]]*/ 'http://example.com',
-            headers: /*[[${tool.headers}]]*/ '{}',
-            parameters: /*[[${tool.parameters}]]*/ '{}',
-            requestBody: /*[[${tool.requestBody}]]*/ '{}'
+            method: /*[[${tool.reqMethod}]]*/ 'GET',
+            url: /*[[${tool.reqUrl}]]*/ 'http://example.com',
+            headers: /*[[${tool.reqHeaders}]]*/ '{}',
+            parameters: /*[[${tool.inputSchema}]]*/ '{}',
+            requestBody: /*[[${tool.outputSchema}]]*/ '{}'
         };
 
         // 发送测试请求

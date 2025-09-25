@@ -147,8 +147,8 @@
                                     <!-- <div class="col-md-6 mb-3">
                                         <label class="form-label" for="toolAuthor">工具作者</label>
                                         <input class="form-control" id="toolAuthor" placeholder="请输入作者名称"
-                                               th:field="*{author}"
-                                               type="text">
+                                               name="author" value="system"
+                                               type="text" readonly>
                                         <div class="form-text">工具的开发者或维护者</div>
                                     </div> -->
                                 </div>
@@ -218,17 +218,47 @@
                             </div>
                         </div>
 
-                        <!-- 工具配置 -->
+                        <!-- HTTP转换模板配置 -->
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>工具配置</h5>
+                                <h5 class="mb-0"><i class="fas fa-globe me-2"></i>HTTP转换模板配置</h5>
                             </div>
                             <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="reqUrl">请求URL</label>
+                                        <input class="form-control" id="reqUrl" name="reqUrl"
+                                               placeholder="请输入HTTP请求URL" type="text">
+                                        <div class="form-text">HTTP API的请求地址</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="reqMethod">请求方法</label>
+                                        <select class="form-select" id="reqMethod" name="reqMethod">
+                                            <option value="GET">GET</option>
+                                            <option value="POST">POST</option>
+                                            <option value="PUT">PUT</option>
+                                            <option value="DELETE">DELETE</option>
+                                            <option value="PATCH">PATCH</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="mb-3">
-                                    <label class="form-label" for="toolConfig">工具配置</label>
-                                    <textarea class="form-control" id="toolConfig" placeholder="请输入JSON格式的工具配置"
-                                              rows="5" th:field="*{config}"></textarea>
-                                    <div class="form-text">工具运行时的配置参数</div>
+                                    <label class="form-label" for="reqHeaders">请求头</label>
+                                    <textarea class="form-control" id="reqHeaders" name="reqHeaders"
+                                              placeholder="请输入JSON格式的请求头" rows="3"></textarea>
+                                    <div class="form-text">HTTP请求头，JSON格式</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="reqBody">请求体模板</label>
+                                    <textarea class="form-control" id="reqBody" name="reqBody"
+                                              placeholder="请输入请求体模板" rows="4"></textarea>
+                                    <div class="form-text">HTTP请求体模板，支持Jinja2语法</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="respBody">响应体模板</label>
+                                    <textarea class="form-control" id="respBody" name="respBody"
+                                              placeholder="请输入响应体模板" rows="4"></textarea>
+                                    <div class="form-text">HTTP响应体模板，支持Jinja2语法</div>
                                 </div>
                             </div>
                         </div>
@@ -243,31 +273,16 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label" for="toolAuthor">工具作者</label>
                                         <input class="form-control" id="toolAuthor" placeholder="请输入作者名称"
-                                               th:field="*{author}"
-                                               type="text">
+                                               name="author" readonly
+                                               type="text" value="system">
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="toolUrl">工具URL</label>
-                                        <input class="form-control" id="toolUrl" placeholder="https://example.com"
-                                               th:field="*{url}"
-                                               type="url">
-                                    </div>
+                                    <!-- URL字段已移除，因为McpTool实体中没有url属性 -->
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label" for="toolTags">工具标签</label>
-                                    <input class="form-control" id="toolTags"
-                                           placeholder="用逗号分隔多个标签，例如: api,utility,converter" th:field="*{tags}"
-                                           type="text">
-                                    <div class="form-text">多个标签请用逗号分隔</div>
-                                </div>
+                                <!-- 标签字段已移除，因为McpTool实体中没有tags属性 -->
 
-                                <div class="mb-3">
-                                    <label class="form-label" for="toolDoc">工具文档</label>
-                                    <textarea class="form-control" id="toolDoc" placeholder="请输入工具使用文档"
-                                              rows="4" th:field="*{documentation}"></textarea>
-                                </div>
+                                <!-- 文档字段已移除，因为McpTool实体中没有documentation属性 -->
                             </div>
                         </div>
 

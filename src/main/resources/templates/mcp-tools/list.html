@@ -90,13 +90,13 @@
         <div class="col-md-6 col-lg-4 mb-4" th:each="tool : ${tools}">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title" th:text="${tool.name}">工具名称</h5>
-                    <p class="card-text text-muted" th:text="${#strings.abbreviate(tool.description, 100)}">工具描述</p>
+                    <h5 class="card-title" th:text="${tool.toolName}">工具名称</h5>
+                    <p class="card-text text-muted" th:text="${#strings.abbreviate(tool.toolDescription, 100)}">工具描述</p>
 
                     <div class="mb-2">
                         <small class="text-muted">
                             <i class="fas fa-tag me-1"></i>
-                            <span th:text="${tool.type}">工具类型</span>
+                            <span th:text="${tool.toolType}">工具类型</span>
                         </small>
                     </div>
 
@@ -107,10 +107,10 @@
                         </small>
                     </div>
 
-                    <div class="mb-2" th:if="${tool.status != null}">
+                    <div class="mb-2" th:if="${tool.valid != null}">
                             <span class="badge"
-                                  th:classappend="${tool.status == 'active' ? 'bg-success' : 'bg-secondary'}"
-                                  th:text="${tool.status == 'active' ? '活跃' : '非活跃'}">状态</span>
+                                  th:classappend="${tool.valid == '1' ? 'bg-success' : 'bg-secondary'}"
+                                  th:text="${tool.valid == '1' ? '有效' : '无效'}">状态</span>
                     </div>
                 </div>
 
@@ -122,8 +122,9 @@
                         <a class="btn btn-outline-secondary btn-sm" th:href="@{/mcp-tools/edit/{id}(id=${tool.id})}">
                             <i class="fas fa-edit me-1"></i>编辑
                         </a>
-                        <button class="btn btn-outline-danger btn-sm"
-                                onclick="confirmDelete([[${tool.id}]], '[[${tool.name}]]')"
+                        <button class="btn btn-outline-danger btn-sm delete-btn"
+                                th:data-tool-id="${tool.id}"
+                                th:data-tool-name="${tool.toolName}"
                                 type="button">
                             <i class="fas fa-trash me-1"></i>删除
                         </button>
@@ -202,6 +203,17 @@
         document.getElementById('deleteForm').action = '/mcp-tools/delete/' + toolId;
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
+
+    // 添加事件监听器
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const toolId = this.dataset.toolId;
+                const toolName = this.dataset.toolName;
+                confirmDelete(toolId, toolName);
+            });
+        });
+    });
 </script>
 </body>
 </html>
