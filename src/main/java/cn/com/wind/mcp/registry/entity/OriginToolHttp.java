@@ -53,6 +53,11 @@ public class OriginToolHttp extends Model<OriginToolHttp> {
     private String updateBy;
 
     /**
+     * 提供者ID
+     */
+    private Long providerId;
+
+    /**
      * 提供者工具编号
      */
     private Long providerToolNum;
@@ -97,12 +102,6 @@ public class OriginToolHttp extends Model<OriginToolHttp> {
      */
     @TableField(exist = false)
     private Long providerAppNum;
-
-    /**
-     * 提供者ID
-     */
-    @TableField(exist = false)
-    private Long providerId;
 
     /**
      * 工具名称（用于验证，映射到nameDisplay）

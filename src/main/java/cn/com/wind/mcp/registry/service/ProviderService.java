@@ -52,4 +52,14 @@ public interface ProviderService extends IService<Provider> {
      * 生成API密钥对
      */
     String generateApiSecret(String username);
+
+    /**
+     * 更新用户个人资料
+     */
+    boolean updateProfile(Long providerId, String email, String phoneNumber, String companyName, String contactPerson);
+
+    /**
+     * 重新生成API密钥
+     */
+    String regenerateApiKey(Long providerId);
 }

@@ -213,4 +213,85 @@ public class ProviderController {
 
         return result;
     }
+
+    /**
+     * 更新个人资料API
+     */
+    @PostMapping("/updateProfile")
+    @ResponseBody
+    public Map<String, Object> updateProfile(@RequestParam(required = false) String email,
+        @RequestParam(required = false) String phoneNumber,
+        @RequestParam(required = false) String companyName,
+        @RequestParam(required = false) String contactPerson,
+        HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+            if (currentProvider == null) {
+                result.put("success", false);
+                result.put("message", "用户未登录");
+                return result;
+            }
+
+            // 更新用户信息
+            boolean success = providerService.updateProfile(currentProvider.getId(), email, phoneNumber, companyName,
+                contactPerson);
+            if (success) {
+                // 更新session中的用户信息
+                Provider updatedProvider = providerService.getById(currentProvider.getId());
+                session.setAttribute("currentProvider", updatedProvider);
+
+                result.put("success", true);
+                result.put("message", "个人信息更新成功");
+            } else {
+                result.put("success", false);
+                result.put("message", "更新失败");
+            }
+        } catch (Exception e) {
+            log.error("更新个人资料失败", e);
+            result.put("success", false);
+            result.put("message", "更新失败，请稍后重试");
+        }
+
+        return result;
+    }
+
+    /**
+     * 重新生成API密钥API
+     */
+    @PostMapping("/regenerateApiKey")
+    @ResponseBody
+    public Map<String, Object> regenerateApiKey(HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+            if (currentProvider == null) {
+                result.put("success", false);
+                result.put("message", "用户未登录");
+                return result;
+            }
+
+            String newApiKey = providerService.regenerateApiKey(currentProvider.getId());
+            if (StrUtil.isNotBlank(newApiKey)) {
+                // 更新session中的用户信息
+                Provider updatedProvider = providerService.getById(currentProvider.getId());
+                session.setAttribute("currentProvider", updatedProvider);
+
+                result.put("success", true);
+                result.put("message", "API密钥重新生成成功");
+                result.put("apiKey", newApiKey);
+            } else {
+                result.put("success", false);
+                result.put("message", "生成失败");
+            }
+        } catch (Exception e) {
+            log.error("重新生成API密钥失败", e);
+            result.put("success", false);
+            result.put("message", "生成失败，请稍后重试");
+        }
+
+        return result;
+    }
 }

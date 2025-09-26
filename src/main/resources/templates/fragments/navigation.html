@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 导航栏片段 -->
+<div th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="fas fa-tools me-2"></i>MCP工具注册中心
+            </a>
+
+            <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#request.requestURI == '/' ? 'active' : ''}"
+                           th:href="@{/}">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#strings.startsWith(#request.requestURI, '/origin-tools') ? 'active' : ''}"
+                           th:href="@{/origin-tools}">
+                            <i class="fas fa-globe me-1"></i>源HTTP工具
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#strings.startsWith(#request.requestURI, '/mcp-tools') ? 'active' : ''}"
+                           th:href="@{/mcp-tools}">
+                            <i class="fas fa-cogs me-1"></i>MCP工具
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <!-- 用户信息区域 -->
+                    <li class="nav-item dropdown" th:if="${session.currentProvider != null}">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                           id="userDropdown" role="button">
+                            <i class="fas fa-user me-1"></i>
+                            <span th:text="${session.currentProvider.username}">用户名</span>
+                        </a>
+                        <ul aria-labelledby="userDropdown" class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/provider/profile}">
+                                    <i class="fas fa-user-circle me-1"></i>个人中心
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="logout()">
+                                    <i class="fas fa-sign-out-alt me-1"></i>退出登录
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 未登录用户 -->
+                    <li class="nav-item" th:if="${session.currentProvider == null}">
+                        <a class="nav-link" th:href="@{/provider/login}">
+                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // 退出登录功能
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                fetch('/provider/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '/';
+                        } else {
+                            alert('退出登录失败：' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('退出登录失败，请稍后重试');
+                    });
+            }
+        }
+    </script>
+</div>
+
+</body>
+</html>

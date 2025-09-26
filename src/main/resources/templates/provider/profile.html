@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>个人中心 - MCP工具注册中心</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/css/fontawesome-fonts.css" rel="stylesheet">
+    <link href="/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- 导航栏 -->
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<!-- 主要内容区域 -->
+<main class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item active">个人中心</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-user-circle me-2"></i>个人中心
+        </h1>
+    </div>
+
+    <div class="row">
+        <!-- 用户信息卡片 -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>基本信息</h5>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="username">用户名</label>
+                                <input class="form-control" id="username" readonly
+                                       th:value="${session.currentProvider?.username}" type="text">
+                                <div class="form-text">用户名不可修改</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="email">邮箱</label>
+                                <input class="form-control" id="email"
+                                       th:value="${session.currentProvider?.email}" type="email">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="phoneNumber">手机号码</label>
+                                <input class="form-control" id="phoneNumber"
+                                       th:value="${session.currentProvider?.phoneNumber}" type="text">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="companyName">公司名称</label>
+                                <input class="form-control" id="companyName"
+                                       th:value="${session.currentProvider?.companyName}" type="text">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="contactPerson">联系人姓名</label>
+                            <input class="form-control" id="contactPerson"
+                                   th:value="${session.currentProvider?.contactPerson}" type="text">
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-save me-1"></i>更新信息
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>我的统计</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0">我的MCP工具</h6>
+                            <small class="text-muted">已发布的工具数量</small>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-cogs fa-2x"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-primary mb-0" id="myMcpToolCount">0</h3>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-globe me-2"></i>我的HTTP工具</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0">我的HTTP工具</h6>
+                            <small class="text-muted">已发布的工具数量</small>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-globe fa-2x"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-success mb-0" id="myHttpToolCount">0</h3>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-key me-2"></i>API密钥</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <label class="form-label">API Key</label>
+                        <div class="input-group">
+                            <input class="form-control" id="apiKey" readonly
+                                   th:value="${session.currentProvider?.apiKey}" type="password">
+                            <button class="btn btn-outline-secondary" id="toggleApiKey" type="button">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-warning w-100" id="regenerateApiKey">
+                        <i class="fas fa-refresh me-1"></i>重新生成
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Bootstrap JS -->
+<script src="/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="/js/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // 加载统计信息
+        loadStatistics();
+
+        // 个人信息表单提交
+        $('#profileForm').on('submit', function (e) {
+            e.preventDefault();
+            updateProfile();
+        });
+
+        // API Key 显示/隐藏切换
+        $('#toggleApiKey').on('click', function () {
+            const input = $('#apiKey');
+            const icon = $(this).find('i');
+
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
+        // 重新生成API Key
+        $('#regenerateApiKey').on('click', function () {
+            if (confirm('确定要重新生成API密钥吗？旧密钥将失效！')) {
+                regenerateApiKey();
+            }
+        });
+    });
+
+    function loadStatistics() {
+        // 加载用户工具统计
+        $.get('/api/user/statistics')
+            .done(function (data) {
+                if (data.success) {
+                    $('#myMcpToolCount').text(data.mcpToolCount || 0);
+                    $('#myHttpToolCount').text(data.httpToolCount || 0);
+                }
+            })
+            .fail(function () {
+                console.error('加载统计信息失败');
+            });
+    }
+
+    function updateProfile() {
+        const formData = {
+            email: $('#email').val(),
+            phoneNumber: $('#phoneNumber').val(),
+            companyName: $('#companyName').val(),
+            contactPerson: $('#contactPerson').val()
+        };
+
+        $.post('/provider/updateProfile', formData)
+            .done(function (data) {
+                if (data.success) {
+                    showMessage('个人信息更新成功', 'success');
+                } else {
+                    showMessage(data.message || '更新失败', 'danger');
+                }
+            })
+            .fail(function () {
+                showMessage('更新失败，请稍后重试', 'danger');
+            });
+    }
+
+    function regenerateApiKey() {
+        $.post('/provider/regenerateApiKey')
+            .done(function (data) {
+                if (data.success) {
+                    $('#apiKey').val(data.apiKey);
+                    showMessage('API密钥重新生成成功', 'success');
+                } else {
+                    showMessage(data.message || '生成失败', 'danger');
+                }
+            })
+            .fail(function () {
+                showMessage('生成失败，请稍后重试', 'danger');
+            });
+    }
+
+    function showMessage(message, type) {
+        const alertClass = 'alert-' + type;
+        const icon = type === 'success' ? 'check-circle' : 'exclamation-triangle';
+        const alert = $('<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert">' +
+            '<i class="fas fa-' + icon + '"></i> ' + message +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+            '</div>');
+
+        // 移除现有的alert
+        $('.alert').remove();
+
+        // 添加新的alert
+        $('main .container').prepend(alert);
+
+        // 自动消失
+        setTimeout(function () {
+            alert.fadeOut();
+        }, 3000);
+    }
+</script>
+</body>
+</html>

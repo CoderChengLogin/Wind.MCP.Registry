@@ -52,6 +52,11 @@ public class McpTool extends Model<McpTool> {
     private String updateBy;
 
     /**
+     * 提供者ID
+     */
+    private Long providerId;
+
+    /**
      * 工具编号
      */
     private Long toolNum;

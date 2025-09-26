@@ -131,4 +131,64 @@ public class ProviderServiceImpl extends ServiceImpl<ProviderMapper, Provider> i
         String content = username + "_secret_" + System.currentTimeMillis() + "_" + RandomUtil.randomString(16);
         return DigestUtil.sha256Hex(content).substring(0, 32);
     }
+
+    @Override
+    public boolean updateProfile(Long providerId, String email, String phoneNumber, String companyName,
+        String contactPerson) {
+        try {
+            Provider provider = getById(providerId);
+            if (provider == null) {
+                log.warn("用户不存在: {}", providerId);
+                return false;
+            }
+
+            // 检查邮箱是否被其他用户使用
+            if (StrUtil.isNotBlank(email) && !email.equals(provider.getEmail())) {
+                QueryWrapper<Provider> emailQuery = new QueryWrapper<>();
+                emailQuery.eq("email", email).eq("status", 1).ne("id", providerId);
+                Provider existingEmailProvider = getOne(emailQuery);
+                if (existingEmailProvider != null) {
+                    log.warn("邮箱已被其他用户使用: {}", email);
+                    return false;
+                }
+            }
+
+            // 更新字段
+            provider.setEmail(email);
+            provider.setPhoneNumber(phoneNumber);
+            provider.setCompanyName(companyName);
+            provider.setContactPerson(contactPerson);
+            provider.setLastUpdateTime(LocalDateTime.now());
+
+            return updateById(provider);
+        } catch (Exception e) {
+            log.error("更新用户资料失败", e);
+            return false;
+        }
+    }
+
+    @Override
+    public String regenerateApiKey(Long providerId) {
+        try {
+            Provider provider = getById(providerId);
+            if (provider == null) {
+                log.warn("用户不存在: {}", providerId);
+                return null;
+            }
+
+            // 生成新的API密钥和密钥对
+            String newApiKey = generateApiKey(provider.getUsername());
+            String newApiSecret = generateApiSecret(provider.getUsername());
+
+            provider.setApiKey(newApiKey);
+            provider.setApiSecret(newApiSecret);
+            provider.setLastUpdateTime(LocalDateTime.now());
+
+            boolean success = updateById(provider);
+            return success ? newApiKey : null;
+        } catch (Exception e) {
+            log.error("重新生成API密钥失败", e);
+            return null;
+        }
+    }
 }

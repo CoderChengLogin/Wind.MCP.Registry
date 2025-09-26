@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -54,6 +53,11 @@ public class OriginToolExpo extends Model<OriginToolExpo> {
     private String updateBy;
 
     /**
+     * 提供者ID
+     */
+    private Long providerId;
+
+    /**
      * 提供者工具编号
      */
     private Long providerToolNum;
@@ -97,12 +101,6 @@ public class OriginToolExpo extends Model<OriginToolExpo> {
      * 提供者app编号
      */
     private Long providerAppNum;
-
-    /**
-     * 提供者ID
-     */
-    @TableField(exist = false)
-    private Long providerId;
 
     /**
      * 主键值，ActiveRecord 模式这个必须有
