@@ -261,9 +261,9 @@ public class McpToolController {
         log.info("搜索MCP工具: keyword={}", keyword);
 
         QueryWrapper<McpTool> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("name", keyword)
+        queryWrapper.like("tool_name", keyword)
             .or()
-            .like("description", keyword);
+            .like("tool_description", keyword);
 
         Page<McpTool> toolPage = new Page<>(page, size);
         IPage<McpTool> result = mcpToolService.page(toolPage, queryWrapper);

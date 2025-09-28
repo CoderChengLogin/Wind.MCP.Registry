@@ -6,9 +6,9 @@
     <title>MCP工具列表 - MCP工具注册中心</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap/bootstrap-5.1.3.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/vendor/fontawesome/all-6.0.0.min.css" rel="stylesheet">
     <!-- 自定义CSS -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -73,11 +73,29 @@
                         <a class="btn btn-outline-primary btn-sm" th:href="@{/mcp-tools/{id}(id=${tool.id})}">
                             <i class="fas fa-eye me-1"></i>查看
                         </a>
-                        <a class="btn btn-outline-secondary btn-sm" th:href="@{/mcp-tools/edit/{id}(id=${tool.id})}">
+                        <!-- 判断用户是否有编辑权限 -->
+                        <a class="btn btn-outline-secondary btn-sm"
+                           th:href="@{/mcp-tools/edit/{id}(id=${tool.id})}"
+                           th:if="${currentProviderId != null and (tool.providerId == currentProviderId)}">
                             <i class="fas fa-edit me-1"></i>编辑
                         </a>
+                        <button class="btn btn-outline-secondary btn-sm permission-denied-edit-btn"
+                                th:data-tool-name="${tool.toolName}"
+                                th:if="${currentProviderId == null or (tool.providerId != currentProviderId)}"
+                                type="button">
+                            <i class="fas fa-edit me-1"></i>编辑
+                        </button>
+
+                        <!-- 判断用户是否有删除权限 -->
                         <button class="btn btn-outline-danger btn-sm delete-btn"
+                                th:data-tool-name="${tool.toolName}"
                                 th:data-tool-id="${tool.id}"
+                                th:if="${currentProviderId != null and (tool.providerId == currentProviderId)}"
+                                type="button">
+                            <i class="fas fa-trash me-1"></i>删除
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm permission-denied-delete-btn"
+                                th:if="${currentProviderId == null or (tool.providerId != currentProviderId)}"
                                 th:data-tool-name="${tool.toolName}"
                                 type="button">
                             <i class="fas fa-trash me-1"></i>删除
@@ -145,8 +163,58 @@
     </div>
 </div>
 
+<!-- 无权限编辑提示模态框 -->
+<div class="modal fade" id="permissionDeniedEditModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>无权限操作
+                </h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                    <h5>无法编辑工具</h5>
+                    <p class="text-muted">您没有编辑工具 "<span id="editToolName"></span>" 的权限。</p>
+                    <p class="text-muted">只有工具的创建者才能编辑该工具。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal" type="button">我知道了</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 无权限删除提示模态框 -->
+<div class="modal fade" id="permissionDeniedDeleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>无权限操作
+                </h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                    <h5>无法删除工具</h5>
+                    <p class="text-muted">您没有删除工具 "<span id="deletePermissionToolName"></span>" 的权限。</p>
+                    <p class="text-muted">只有工具的创建者才能删除该工具。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal" type="button">我知道了</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/bootstrap/bootstrap-5.1.3.bundle.min.js"></script>
 
 <script>
     function confirmDelete(toolId, toolName) {
@@ -155,13 +223,40 @@
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
 
+    function showEditPermissionDenied(toolName) {
+        document.getElementById('editToolName').textContent = toolName;
+        new bootstrap.Modal(document.getElementById('permissionDeniedEditModal')).show();
+    }
+
+    function showDeletePermissionDenied(toolName) {
+        document.getElementById('deletePermissionToolName').textContent = toolName;
+        new bootstrap.Modal(document.getElementById('permissionDeniedDeleteModal')).show();
+    }
+
     // 添加事件监听器
     document.addEventListener('DOMContentLoaded', function () {
+        // 删除按钮事件监听器
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const toolId = this.dataset.toolId;
                 const toolName = this.dataset.toolName;
                 confirmDelete(toolId, toolName);
+            });
+        });
+
+        // 无权限编辑按钮事件监听器
+        document.querySelectorAll('.permission-denied-edit-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const toolName = this.dataset.toolName;
+                showEditPermissionDenied(toolName);
+            });
+        });
+
+        // 无权限删除按钮事件监听器
+        document.querySelectorAll('.permission-denied-delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const toolName = this.dataset.toolName;
+                showDeletePermissionDenied(toolName);
             });
         });
     });

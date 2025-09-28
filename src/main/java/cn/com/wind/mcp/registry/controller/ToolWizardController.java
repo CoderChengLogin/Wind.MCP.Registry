@@ -60,45 +60,59 @@ public class ToolWizardController {
     @PostMapping("/save-unified")
     @ResponseBody
     public String saveUnified(UnifiedToolAddDto dto) {
-        log.info("一键保存工具数据: {}", dto);
+        log.info("收到一键保存请求，工具类型: {}", dto.getSelectedToolType());
+        log.info("完整请求数据: {}", dto);
+
+        // 基本验证
+        if (dto.getSelectedToolType() == null || dto.getSelectedToolType().trim().isEmpty()) {
+            log.error("工具类型不能为空");
+            return "error";
+        }
 
         try {
             // 生成提供者工具编号（使用当前时间戳）
             Long providerToolNum = System.currentTimeMillis();
 
-            // 1. 保存原始HTTP工具
-            OriginToolHttp httpTool = new OriginToolHttp();
-            httpTool.setProviderToolNum(providerToolNum);
-            httpTool.setNameDisplay(dto.getHttpToolName());
-            httpTool.setDescDisplay(dto.getHttpDescription());
-            httpTool.setReqUrl(dto.getHttpToolUrl());
-            httpTool.setReqMethod(dto.getHttpMethod());
-            httpTool.setReqHeaders(dto.getHttpHeaders());
-            httpTool.setCreateTime(LocalDateTime.now());
-            httpTool.setCreateBy("system");
-            httpTool.setUpdateTime(LocalDateTime.now());
-            httpTool.setUpdateBy("system");
+            // 1. 根据工具类型保存原始工具
+            if ("http".equals(dto.getSelectedToolType())) {
+                // 保存原始HTTP工具
+                OriginToolHttp httpTool = new OriginToolHttp();
+                httpTool.setProviderToolNum(providerToolNum);
+                httpTool.setNameDisplay(dto.getNameDisplay());
+                httpTool.setDescDisplay(dto.getDescDisplay());
+                httpTool.setReqUrl(dto.getReqUrl());
+                httpTool.setReqMethod(dto.getReqMethod());
+                httpTool.setReqHeaders(dto.getReqHeaders());
+                httpTool.setInputSchema(dto.getInputSchema());
+                httpTool.setOutputSchema(dto.getOutputSchema());
+                httpTool.setProviderAppNum(
+                    dto.getProviderAppNum() != null ? Long.valueOf(dto.getProviderAppNum()) : null);
+                httpTool.setCreateTime(LocalDateTime.now());
+                httpTool.setCreateBy("system");
+                httpTool.setUpdateTime(LocalDateTime.now());
+                httpTool.setUpdateBy("system");
 
-            // 根据输入生成JSON Schema
-            if (dto.getHttpParams() != null && !dto.getHttpParams().trim().isEmpty()) {
-                httpTool.setInputSchema(dto.getHttpParams());
+                originToolHttpService.save(httpTool);
+                log.info("保存HTTP工具成功: {}", httpTool.getId());
+            } else if ("expo".equals(dto.getSelectedToolType())) {
+                // 这里可以添加Expo工具的保存逻辑
+                log.info("当前版本暂不支持Expo工具保存，但已接收到Expo工具数据: {}", dto.getExpoToolName());
             }
-
-            originToolHttpService.save(httpTool);
-            log.info("保存HTTP工具成功: {}", httpTool.getId());
 
             // 2. 保存MCP工具信息
             McpTool mcpTool = new McpTool();
             mcpTool.setToolNum(providerToolNum); // 使用相同的工具编号
             mcpTool.setToolVersion(1L);
             mcpTool.setValid("1");
-            mcpTool.setToolName(dto.getMcpToolEnglishName());
-            mcpTool.setToolDescription(dto.getMcpToolDescription());
-            mcpTool.setNameDisplay(dto.getMcpToolChineseName());
-            mcpTool.setDescriptionDisplay(dto.getMcpToolDescription());
-            mcpTool.setConvertType("1"); // HTTP工具
-            mcpTool.setToolType("1"); // tool类型
-            mcpTool.setStreamOutput("0"); // 非流式输出
+            mcpTool.setToolName(dto.getToolName());
+            mcpTool.setToolDescription(dto.getToolDescription());
+            mcpTool.setNameDisplay(dto.getMcpNameDisplay());
+            mcpTool.setDescriptionDisplay(dto.getDescriptionDisplay());
+            mcpTool.setInputSchema(dto.getMcpInputSchema());
+            mcpTool.setOutputSchema(dto.getMcpOutputSchema());
+            mcpTool.setStreamOutput(dto.getStreamOutput());
+            mcpTool.setConvertType(dto.getConvertType());
+            mcpTool.setToolType(dto.getToolType());
             mcpTool.setCreateTime(LocalDateTime.now());
             mcpTool.setCreateBy("system");
             mcpTool.setUpdateTime(LocalDateTime.now());
@@ -111,10 +125,11 @@ public class ToolWizardController {
             HttpTemplateConverter converter = new HttpTemplateConverter();
             converter.setToolNum(providerToolNum);
             converter.setToolVersion(1L);
-            converter.setReqUrl(dto.getHttpToolUrl());
-            converter.setReqMethod(dto.getHttpMethod());
-            converter.setReqHeaders(dto.getHttpHeaders());
-            converter.setReqBody(dto.getHttpParams());
+            converter.setReqUrl(dto.getTemplateReqUrl());
+            converter.setReqMethod(dto.getTemplateReqMethod());
+            converter.setReqHeaders(dto.getTemplateReqHeaders());
+            converter.setReqBody(dto.getReqBody());
+            converter.setRespBody(dto.getRespBody());
             converter.setProviderToolNum(providerToolNum);
             converter.setCreateTime(LocalDateTime.now());
             converter.setCreateBy("system");

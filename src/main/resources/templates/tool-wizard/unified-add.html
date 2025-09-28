@@ -6,9 +6,9 @@
     <title>一体化工具录入 - MCP工具注册中心</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap/bootstrap-5.1.3.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/vendor/fontawesome/all-6.0.0.min.css" rel="stylesheet">
     <!-- 自定义CSS -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -70,7 +70,7 @@
     <form id="unifiedForm" method="post" th:action="@{/tool-wizard/save-unified}">
 
         <!-- 选择的工具类型隐藏字段 -->
-        <input id="selectedToolType" name="toolType" type="hidden">
+        <input id="selectedToolType" name="selectedToolType" type="hidden">
 
         <!-- ===== 第一部分：选择原始工具类型 ===== -->
         <div class="card mb-4" id="section1">
@@ -136,20 +136,20 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label required">工具名称 <span class="text-danger">*</span></label>
-                                <input class="form-control" disabled id="httpToolName" name="httpToolName"
-                                       placeholder="请输入HTTP工具名称"
+                                <label class="form-label required">名称 <span class="text-danger">*</span></label>
+                                <input class="form-control" disabled id="nameDisplay" name="nameDisplay"
+                                       placeholder="请输入工具名称"
                                        required type="text">
-                                <div class="form-text">工具的标识名称，用于系统识别</div>
+                                <div class="form-text">对应数据库字段：name_display</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label required">API地址 <span class="text-danger">*</span></label>
-                                <input class="form-control" disabled id="httpToolUrl" name="httpToolUrl"
-                                       placeholder="https://api.example.com/endpoint"
-                                       required type="url">
-                                <div class="form-text">完整的API调用地址</div>
+                                <label class="form-label required">功能描述 <span class="text-danger">*</span></label>
+                                <textarea class="form-control" disabled id="descDisplay" name="descDisplay"
+                                          placeholder="请描述这个工具的功能"
+                                          required rows="3"></textarea>
+                                <div class="form-text">对应数据库字段：desc_display</div>
                             </div>
                         </div>
                     </div>
@@ -157,8 +157,17 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label required">请求方法 <span class="text-danger">*</span></label>
-                                <select class="form-select" disabled id="httpMethod" name="httpMethod" required>
+                                <label class="form-label required">请求url <span class="text-danger">*</span></label>
+                                <input class="form-control" disabled id="reqUrl" name="reqUrl"
+                                       placeholder="https://api.example.com/endpoint"
+                                       required type="url">
+                                <div class="form-text">对应数据库字段：req_url</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label required">请求方式 <span class="text-danger">*</span></label>
+                                <select class="form-select" disabled id="reqMethod" name="reqMethod" required>
                                     <option value="">请选择请求方法</option>
                                     <option value="GET">GET</option>
                                     <option value="POST">POST</option>
@@ -166,15 +175,7 @@
                                     <option value="DELETE">DELETE</option>
                                     <option value="PATCH">PATCH</option>
                                 </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">请求头信息</label>
-                                <textarea class="form-control" disabled id="httpHeaders" name="httpHeaders"
-                                          placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token"}'
-                                          rows="3"></textarea>
-                                <div class="form-text">JSON格式的请求头信息（可选）</div>
+                                <div class="form-text">对应数据库字段：req_method</div>
                             </div>
                         </div>
                     </div>
@@ -182,20 +183,41 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">请求参数</label>
-                                <textarea class="form-control" disabled id="httpParams" name="httpParams"
-                                          placeholder='{"param1": "value1", "param2": "value2"}'
-                                          rows="4"></textarea>
-                                <div class="form-text">JSON格式的请求参数（可选）</div>
+                                <label class="form-label required">请求头 <span class="text-danger">*</span></label>
+                                <textarea class="form-control" disabled id="reqHeaders" name="reqHeaders"
+                                          placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token"}'
+                                          required rows="3"></textarea>
+                                <div class="form-text">对应数据库字段：req_headers</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label required">工具描述 <span class="text-danger">*</span></label>
-                                <textarea class="form-control" disabled id="httpDescription" name="httpDescription"
-                                          placeholder="请描述这个HTTP工具的功能和用途"
-                                          required rows="4"></textarea>
-                                <div class="form-text">详细说明工具的功能和使用场景</div>
+                                <label class="form-label required">输入参数 <span class="text-danger">*</span></label>
+                                <textarea class="form-control" disabled id="inputSchema" name="inputSchema"
+                                          placeholder='{"param1": "value1", "param2": "value2"}'
+                                          required rows="3"></textarea>
+                                <div class="form-text">对应数据库字段：input_schema</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label required">输出参数 <span class="text-danger">*</span></label>
+                                <textarea class="form-control" disabled id="outputSchema" name="outputSchema"
+                                          placeholder='{"result": "success", "data": {...}}'
+                                          required rows="3"></textarea>
+                                <div class="form-text">对应数据库字段：output_schema</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label required">服务方app <span class="text-danger">*</span></label>
+                                <input class="form-control" disabled id="providerAppNum" name="providerAppNum"
+                                       placeholder="请输入服务方app编号"
+                                       required type="text">
+                                <div class="form-text">对应数据库字段：provider_app_num</div>
                             </div>
                         </div>
                     </div>
@@ -275,18 +297,18 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label required">工具英文名 <span class="text-danger">*</span></label>
-                            <input class="form-control" disabled id="mcpToolEnglishName" name="mcpToolEnglishName"
-                                   placeholder="tool_english_name" required type="text">
-                            <div class="form-text">英文标识名称，用于MCP协议识别</div>
+                            <label class="form-label required">MCP工具英文名 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="toolName" name="toolName"
+                                   placeholder="请输入MCP工具英文名" required type="text">
+                            <div class="form-text">对应数据库字段：tool_name</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">工具中文名</label>
-                            <input class="form-control" disabled id="mcpToolChineseName" name="mcpToolChineseName"
-                                   placeholder="工具的中文名称" type="text">
-                            <div class="form-text">便于理解的中文名称（可选）</div>
+                            <label class="form-label required">MCP工具描述 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="toolDescription" name="toolDescription"
+                                   placeholder="请输入MCP工具描述" required type="text">
+                            <div class="form-text">对应数据库字段：tool_description</div>
                         </div>
                     </div>
                 </div>
@@ -294,9 +316,73 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label required">工具类型 <span class="text-danger">*</span></label>
-                            <select class="form-select" disabled id="mcpToolType" name="mcpToolType" required>
-                                <option value="">请选择工具类型</option>
+                            <label class="form-label required">多语言名称 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="mcpNameDisplay" name="mcpNameDisplay"
+                                   placeholder="请输入多语言名称" required type="text">
+                            <div class="form-text">对应数据库字段：name_display</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">多语言描述 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="descriptionDisplay" name="descriptionDisplay"
+                                   placeholder="请输入多语言描述" required type="text">
+                            <div class="form-text">对应数据库字段：description_display</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">input_json_schema <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" disabled id="mcpInputSchema" name="mcpInputSchema"
+                                      placeholder='请输入JSON Schema格式的输入参数定义'
+                                      required rows="3"></textarea>
+                            <div class="form-text">对应数据库字段：input_schema</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">output_json_schema <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" disabled id="mcpOutputSchema" name="mcpOutputSchema"
+                                      placeholder='请输入JSON Schema格式的输出参数定义'
+                                      required rows="3"></textarea>
+                            <div class="form-text">对应数据库字段：output_schema</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">是否流式输出 <span class="text-danger">*</span></label>
+                            <select class="form-select" disabled id="streamOutput" name="streamOutput" required>
+                                <option value="">请选择是否流式输出</option>
+                                <option value="0">否</option>
+                                <option value="1">是</option>
+                            </select>
+                            <div class="form-text">对应数据库字段：stream_output</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">转换模板类型 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="convertType" name="convertType"
+                                   placeholder="请输入转换模板类型" required type="text">
+                            <div class="form-text">对应数据库字段：convert_type</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">MCP工具类型 <span class="text-danger">*</span></label>
+                            <select class="form-select" disabled id="toolType" name="toolType" required>
+                                <option value="">请选择MCP工具类型</option>
                                 <option value="HTTP工具">HTTP工具</option>
                                 <option value="数据库工具">数据库工具</option>
                                 <option value="文件工具">文件工具</option>
@@ -307,49 +393,9 @@
                                 <option value="监控工具">监控工具</option>
                                 <option value="其他">其他</option>
                             </select>
+                            <div class="form-text">对应数据库字段：tool_type</div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label required">工具用法 <span class="text-danger">*</span></label>
-                            <input class="form-control" disabled id="mcpToolUsage" name="mcpToolUsage"
-                                   placeholder="tool_name(param1, param2)" required type="text">
-                            <div class="form-text">MCP工具的调用语法</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label required">工具描述 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" disabled id="mcpToolDescription" name="mcpToolDescription"
-                              placeholder="详细描述MCP工具的功能和用途" required rows="3"></textarea>
-                    <div class="form-text">用于MCP协议的工具说明</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">参数说明</label>
-                            <textarea class="form-control" disabled id="mcpToolParameters" name="mcpToolParameters"
-                                      placeholder="param1: 参数1说明&#10;param2: 参数2说明" rows="4"></textarea>
-                            <div class="form-text">每个参数的详细说明（可选）</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">返回值说明</label>
-                            <textarea class="form-control" disabled id="mcpToolReturns" name="mcpToolReturns"
-                                      placeholder="描述工具执行后的返回结果格式和含义" rows="4"></textarea>
-                            <div class="form-text">返回值的格式和含义说明（可选）</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">使用示例</label>
-                    <textarea class="form-control" disabled id="mcpToolExamples" name="mcpToolExamples"
-                              placeholder="提供一些使用示例，帮助用户理解工具用法" rows="4"></textarea>
-                    <div class="form-text">工具的使用示例和说明（可选）</div>
                 </div>
 
                 <!-- 第二部分完成提示 -->
@@ -374,34 +420,48 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label required">模板名称 <span class="text-danger">*</span></label>
-                            <input class="form-control" disabled id="templateName" name="templateName"
-                                   placeholder="转换模板名称" required type="text">
-                            <div class="form-text">用于标识这个转换模板</div>
+                            <label class="form-label required">请求路径 <span class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="templateReqUrl" name="templateReqUrl"
+                                   placeholder="请输入请求路径" required type="text">
+                            <div class="form-text">对应数据库字段：req_url</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">映射规则</label>
-                            <textarea class="form-control" disabled id="mappingRules" name="mappingRules"
-                                      placeholder="描述参数映射和转换规则" rows="3"></textarea>
-                            <div class="form-text">参数映射和数据转换规则（可选）</div>
+                            <label class="form-label required">请求方式 <span class="text-danger">*</span></label>
+                            <select class="form-select" disabled id="templateReqMethod" name="templateReqMethod"
+                                    required>
+                                <option value="">请选择请求方式</option>
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                                <option value="PATCH">PATCH</option>
+                            </select>
+                            <div class="form-text">对应数据库字段：req_method</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label required">模板内容 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" disabled id="templateContent" name="templateContent"
-                              placeholder="请输入转换模板的具体内容" required rows="8"></textarea>
-                    <div class="form-text">定义源工具如何转换为MCP工具的模板内容</div>
+                    <label class="form-label required">请求头（jinja2） <span class="text-danger">*</span></label>
+                    <textarea class="form-control" disabled id="templateReqHeaders" name="templateReqHeaders"
+                              placeholder='请输入jinja2格式的请求头模板' required rows="3"></textarea>
+                    <div class="form-text">对应数据库字段：req_headers</div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">模板描述</label>
-                    <textarea class="form-control" disabled id="templateDescription" name="templateDescription"
-                              placeholder="描述这个转换模板的作用和特点" rows="3"></textarea>
-                    <div class="form-text">模板的详细说明和使用场景（可选）</div>
+                    <label class="form-label required">请求体（jinja2） <span class="text-danger">*</span></label>
+                    <textarea class="form-control" disabled id="reqBody" name="reqBody"
+                              placeholder='请输入jinja2格式的请求体模板' required rows="5"></textarea>
+                    <div class="form-text">对应数据库字段：req_body</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label required">响应体（jinja2） <span class="text-danger">*</span></label>
+                    <textarea class="form-control" disabled id="respBody" name="respBody"
+                              placeholder='请输入jinja2格式的响应体模板' required rows="5"></textarea>
+                    <div class="form-text">对应数据库字段：resp_body</div>
                 </div>
 
                 <!-- 第四部分完成提示 -->
@@ -444,7 +504,7 @@
 </footer>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/bootstrap/bootstrap-5.1.3.bundle.min.js"></script>
 <!-- 自定义JS -->
 <script th:src="@{/js/app.js}"></script>
 
@@ -543,8 +603,8 @@
         const requiredFields = {
             section1: [], // 第一步只需要选择工具类型，通过点击事件验证
             section2: [], // 动态设置，根据选择的工具类型
-            section3: ['mcpToolEnglishName', 'mcpToolType', 'mcpToolUsage', 'mcpToolDescription'],
-            section4: ['templateName', 'templateContent']
+            section3: ['toolName', 'toolDescription', 'mcpNameDisplay', 'descriptionDisplay', 'mcpInputSchema', 'mcpOutputSchema', 'streamOutput', 'convertType', 'toolType'],
+            section4: ['templateReqUrl', 'templateReqMethod', 'templateReqHeaders', 'reqBody', 'respBody']
         };
 
         let selectedToolType = '';
@@ -568,7 +628,7 @@
 
                 // 设置第二步的必填字段
                 if (selectedToolType === 'http') {
-                    requiredFields.section2 = ['httpToolName', 'httpToolUrl', 'httpMethod', 'httpDescription'];
+                    requiredFields.section2 = ['nameDisplay', 'descDisplay', 'reqUrl', 'reqMethod', 'reqHeaders', 'inputSchema', 'outputSchema', 'providerAppNum'];
                 } else if (selectedToolType === 'expo') {
                     requiredFields.section2 = ['expoToolName', 'expoToolVersion', 'expoDescription'];
                 }
@@ -678,9 +738,16 @@
             input.addEventListener('input', function () {
                 // 检查当前字段所属的部分
                 let currentSection = 1;
-                if (this.name.startsWith('http') || this.name.startsWith('expo')) currentSection = 2;
-                else if (this.name.startsWith('mcp')) currentSection = 3;
-                else if (this.name.startsWith('template')) currentSection = 4;
+                if (this.name === 'nameDisplay' || this.name === 'descDisplay' || this.name === 'reqUrl' ||
+                    this.name === 'reqMethod' || this.name === 'reqHeaders' || this.name === 'inputSchema' ||
+                    this.name === 'outputSchema' || this.name === 'providerAppNum' ||
+                    this.name.startsWith('expo')) currentSection = 2;
+                else if (this.name === 'toolName' || this.name === 'toolDescription' ||
+                    this.name === 'mcpNameDisplay' || this.name === 'descriptionDisplay' ||
+                    this.name === 'mcpInputSchema' || this.name === 'mcpOutputSchema' ||
+                    this.name === 'streamOutput' || this.name === 'convertType' || this.name === 'toolType') currentSection = 3;
+                else if (this.name === 'templateReqUrl' || this.name === 'templateReqMethod' ||
+                    this.name === 'templateReqHeaders' || this.name === 'reqBody' || this.name === 'respBody') currentSection = 4;
 
                 // 检查当前部分是否完成
                 if (checkSectionCompletion(`section${currentSection}`)) {
@@ -710,10 +777,7 @@
             // 发送数据到后端
             fetch(this.action, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams(data)
+                body: formData
             })
                 .then(response => response.text())
                 .then(result => {
