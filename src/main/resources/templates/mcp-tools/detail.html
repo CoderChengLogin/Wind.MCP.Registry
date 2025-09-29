@@ -342,9 +342,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
-                <form id="deleteForm" method="post" style="display: inline;">
-                    <button class="btn btn-danger" type="submit">确认删除</button>
-                </form>
+                <button class="btn btn-danger" id="confirmDeleteBtn" type="button">确认删除</button>
             </div>
         </div>
     </div>
@@ -357,11 +355,58 @@
 <script src="/vendor/prism/prism-autoloader-1.24.1.min.js"></script>
 
 <script>
+    let currentToolId = null;
+
     function confirmDelete(toolId, toolName) {
+        currentToolId = toolId;
         document.getElementById('deleteToolName').textContent = toolName;
-        document.getElementById('deleteForm').action = '/mcp-tools/delete/' + toolId;
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
+
+    // 处理删除确认
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        if (!currentToolId) return;
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+
+        // 显示加载状态
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>删除中...';
+        btn.disabled = true;
+
+        // 发送删除请求
+        fetch(`/mcp-tools/delete/${currentToolId}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 删除成功，显示成功消息并跳转
+                    btn.innerHTML = '<i class="fas fa-check me-1"></i>删除成功';
+                    btn.classList.remove('btn-danger');
+                    btn.classList.add('btn-success');
+
+                    setTimeout(() => {
+                        // 跳转到工具列表页面
+                        window.location.href = '/mcp-tools?success=工具删除成功';
+                    }, 1000);
+                } else {
+                    throw new Error('删除失败');
+                }
+            })
+            .catch(error => {
+                console.error('删除失败:', error);
+                alert('删除失败，请稍后重试');
+
+                // 恢复按钮状态
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-danger');
+            });
+    });
 
     function copyConfig() {
         const configElement = document.getElementById('toolConfig');

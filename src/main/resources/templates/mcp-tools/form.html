@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${tool.id != null ? '编辑工具 - ' + tool.toolName : '添加新工具'} + ' - MCP工具注册中心'">添加新工具 -
+        MCP工具注册中心</title>
+    <link href="/vendor/bootstrap/bootstrap-5.3.0.min.css" rel="stylesheet">
+    <link href="/vendor/fontawesome/all-6.4.0.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .json-editor {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-tools me-2"></i>MCP工具注册中心
+        </a>
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/mcp-tools">MCP工具</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/origin-http-tools">原始HTTP工具</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item"><a href="/mcp-tools">MCP工具</a></li>
+            <li class="breadcrumb-item active" th:text="${tool.id != null ? '编辑工具' : '添加新工具'}">添加新工具</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-cogs me-2"></i>
+            <span th:text="${tool.id != null ? '编辑MCP工具' : '添加新MCP工具'}">添加新MCP工具</span>
+        </h1>
+        <a class="btn btn-outline-secondary" href="/mcp-tools">
+            <i class="fas fa-arrow-left me-2"></i>返回列表
+        </a>
+    </div>
+
+    <!-- 工具表单 -->
+    <form id="mcpToolForm" method="post" th:action="@{/mcp-tools/api/save}">
+        <input th:field="${tool.id}" type="hidden">
+
+        <!-- 基本信息 -->
+        <div class="form-section">
+            <h4 class="mb-3"><i class="fas fa-info-circle me-2"></i>基本信息</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="toolName">工具英文名 <span class="required">*</span></label>
+                        <input class="form-control" id="toolName" required th:field="${tool.toolName}" type="text">
+                        <div class="form-text">请输入工具的英文名称（用于系统识别）</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="nameDisplay">工具显示名 <span class="required">*</span></label>
+                        <input class="form-control" id="nameDisplay" required th:field="${tool.nameDisplay}"
+                               type="text">
+                        <div class="form-text">请输入工具的显示名称</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="toolDescription">工具描述 <span class="required">*</span></label>
+                        <textarea class="form-control" id="toolDescription" required rows="3"
+                                  th:field="${tool.toolDescription}"></textarea>
+                        <div class="form-text">请描述这个工具的功能和用途</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="descriptionDisplay">多语言描述 <span class="required">*</span></label>
+                        <textarea class="form-control" id="descriptionDisplay" required rows="3"
+                                  th:field="${tool.descriptionDisplay}"></textarea>
+                        <div class="form-text">请输入多语言显示描述</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCP配置 -->
+        <div class="form-section">
+            <h4 class="mb-3"><i class="fas fa-cog me-2"></i>MCP配置</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="toolType">工具类型 <span class="required">*</span></label>
+                        <select class="form-select" id="toolType" required th:field="${tool.toolType}">
+                            <option value="">请选择工具类型</option>
+                            <option value="HTTP工具">HTTP工具</option>
+                            <option value="数据库工具">数据库工具</option>
+                            <option value="文件工具">文件工具</option>
+                            <option value="系统工具">系统工具</option>
+                            <option value="网络工具">网络工具</option>
+                            <option value="安全工具">安全工具</option>
+                            <option value="开发工具">开发工具</option>
+                            <option value="监控工具">监控工具</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="streamOutput">是否流式输出 <span class="required">*</span></label>
+                        <select class="form-select" id="streamOutput" required th:field="${tool.streamOutput}">
+                            <option value="">请选择是否流式输出</option>
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="convertType">转换模板类型 <span class="required">*</span></label>
+                        <input class="form-control" id="convertType" required th:field="${tool.convertType}"
+                               type="text">
+                        <div class="form-text">请输入转换模板类型</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="valid">工具状态 <span class="required">*</span></label>
+                        <select class="form-select" id="valid" required th:field="${tool.valid}">
+                            <option value="">请选择工具状态</option>
+                            <option value="1">有效</option>
+                            <option value="0">无效</option>
+                        </select>
+                        <div class="form-text">设置工具是否有效可用</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schema配置 -->
+        <div class="form-section">
+            <h4 class="mb-3"><i class="fas fa-sliders-h me-2"></i>Schema配置</h4>
+
+            <div class="mb-3">
+                <label class="form-label" for="inputSchema">输入Schema (JSON格式) <span class="required">*</span></label>
+                <textarea class="form-control json-editor" id="inputSchema"
+                          placeholder='{"type": "object", "properties": {...}}'
+                          required rows="6"
+                          th:field="${tool.inputSchema}"></textarea>
+                <div class="form-text">请输入符合JSON Schema规范的输入定义</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="outputSchema">输出Schema (JSON格式) <span class="required">*</span></label>
+                <textarea class="form-control json-editor" id="outputSchema"
+                          placeholder='{"type": "object", "properties": {...}}'
+                          required rows="6"
+                          th:field="${tool.outputSchema}"></textarea>
+                <div class="form-text">请输入符合JSON Schema规范的输出定义</div>
+            </div>
+        </div>
+
+        <!-- 源HTTP工具配置 -->
+        <div class="form-section" th:if="${httpTool != null}">
+            <h4 class="mb-3"><i class="fas fa-globe me-2"></i>源HTTP工具配置</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="httpToolName">工具名称</label>
+                        <input class="form-control" id="httpToolName" th:value="${httpTool.nameDisplay}" type="text">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="httpToolDesc">工具描述</label>
+                        <input class="form-control" id="httpToolDesc" th:value="${httpTool.descDisplay}" type="text">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="httpToolUrl">请求URL</label>
+                        <input class="form-control" id="httpToolUrl" th:value="${httpTool.reqUrl}" type="text">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="httpToolMethod">请求方法</label>
+                        <select class="form-select" id="httpToolMethod" th:value="${httpTool.reqMethod}">
+                            <option th:selected="${httpTool.reqMethod == 'GET'}" value="GET">GET</option>
+                            <option th:selected="${httpTool.reqMethod == 'POST'}" value="POST">POST</option>
+                            <option th:selected="${httpTool.reqMethod == 'PUT'}" value="PUT">PUT</option>
+                            <option th:selected="${httpTool.reqMethod == 'DELETE'}" value="DELETE">DELETE</option>
+                            <option th:selected="${httpTool.reqMethod == 'PATCH'}" value="PATCH">PATCH</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="httpToolHeaders">请求头（JSON格式）</label>
+                <textarea class="form-control json-editor" id="httpToolHeaders" rows="3"
+                          th:text="${httpTool.reqHeaders}"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="httpToolInputSchema">输入Schema（JSON格式）</label>
+                <textarea class="form-control json-editor" id="httpToolInputSchema" rows="4"
+                          th:text="${httpTool.inputSchema}"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="httpToolOutputSchema">输出Schema（JSON格式）</label>
+                <textarea class="form-control json-editor" id="httpToolOutputSchema" rows="4"
+                          th:text="${httpTool.outputSchema}"></textarea>
+            </div>
+        </div>
+
+        <!-- 转换器配置 -->
+        <div class="form-section" th:if="${converter != null}">
+            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>转换器配置</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="converterReqUrl">请求URL模板（jinja2）</label>
+                        <input class="form-control" id="converterReqUrl" th:value="${converter.reqUrl}" type="text">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="converterReqMethod">请求方法</label>
+                        <select class="form-select" id="converterReqMethod" th:value="${converter.reqMethod}">
+                            <option th:selected="${converter.reqMethod == 'GET'}" value="GET">GET</option>
+                            <option th:selected="${converter.reqMethod == 'POST'}" value="POST">POST</option>
+                            <option th:selected="${converter.reqMethod == 'PUT'}" value="PUT">PUT</option>
+                            <option th:selected="${converter.reqMethod == 'DELETE'}" value="DELETE">DELETE</option>
+                            <option th:selected="${converter.reqMethod == 'PATCH'}" value="PATCH">PATCH</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="converterReqHeaders">请求头模板（jinja2）</label>
+                <textarea class="form-control" id="converterReqHeaders" rows="3"
+                          th:text="${converter.reqHeaders}"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="converterReqBody">请求体模板（jinja2）</label>
+                <textarea class="form-control" id="converterReqBody" rows="3" th:text="${converter.reqBody}"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="converterRespBody">响应体模板（jinja2）</label>
+                <textarea class="form-control" id="converterRespBody" rows="3"
+                          th:text="${converter.respBody}"></textarea>
+            </div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-secondary" href="/mcp-tools">
+                <i class="fas fa-times me-2"></i>取消
+            </a>
+            <button class="btn btn-success" type="submit">
+                <i class="fas fa-save me-2"></i>保存工具
+            </button>
+        </div>
+    </form>
+</div>
+
+<script src="/vendor/bootstrap/bootstrap-5.3.0.bundle.min.js"></script>
+<script>
+    // 表单验证
+    document.getElementById('mcpToolForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // 验证JSON格式
+        const jsonFields = ['inputSchema', 'outputSchema'];
+        for (let field of jsonFields) {
+            const element = document.getElementById(field);
+            if (element.value.trim()) {
+                try {
+                    JSON.parse(element.value);
+                } catch (error) {
+                    alert(`${field} 字段的JSON格式不正确: ${error.message}`);
+                    element.focus();
+                    return;
+                }
+            }
+        }
+
+        // 发送AJAX请求
+        const formData = new FormData(this);
+        const jsonData = {};
+
+        // 转换FormData为JSON
+        for (let [key, value] of formData.entries()) {
+            jsonData[key] = value;
+        }
+
+        // 收集源HTTP工具数据
+        const httpToolData = {};
+        const httpToolFields = ['httpToolName', 'httpToolDesc', 'httpToolUrl', 'httpToolMethod', 'httpToolHeaders', 'httpToolInputSchema', 'httpToolOutputSchema'];
+        httpToolFields.forEach(field => {
+            const element = document.getElementById(field);
+            if (element) {
+                let fieldName = field.replace('httpTool', '').toLowerCase();
+                if (fieldName === 'name') fieldName = 'nameDisplay';
+                else if (fieldName === 'desc') fieldName = 'descDisplay';
+                else if (fieldName === 'url') fieldName = 'reqUrl';
+                else if (fieldName === 'method') fieldName = 'reqMethod';
+                else if (fieldName === 'headers') fieldName = 'reqHeaders';
+                else if (fieldName === 'inputschema') fieldName = 'inputSchema';
+                else if (fieldName === 'outputschema') fieldName = 'outputSchema';
+                httpToolData[fieldName] = element.value;
+            }
+        });
+
+        // 收集转换器数据
+        const converterData = {};
+        const converterFields = ['converterReqUrl', 'converterReqMethod', 'converterReqHeaders', 'converterReqBody', 'converterRespBody'];
+        converterFields.forEach(field => {
+            const element = document.getElementById(field);
+            if (element) {
+                let fieldName = field.replace('converter', '').toLowerCase();
+                if (fieldName === 'requrl') fieldName = 'reqUrl';
+                else if (fieldName === 'reqmethod') fieldName = 'reqMethod';
+                else if (fieldName === 'reqheaders') fieldName = 'reqHeaders';
+                else if (fieldName === 'reqbody') fieldName = 'reqBody';
+                else if (fieldName === 'respbody') fieldName = 'respBody';
+                converterData[fieldName] = element.value;
+            }
+        });
+
+        // 添加多表数据到请求
+        if (Object.keys(httpToolData).length > 0) {
+            jsonData.httpTool = httpToolData;
+        }
+        if (Object.keys(converterData).length > 0) {
+            jsonData.converter = converterData;
+        }
+
+        fetch('/mcp-tools/api/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    return response.text().then(text => Promise.reject(text));
+                }
+            })
+            .then(data => {
+                alert('保存成功!');
+                window.location.href = '/mcp-tools';
+            })
+            .catch(error => {
+                alert('保存失败: ' + error);
+            });
+    });
+
+    // JSON格式化
+    function formatJson(fieldId) {
+        const element = document.getElementById(fieldId);
+        try {
+            const json = JSON.parse(element.value);
+            element.value = JSON.stringify(json, null, 2);
+        } catch (error) {
+            alert('JSON格式不正确: ' + error.message);
+        }
+    }
+
+    // 为JSON编辑器添加格式化功能
+    document.addEventListener('DOMContentLoaded', function () {
+        const jsonEditors = document.querySelectorAll('.json-editor');
+        jsonEditors.forEach(editor => {
+            editor.addEventListener('blur', function () {
+                if (this.value.trim()) {
+                    try {
+                        const json = JSON.parse(this.value);
+                        this.value = JSON.stringify(json, null, 2);
+                    } catch (error) {
+                        // 静默处理，不打断用户输入
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

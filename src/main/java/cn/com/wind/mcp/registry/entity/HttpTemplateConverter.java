@@ -53,6 +53,11 @@ public class HttpTemplateConverter extends Model<HttpTemplateConverter> {
     private String updateBy;
 
     /**
+     * 提供者ID
+     */
+    private Long providerId;
+
+    /**
      * 工具编号 (MCP工具ID)
      */
     private Long toolNum;

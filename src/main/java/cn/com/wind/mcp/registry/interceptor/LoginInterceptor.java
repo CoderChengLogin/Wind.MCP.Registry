@@ -30,6 +30,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             "/provider/register",  // 注册页面
             "/css/",              // CSS静态资源
             "/js/",               // JS静态资源
+            "/vendor/",           // 第三方库资源
             "/webfonts/",         // 字体资源
             "/images/",           // 图片资源
             "/favicon.ico"        // 网站图标
