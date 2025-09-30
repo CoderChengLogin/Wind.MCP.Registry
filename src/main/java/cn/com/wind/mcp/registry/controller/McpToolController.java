@@ -356,16 +356,34 @@ public class McpToolController {
         // 检查工具是否存在
         McpTool tool = mcpToolService.getById(id);
         if (tool == null) {
-            return "redirect:/mcp-tools?error=工具不存在";
+            try {
+                return "redirect:/mcp-tools?error=" + URLEncoder.encode("工具不存在",
+                    StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                log.error("URL编码失败", e);
+                return "redirect:/mcp-tools";
+            }
         }
 
         // 检查权限：只有工具的创建者可以删除
         if (!PermissionUtil.hasPermission(session, tool.getProviderId())) {
-            return "redirect:/mcp-tools?error=无权限删除此工具";
+            try {
+                return "redirect:/mcp-tools?error=" + URLEncoder.encode("无权限删除此工具",
+                    StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                log.error("URL编码失败", e);
+                return "redirect:/mcp-tools";
+            }
         }
 
         mcpToolService.removeById(id);
-        return "redirect:/mcp-tools?success=工具删除成功";
+        try {
+            return "redirect:/mcp-tools?success=" + URLEncoder.encode("工具删除成功",
+                StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            log.error("URL编码失败", e);
+            return "redirect:/mcp-tools";
+        }
     }
 
     /**

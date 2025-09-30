@@ -1,5 +1,8 @@
 package cn.com.wind.mcp.registry.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * 工具录入向导Controller
@@ -78,8 +81,7 @@ public class ToolWizardController {
      * @return 保存结果
      */
     @PostMapping("/save-unified")
-    @ResponseBody
-    public String saveUnified(UnifiedToolAddDto dto, HttpSession session) {
+    public String saveUnified(UnifiedToolAddDto dto, HttpSession session, RedirectAttributes redirectAttributes) {
         log.info("收到一键保存请求，工具类型: {}", dto.getSelectedToolType());
         log.info("完整请求数据: {}", dto);
 
@@ -119,11 +121,20 @@ public class ToolWizardController {
             saveHttpTemplateConverter(dto, providerToolNum, currentUser, session);
 
             log.info("一键保存成功，工具编号: {}", providerToolNum);
-            return "success";
+
+            // 根据Bug3.md要求：新增工具成功后要跳转到list.html页面
+            try {
+                return "redirect:/mcp-tools?success=" + URLEncoder.encode("工具创建成功",
+                    StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException ex) {
+                log.error("URL编码失败", ex);
+                return "redirect:/mcp-tools";
+            }
 
         } catch (Exception e) {
             log.error("保存工具数据失败: ", e);
-            return "保存失败: " + e.getMessage();
+            redirectAttributes.addFlashAttribute("error", "保存失败: " + e.getMessage());
+            return "redirect:/tool-wizard/unified-add";
         }
     }
 
@@ -355,8 +366,17 @@ public class ToolWizardController {
         httpTool.setReqHeaders(dto.getReqHeaders());
         httpTool.setInputSchema(dto.getInputSchema());
         httpTool.setOutputSchema(dto.getOutputSchema());
-        httpTool.setProviderAppNum(
-            dto.getProviderAppNum() != null ? Long.valueOf(dto.getProviderAppNum()) : null);
+        // 设置providerAppNum，处理可能的数字格式异常
+        if (dto.getProviderAppNum() != null && !dto.getProviderAppNum().trim().isEmpty()) {
+            try {
+                httpTool.setProviderAppNum(Long.valueOf(dto.getProviderAppNum().trim()));
+            } catch (NumberFormatException e) {
+                log.warn("providerAppNum不是有效数字，将设置为null: {}", dto.getProviderAppNum());
+                httpTool.setProviderAppNum(null);
+            }
+        } else {
+            httpTool.setProviderAppNum(null);
+        }
         httpTool.setCreateTime(LocalDateTime.now());
         httpTool.setCreateBy(currentUser);
         httpTool.setUpdateTime(LocalDateTime.now());

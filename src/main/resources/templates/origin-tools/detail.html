@@ -149,7 +149,7 @@
             <!-- 描述信息 -->
             <div class="info-card card" th:if="${tool.descDisplay}">
                 <div class="card-header">
-                    <i class="fas fa-info-circle me-2"></i>工具描述
+                    <i class="fas fa-info-circle me-2"></i>功能描述
                 </div>
                 <div class="card-body">
                     <p class="mb-0" th:text="${tool.descDisplay}">工具的详细描述信息</p>
@@ -163,18 +163,18 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-sm-3"><strong>请求方法:</strong></div>
+                        <div class="col-sm-3"><strong>请求方式:</strong></div>
                         <div class="col-sm-9">
                                 <span class="badge method-badge"
-                                      th:classappend="${tool.reqMethod == 'GET' ? 'bg-primary' : 
-                                                     tool.reqMethod == 'POST' ? 'bg-success' : 
-                                                     tool.reqMethod == 'PUT' ? 'bg-warning' : 
+                                      th:classappend="${tool.reqMethod == 'GET' ? 'bg-primary' :
+                                                     tool.reqMethod == 'POST' ? 'bg-success' :
+                                                     tool.reqMethod == 'PUT' ? 'bg-warning' :
                                                      tool.reqMethod == 'DELETE' ? 'bg-danger' : 'bg-secondary'}"
                                       th:text="${tool.reqMethod}">GET</span>
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-sm-3"><strong>URL地址:</strong></div>
+                        <div class="col-sm-3"><strong>请求url:</strong></div>
                         <div class="col-sm-9">
                             <code th:text="${tool.reqUrl}">http://example.com/api</code>
                         </div>
@@ -192,25 +192,26 @@
                 </div>
             </div>
 
-            <!-- 请求参数 -->
+            <!-- 输入参数 -->
             <div class="info-card card" th:if="${tool.inputSchema}">
                 <div class="card-header">
-                    <i class="fas fa-sliders-h me-2"></i>请求参数
+                    <i class="fas fa-sliders-h me-2"></i>输入参数
                 </div>
                 <div class="card-body">
                     <div class="json-display" th:text="${tool.inputSchema}">{"param1": "value1"}</div>
                 </div>
             </div>
 
-            <!-- 请求体 -->
+            <!-- 输出参数 -->
             <div class="info-card card" th:if="${tool.outputSchema}">
                 <div class="card-header">
-                    <i class="fas fa-file-code me-2"></i>请求体
+                    <i class="fas fa-file-code me-2"></i>输出参数
                 </div>
                 <div class="card-body">
-                    <div class="json-display" th:text="${tool.outputSchema}">{"key": "value"}</div>
+                    <div class="json-display" th:text="${tool.outputSchema}">{"result": "success"}</div>
                 </div>
             </div>
+
 
             <!-- 测试结果 -->
             <div class="test-result" id="testResult">
@@ -223,26 +224,12 @@
         <div class="col-lg-4">
             <div class="info-card card sidebar-card">
                 <div class="card-header">
-                    <i class="fas fa-info me-2"></i>基本信息
+                    <i class="fas fa-info me-2"></i>服务方app信息
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <small class="text-muted">工具ID</small>
-                        <div th:text="${tool.id}">1</div>
-                    </div>
-                    <div class="mb-3" th:if="${tool.createTime}">
-                        <small class="text-muted">创建时间</small>
-                        <div th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
-                        </div>
-                    </div>
-                    <div class="mb-3" th:if="${tool.updateTime}">
-                        <small class="text-muted">更新时间</small>
-                        <div th:text="${#temporals.format(tool.updateTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00
-                        </div>
-                    </div>
-                    <div class="mb-3" th:if="${tool.providerToolNum}">
-                        <small class="text-muted">工具编号</small>
-                        <div th:text="${tool.providerToolNum}">123456789</div>
+                    <div class="mb-3" th:if="${tool.providerAppNum}">
+                        <small class="text-muted">服务方app</small>
+                        <div th:text="${tool.providerAppNum}">应用名称</div>
                     </div>
                 </div>
             </div>

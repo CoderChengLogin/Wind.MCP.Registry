@@ -49,12 +49,9 @@
         </ol>
     </nav>
 
-    <!-- 页面标题和操作 -->
+    <!-- 页面标题 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-globe me-2"></i>原始HTTP工具</h1>
-        <a class="btn btn-success" href="/origin-tools/new">
-            <i class="fas fa-plus me-2"></i>添加新工具
-        </a>
     </div>
 
     <!-- 搜索框 -->
@@ -126,10 +123,7 @@
     <div class="text-center py-5" th:if="${#lists.isEmpty(tools)}">
         <i class="fas fa-globe fa-4x text-muted mb-3"></i>
         <h3 class="text-muted">暂无原始HTTP工具</h3>
-        <p class="text-muted">开始添加您的第一个HTTP工具吧！</p>
-        <a class="btn btn-success" href="/origin-tools/new">
-            <i class="fas fa-plus me-2"></i>添加新工具
-        </a>
+        <p class="text-muted">当前没有找到任何HTTP工具。</p>
     </div>
 
     <!-- 分页 -->

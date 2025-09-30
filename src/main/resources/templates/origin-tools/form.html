@@ -77,8 +77,7 @@
     </div>
 
     <!-- 工具表单 -->
-    <form id="toolForm"
-          method="post" th:action="${tool.id != null ? '/origin-tools/' + tool.id + '/save' : '/origin-tools/save'}">
+    <form id="toolForm" method="post" th:action="@{/origin-tools/save}">
         <input th:field="${tool.id}" type="hidden">
 
         <!-- 基本信息 -->
@@ -88,38 +87,45 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label" for="name">工具名称 <span class="required">*</span></label>
-                        <input class="form-control" id="name" required th:field="${tool.nameDisplay}" type="text">
-                        <div class="form-text">请输入工具的名称</div>
+                        <label class="form-label" for="name">名称 <span class="required">*</span></label>
+                        <input class="form-control" id="name" placeholder="请输入工具名称" required th:field="${tool.nameDisplay}"
+                               type="text">
+                        <div class="form-text">对应数据库字段：name_display</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label" for="method">HTTP方法 <span class="required">*</span></label>
+                        <label class="form-label" for="description">功能描述 <span class="required">*</span></label>
+                        <textarea class="form-control" id="description" placeholder="请描述这个工具的功能" required
+                                  rows="3" th:field="${tool.descDisplay}"></textarea>
+                        <div class="form-text">对应数据库字段：desc_display</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="url">请求url <span class="required">*</span></label>
+                        <input class="form-control" id="url" placeholder="https://api.example.com/endpoint" required th:field="${tool.reqUrl}"
+                               type="url">
+                        <div class="form-text">对应数据库字段：req_url</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="method">请求方式 <span class="required">*</span></label>
                         <select class="form-select" id="method" required th:field="${tool.reqMethod}">
-                            <option value="">请选择HTTP方法</option>
+                            <option value="">请选择请求方法</option>
                             <option value="GET">GET</option>
                             <option value="POST">POST</option>
                             <option value="PUT">PUT</option>
                             <option value="DELETE">DELETE</option>
                             <option value="PATCH">PATCH</option>
-                            <option value="HEAD">HEAD</option>
-                            <option value="OPTIONS">OPTIONS</option>
                         </select>
+                        <div class="form-text">对应数据库字段：req_method</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="url">URL地址 <span class="required">*</span></label>
-                <input class="form-control" id="url" required th:field="${tool.reqUrl}" type="url">
-                <div class="form-text">请输入完整的HTTP URL地址</div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="description">工具描述</label>
-                <textarea class="form-control" id="description" rows="3" th:field="${tool.descDisplay}"></textarea>
-                <div class="form-text">请描述这个工具的功能和用途</div>
             </div>
         </div>
 
@@ -130,44 +136,52 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label" for="headers">请求头 (JSON格式)</label>
+                        <label class="form-label" for="headers">请求头 <span class="required">*</span></label>
                         <textarea class="form-control json-editor" id="headers"
                                   placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token"}'
-                                  rows="6"
+                                  required rows="3"
                                   th:field="${tool.reqHeaders}"></textarea>
-                        <div class="form-text">请输入有效的JSON格式请求头</div>
+                        <div class="form-text">对应数据库字段：req_headers</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label" for="parameters">预留字段</label>
-                        <textarea class="form-control json-editor" id="parameters"
-                                  placeholder='{预留字段}' readonly
-                                  rows="6"></textarea>
-                        <div class="form-text">此字段预留用于扩展</div>
+                        <label class="form-label" for="inputSchema">输入参数 <span class="required">*</span></label>
+                        <textarea class="form-control json-editor" id="inputSchema"
+                                  placeholder='{"param1": "value1", "param2": "value2"}'
+                                  required rows="3"
+                                  th:field="${tool.inputSchema}"></textarea>
+                        <div class="form-text">对应数据库字段：input_schema</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Schema配置 -->
+        <!-- 输出参数和服务方配置 -->
         <div class="form-section">
-            <h4 class="mb-3"><i class="fas fa-sliders-h me-2"></i>Schema配置</h4>
+            <h4 class="mb-3"><i class="fas fa-sliders-h me-2"></i>输出参数和服务方配置</h4>
 
-            <div class="mb-3">
-                <label class="form-label" for="inputSchema">输入Schema (JSON格式)</label>
-                <textarea class="form-control json-editor" id="inputSchemaField"
-                          placeholder='{"type": "object", "properties": {...}}' rows="6"
-                          th:field="${tool.inputSchema}"></textarea>
-                <div class="form-text">请输入符合JSON Schema规范的输入定义</div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="outputSchema">输出Schema (JSON格式)</label>
-                <textarea class="form-control json-editor" id="outputSchemaField"
-                          placeholder='{"type": "object", "properties": {...}}' rows="6"
-                          th:field="${tool.outputSchema}"></textarea>
-                <div class="form-text">请输入符合JSON Schema规范的输出定义</div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="outputSchema">输出参数 <span class="required">*</span></label>
+                        <textarea class="form-control json-editor" id="outputSchema"
+                                  placeholder='{"result": "success", "data": {...}}'
+                                  required rows="3"
+                                  th:field="${tool.outputSchema}"></textarea>
+                        <div class="form-text">对应数据库字段：output_schema</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="providerAppNum">服务方app <span class="required">*</span></label>
+                        <input class="form-control" id="providerAppNum"
+                               placeholder="请输入服务方app名称"
+                               required th:field="${tool.providerAppNum}"
+                               type="text">
+                        <div class="form-text">对应数据库字段：provider_app_num</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -191,15 +205,20 @@
     // 表单验证
     document.getElementById('toolForm').addEventListener('submit', function (e) {
         // 验证JSON格式
-        const jsonFields = ['headers', 'parameters', 'requestBody'];
+        const jsonFields = [
+            {id: 'headers', name: '请求头'},
+            {id: 'inputSchema', name: '输入参数'},
+            {id: 'outputSchema', name: '输出参数'}
+        ];
+
         for (let field of jsonFields) {
-            const element = document.getElementById(field);
-            if (element.value.trim()) {
+            const element = document.getElementById(field.id);
+            if (element && element.value.trim()) {
                 try {
                     JSON.parse(element.value);
                 } catch (error) {
                     e.preventDefault();
-                    alert(`${field} 字段的JSON格式不正确: ${error.message}`);
+                    alert(`${field.name} 字段的JSON格式不正确: ${error.message}`);
                     element.focus();
                     return;
                 }
