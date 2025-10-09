@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 原始HTTP工具实体类
+ * 原始HTTP接口实体类
  * </p>
  *
  * @author system

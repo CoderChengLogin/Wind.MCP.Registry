@@ -22,9 +22,9 @@ public interface ToolValidationService {
     ValidationResult validateMcpTool(McpTool tool);
 
     /**
-     * 验证HTTP工具信息
+     * 验证HTTP接口信息
      *
-     * @param tool HTTP工具
+     * @param tool HTTP接口
      * @return 验证结果
      */
     ValidationResult validateHttpTool(OriginToolHttp tool);

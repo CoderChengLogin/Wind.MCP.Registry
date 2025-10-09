@@ -24,9 +24,6 @@
 
 <!-- 主要内容区域 -->
 <main class="container mt-4">
-    <!-- 消息提示区域 -->
-    <div class="mb-4" id="messageContainer" style="display: none;"></div>
-
     <!-- 面包屑导航 -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -95,7 +92,7 @@
                                         <div class="card-body text-center">
                                             <i class="fas fa-server fa-3x text-primary mb-3"></i>
                                             <h5>Expo工具</h5>
-                                            <p class="text-muted">基于Expo协议的工具</p>
+                                            <p class="text-muted">用于Expo应用的工具，支持应用级别的操作</p>
                                         </div>
                                     </div>
                                 </div>
@@ -218,7 +215,7 @@
                             <div class="mb-3">
                                 <label class="form-label required">服务方app <span class="text-danger">*</span></label>
                                 <input class="form-control" disabled id="providerAppNum" name="providerAppNum"
-                                       placeholder="请输入服务方app名称"
+                                       placeholder="请输入服务方app编号"
                                        required type="text">
                                 <div class="form-text">对应数据库字段：provider_app_num</div>
                             </div>
@@ -583,252 +580,25 @@
     }
 
     #saveBtn:enabled {
-        /* 移除跳动动画，避免影响点击 */
+        animation: pulse 2s infinite;
     }
 
-    /* 删除pulse动画，提升用户体验 */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
 </style>
 
 <!-- 页面专用JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // 数据校验规则配置
-        const validationRules = {
-            // URL格式校验
-            url: /^https?:\/\/([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
-            // JSON格式校验
-            json: function (value) {
-                try {
-                    JSON.parse(value);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            },
-            // 工具名称校验（只允许字母、数字、连字符和下划线）
-            toolName: /^[a-zA-Z0-9_-]{3,50}$/,
-            // 版本号校验
-            version: /^\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$/,
-            // 非空校验
-            required: function (value) {
-                return value && value.trim().length > 0;
-            },
-            // 长度校验
-            minLength: function (value, min) {
-                return value && value.trim().length >= min;
-            },
-            maxLength: function (value, max) {
-                return value && value.trim().length <= max;
-            }
-        };
-
-        // 字段校验配置
-        const fieldValidations = {
-            // HTTP工具字段
-            nameDisplay: [
-                {rule: 'required', message: '名称不能为空'},
-                {rule: 'minLength', param: 2, message: '名称至少需要2个字符'},
-                {rule: 'maxLength', param: 100, message: '名称不能超过100个字符'}
-            ],
-            descDisplay: [
-                {rule: 'required', message: '功能描述不能为空'},
-                {rule: 'minLength', param: 10, message: '功能描述至少需要10个字符'},
-                {rule: 'maxLength', param: 500, message: '功能描述不能超过500个字符'}
-            ],
-            reqUrl: [
-                {rule: 'required', message: '请求URL不能为空'},
-                {rule: 'url', message: '请输入有效的URL格式（如：https://api.example.com/endpoint）'}
-            ],
-            reqMethod: [
-                {rule: 'required', message: '请选择请求方式'}
-            ],
-            reqHeaders: [
-                {rule: 'required', message: '请求头不能为空'},
-                {rule: 'json', message: '请求头必须是有效的JSON格式'}
-            ],
-            inputSchema: [
-                {rule: 'required', message: '输入参数不能为空'},
-                {rule: 'json', message: '输入参数必须是有效的JSON格式'}
-            ],
-            outputSchema: [
-                {rule: 'required', message: '输出参数不能为空'},
-                {rule: 'json', message: '输出参数必须是有效的JSON格式'}
-            ],
-            providerAppNum: [
-                {rule: 'required', message: '服务方app不能为空'},
-                {rule: 'minLength', param: 1, message: '服务方app编号不能为空'}
-            ],
-            // Expo工具字段
-            expoToolName: [
-                {rule: 'required', message: '工具名称不能为空'},
-                {rule: 'toolName', message: '工具名称只能包含字母、数字、连字符和下划线，长度3-50个字符'}
-            ],
-            expoToolVersion: [
-                {rule: 'required', message: '工具版本不能为空'},
-                {rule: 'version', message: '版本号格式不正确，请使用语义化版本（如：1.0.0）'}
-            ],
-            expoDescription: [
-                {rule: 'required', message: '工具描述不能为空'},
-                {rule: 'minLength', param: 10, message: '工具描述至少需要10个字符'},
-                {rule: 'maxLength', param: 500, message: '工具描述不能超过500个字符'}
-            ],
-            // MCP工具字段
-            toolName: [
-                {rule: 'required', message: 'MCP工具英文名不能为空'},
-                {rule: 'toolName', message: 'MCP工具英文名只能包含字母、数字、连字符和下划线，长度3-50个字符'}
-            ],
-            toolDescription: [
-                {rule: 'required', message: 'MCP工具描述不能为空'},
-                {rule: 'minLength', param: 10, message: 'MCP工具描述至少需要10个字符'},
-                {rule: 'maxLength', param: 200, message: 'MCP工具描述不能超过200个字符'}
-            ],
-            mcpNameDisplay: [
-                {rule: 'required', message: '多语言名称不能为空'},
-                {rule: 'minLength', param: 2, message: '多语言名称至少需要2个字符'}
-            ],
-            descriptionDisplay: [
-                {rule: 'required', message: '多语言描述不能为空'},
-                {rule: 'minLength', param: 10, message: '多语言描述至少需要10个字符'}
-            ],
-            mcpInputSchema: [
-                {rule: 'required', message: 'input_json_schema不能为空'},
-                {rule: 'json', message: 'input_json_schema必须是有效的JSON Schema格式'}
-            ],
-            mcpOutputSchema: [
-                {rule: 'required', message: 'output_json_schema不能为空'},
-                {rule: 'json', message: 'output_json_schema必须是有效的JSON Schema格式'}
-            ],
-            streamOutput: [
-                {rule: 'required', message: '请选择是否流式输出'}
-            ],
-            convertType: [
-                {rule: 'required', message: '转换模板类型不能为空'},
-                {rule: 'minLength', param: 2, message: '转换模板类型至少需要2个字符'}
-            ],
-            toolType: [
-                {rule: 'required', message: '请选择MCP工具类型'}
-            ],
-            // 模板转换器字段
-            templateReqUrl: [
-                {rule: 'required', message: '请求路径不能为空'},
-                {rule: 'minLength', param: 1, message: '请求路径不能为空'}
-            ],
-            templateReqMethod: [
-                {rule: 'required', message: '请选择请求方式'}
-            ],
-            templateReqHeaders: [
-                {rule: 'required', message: '请求头模板不能为空'},
-                {rule: 'minLength', param: 5, message: '请求头模板内容过短'}
-            ],
-            reqBody: [
-                {rule: 'required', message: '请求体模板不能为空'},
-                {rule: 'minLength', param: 5, message: '请求体模板内容过短'}
-            ],
-            respBody: [
-                {rule: 'required', message: '响应体模板不能为空'},
-                {rule: 'minLength', param: 5, message: '响应体模板内容过短'}
-            ]
-        };
-
-        // 校验单个字段
-        function validateField(fieldId, value) {
-            const validations = fieldValidations[fieldId];
-            if (!validations) return {valid: true};
-
-            for (let validation of validations) {
-                const rule = validation.rule;
-                let isValid = false;
-
-                if (typeof validationRules[rule] === 'function') {
-                    if (validation.param !== undefined) {
-                        isValid = validationRules[rule](value, validation.param);
-                    } else {
-                        isValid = validationRules[rule](value);
-                    }
-                } else if (validationRules[rule] instanceof RegExp) {
-                    isValid = validationRules[rule].test(value);
-                }
-
-                if (!isValid) {
-                    return {valid: false, message: validation.message};
-                }
-            }
-
-            return {valid: true};
-        }
-
-        // 显示字段错误信息
-        function showFieldError(fieldId, message) {
-            const field = document.getElementById(fieldId);
-            if (!field) return;
-
-            // 移除之前的错误状态
-            field.classList.remove('is-valid', 'is-invalid');
-
-            // 移除之前的错误信息
-            const existingError = field.parentNode.querySelector('.invalid-feedback');
-            if (existingError) {
-                existingError.remove();
-            }
-
-            if (message) {
-                // 添加错误状态
-                field.classList.add('is-invalid');
-
-                // 添加错误信息
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'invalid-feedback';
-                errorDiv.textContent = message;
-                field.parentNode.appendChild(errorDiv);
-            } else {
-                // 添加成功状态
-                field.classList.add('is-valid');
-            }
-        }
-
-        // 实时校验字段
-        function setupRealTimeValidation() {
-            Object.keys(fieldValidations).forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    // 失去焦点时校验
-                    field.addEventListener('blur', function () {
-                        const result = validateField(fieldId, this.value);
-                        showFieldError(fieldId, result.valid ? null : result.message);
-
-                        // 检查当前部分是否完成
-                        checkCurrentSectionCompletion();
-                    });
-
-                    // 输入时清除错误状态（延迟校验）
-                    let timeout;
-                    field.addEventListener('input', function () {
-                        clearTimeout(timeout);
-                        timeout = setTimeout(() => {
-                            const result = validateField(fieldId, this.value);
-                            if (result.valid) {
-                                showFieldError(fieldId, null);
-                            }
-                            checkCurrentSectionCompletion();
-                        }, 500);
-                    });
-                }
-            });
-        }
-
-        // 检查当前部分完成状态
-        function checkCurrentSectionCompletion() {
-            // 检查每个部分的完成状态
-            for (let i = 1; i <= 4; i++) {
-                if (checkSectionCompletion(`section${i}`)) {
-                    if (i < 4) {
-                        unlockNextSection(i);
-                    }
-                    checkSaveButton();
-                }
-            }
-        }
-
         // 必填字段配置
         const requiredFields = {
             section1: [], // 第一步只需要选择工具类型，通过点击事件验证
@@ -870,20 +640,15 @@
             });
         });
 
-        // 检查每个部分的完成状态（增强版本）
+        // 检查每个部分的完成状态
         function checkSectionCompletion(sectionId) {
             if (sectionId === 'section1') {
                 return selectedToolType !== '';
             }
-
             const fields = requiredFields[sectionId];
             return fields.every(fieldId => {
                 const field = document.getElementById(fieldId);
-                if (!field) return false;
-
-                // 检查字段值是否有效
-                const result = validateField(fieldId, field.value);
-                return result.valid && field.value.trim() !== '';
+                return field && field.value.trim() !== '';
             });
         }
 
@@ -894,6 +659,7 @@
                 const nextSectionElement = document.getElementById(`section${nextSection}`);
                 const nextLockElement = document.getElementById(`section${nextSection}-lock`);
                 const nextContentElement = nextSectionElement.querySelector('.section-content-locked');
+                const nextIndicator = document.getElementById(`step${nextSection}-indicator`);
 
                 // 移除锁定状态
                 nextSectionElement.classList.remove('section-locked');
@@ -924,11 +690,8 @@
                 allInputs.forEach(input => input.disabled = false);
 
                 // 更新进度指示器
-                const nextIndicator = document.getElementById(`step-${nextSection}`);
-                if (nextIndicator) {
-                    nextIndicator.classList.remove('pending');
-                    nextIndicator.classList.add('active');
-                }
+                nextIndicator.classList.remove('pending');
+                nextIndicator.classList.add('active');
 
                 // 显示完成提示
                 const completedAlert = document.getElementById(`section${currentSection}-completed`);
@@ -936,12 +699,12 @@
                     completedAlert.style.display = 'block';
                 }
 
-                // 移除自动滚动，避免页面抖动
-                // nextSectionElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+                // 平滑滚动到下一部分
+                nextSectionElement.scrollIntoView({behavior: 'smooth', block: 'start'});
             }
         }
 
-        // 检查是否可以启用保存按钮（增强版本）
+        // 检查是否可以启用保存按钮
         function checkSaveButton() {
             const allCompleted = Object.keys(requiredFields).every(section => checkSectionCompletion(section));
             const saveBtn = document.getElementById('saveBtn');
@@ -949,8 +712,6 @@
             if (allCompleted) {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>一键保存工具信息';
-                saveBtn.classList.remove('btn-secondary');
-                saveBtn.classList.add('btn-success');
 
                 // 显示最终完成提示
                 const section4Completed = document.getElementById('section4-completed');
@@ -961,176 +722,96 @@
                 // 更新所有进度指示器为完成状态
                 for (let i = 1; i <= 4; i++) {
                     const indicator = document.getElementById(`step-${i}`);
-                    if (indicator) {
-                        indicator.classList.add('completed');
-                        indicator.classList.remove('active');
-                        indicator.classList.remove('pending');
-                    }
+                    indicator.classList.add('completed');
+                    indicator.classList.remove('active');
+                    indicator.classList.remove('pending');
                 }
             } else {
                 saveBtn.disabled = true;
                 saveBtn.innerHTML = '<i class="fas fa-lock me-2"></i>请完成所有必填项';
-                saveBtn.classList.remove('btn-success');
-                saveBtn.classList.add('btn-secondary');
             }
         }
 
-        // 表单提交前的最终校验
-        function validateAllFields() {
-            let isValid = true;
-            const errors = [];
+        // 为所有输入字段添加事件监听器
+        const allInputs = document.querySelectorAll('input, textarea, select');
+        allInputs.forEach(input => {
+            input.addEventListener('input', function () {
+                // 检查当前字段所属的部分
+                let currentSection = 1;
+                if (this.name === 'nameDisplay' || this.name === 'descDisplay' || this.name === 'reqUrl' ||
+                    this.name === 'reqMethod' || this.name === 'reqHeaders' || this.name === 'inputSchema' ||
+                    this.name === 'outputSchema' || this.name === 'providerAppNum' ||
+                    this.name.startsWith('expo')) currentSection = 2;
+                else if (this.name === 'toolName' || this.name === 'toolDescription' ||
+                    this.name === 'mcpNameDisplay' || this.name === 'descriptionDisplay' ||
+                    this.name === 'mcpInputSchema' || this.name === 'mcpOutputSchema' ||
+                    this.name === 'streamOutput' || this.name === 'convertType' || this.name === 'toolType') currentSection = 3;
+                else if (this.name === 'templateReqUrl' || this.name === 'templateReqMethod' ||
+                    this.name === 'templateReqHeaders' || this.name === 'reqBody' || this.name === 'respBody') currentSection = 4;
 
-            // 校验所有相关字段
-            const fieldsToValidate = [];
-
-            // 根据选择的工具类型添加字段
-            if (selectedToolType === 'http') {
-                fieldsToValidate.push(...requiredFields.section2);
-            } else if (selectedToolType === 'expo') {
-                fieldsToValidate.push(...requiredFields.section2);
-            }
-
-            fieldsToValidate.push(...requiredFields.section3);
-            fieldsToValidate.push(...requiredFields.section4);
-
-            fieldsToValidate.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    const result = validateField(fieldId, field.value);
-                    if (!result.valid) {
-                        isValid = false;
-                        errors.push(`${fieldId}: ${result.message}`);
-                        showFieldError(fieldId, result.message);
+                // 检查当前部分是否完成
+                if (checkSectionCompletion(`section${currentSection}`)) {
+                    // 如果当前部分完成，解锁下一部分
+                    if (currentSection < 4) {
+                        unlockNextSection(currentSection);
                     }
+
+                    // 检查是否可以启用保存按钮
+                    checkSaveButton();
                 }
             });
+        });
 
-            return {valid: isValid, errors};
-        }
-
-        // 保存按钮直接点击事件处理 - 确保100%请求后端
-        document.getElementById('saveBtn').addEventListener('click', function (e) {
+        // 表单提交处理
+        document.getElementById('unifiedForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            // 获取表单引用
-            const form = document.getElementById('unifiedForm');
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
 
-            // 显示保存中状态（立即显示，确保用户看到响应）
+            // 显示保存中状态
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>正在保存...';
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>保存中...';
 
-            // 最终校验
-            const validation = validateAllFields();
-            if (!validation.valid) {
-                // 校验失败，恢复按钮状态
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>一键保存工具信息';
-
-                // 显示错误信息
-                const errorsList = validation.errors.map(error => `<li>${error}</li>`).join('');
-                showMessage('danger', '表单验证失败！', `请检查并修正以下错误：<ul class="mb-0 mt-2">${errorsList}</ul>`);
-                return;
-            }
-
-            // 构建表单数据
-            const formData = new FormData(form);
-
-            // 使用fetch API直接调用后端接口
-            fetch(form.action, {
+            // 发送数据到后端
+            fetch(this.action, {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                body: formData
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP错误: ${response.status} - ${response.statusText}`);
-                    }
-                    return response.text();
-                })
+                .then(response => response.text())
                 .then(result => {
                     if (result === 'success') {
                         saveBtn.innerHTML = '<i class="fas fa-check me-2"></i>保存成功！';
                         saveBtn.classList.remove('btn-success');
                         saveBtn.classList.add('btn-outline-success');
 
-                        // 显示成功消息
-                        showMessage('success', '保存成功！', '工具信息已成功录入系统。<div class="mt-2"><small>3秒后将自动跳转到工具列表页面...</small></div>');
+                        // 显示成功提示
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-success alert-dismissible fade show';
+                        alert.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>保存成功！</strong> 工具信息已成功录入系统。
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                        document.querySelector('main').insertBefore(alert, document.querySelector('main').firstChild);
 
                         // 3秒后跳转
                         setTimeout(() => {
                             window.location.href = '/mcp-tools';
                         }, 3000);
                     } else {
-                        handleSaveError('保存失败：' + result);
+                        throw new Error('保存失败');
                     }
                 })
                 .catch(error => {
-                    handleSaveError(error.message || '网络连接错误，请检查网络后重试');
+                    console.error('Error:', error);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>保存失败，请重试';
+                    saveBtn.classList.remove('btn-success');
+                    saveBtn.classList.add('btn-danger');
                 });
-
-            // 错误处理函数
-            function handleSaveError(errorMessage) {
-                console.error('保存错误:', errorMessage);
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>保存失败，请重试';
-                saveBtn.classList.remove('btn-success');
-                saveBtn.classList.add('btn-danger');
-
-                showMessage('danger', '保存失败！', errorMessage);
-            }
         });
-
-        // 表单提交事件处理（作为备用，防止直接提交）
-        document.getElementById('unifiedForm').addEventListener('submit', function (e) {
-            e.preventDefault(); // 阻止默认提交，统一通过按钮点击处理
-            document.getElementById('saveBtn').click(); // 触发按钮点击事件
-        });
-
-        // 统一的消息显示函数
-        function showMessage(type, title, content, autoHide = false, hideDelay = 3000) {
-            const messageContainer = document.getElementById('messageContainer');
-            const iconMap = {
-                success: 'fas fa-check-circle',
-                danger: 'fas fa-exclamation-triangle',
-                warning: 'fas fa-exclamation-circle',
-                info: 'fas fa-info-circle'
-            };
-
-            const icon = iconMap[type] || iconMap.info;
-            let alertHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show">
-                    <i class="${icon} me-2"></i>
-                    <strong>${title}</strong> ${content}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-
-            messageContainer.innerHTML = alertHTML;
-            messageContainer.style.display = 'block';
-
-            // 自动隐藏
-            if (autoHide) {
-                setTimeout(() => {
-                    messageContainer.style.display = 'none';
-                }, hideDelay);
-            }
-
-            // 不滚动到顶部，避免页面抖动
-            return messageContainer.firstElementChild;
-        }
-
-        // 隐藏消息
-        function hideMessage() {
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.style.display = 'none';
-            messageContainer.innerHTML = '';
-        }
-
-        // 初始化实时校验
-        setupRealTimeValidation();
     });
 </script>
 </body>

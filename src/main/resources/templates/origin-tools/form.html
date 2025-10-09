@@ -48,7 +48,7 @@
                     <a class="nav-link" href="/mcp-tools">MCP工具</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/origin-tools">原始HTTP工具</a>
+                    <a class="nav-link active" href="/origin-http-tools">原始HTTP接口</a>
                 </li>
             </ul>
         </div>
@@ -60,7 +60,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">首页</a></li>
-            <li class="breadcrumb-item"><a href="/origin-tools">原始HTTP工具</a></li>
+            <li class="breadcrumb-item"><a href="/origin-http-tools">原始HTTP接口</a></li>
             <li class="breadcrumb-item active" th:text="${tool.id != null ? '编辑工具' : '添加新工具'}">添加新工具</li>
         </ol>
     </nav>
@@ -71,13 +71,13 @@
             <i class="fas fa-globe me-2"></i>
             <span th:text="${tool.id != null ? '编辑工具' : '添加新工具'}">添加新工具</span>
         </h1>
-        <a class="btn btn-outline-secondary" href="/origin-tools">
+        <a class="btn btn-outline-secondary" href="/origin-http-tools">
             <i class="fas fa-arrow-left me-2"></i>返回列表
         </a>
     </div>
 
     <!-- 工具表单 -->
-    <form id="toolForm" method="post" th:action="@{/origin-tools/save}">
+    <form id="toolForm" method="post" th:action="@{/origin-http-tools/save}">
         <input th:field="${tool.id}" type="hidden">
 
         <!-- 基本信息 -->
@@ -187,7 +187,7 @@
 
         <!-- 提交按钮 -->
         <div class="d-flex justify-content-end gap-2">
-            <a class="btn btn-secondary" href="/origin-tools">
+            <a class="btn btn-secondary" href="/origin-http-tools">
                 <i class="fas fa-times me-2"></i>取消
             </a>
             <button class="btn btn-info" onclick="testTool()" type="button">

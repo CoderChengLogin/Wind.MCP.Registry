@@ -48,7 +48,7 @@
                     <a class="nav-link active" href="/mcp-tools">MCP工具</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/origin-http-tools">原始HTTP工具</a>
+                    <a class="nav-link" href="/origin-http-tools">原始HTTP接口</a>
                 </li>
             </ul>
         </div>
@@ -132,7 +132,7 @@
                         <label class="form-label" for="toolType">工具类型 <span class="required">*</span></label>
                         <select class="form-select" id="toolType" required th:field="${tool.toolType}">
                             <option value="">请选择工具类型</option>
-                            <option value="HTTP工具">HTTP工具</option>
+                            <option value="HTTP接口">HTTP接口</option>
                             <option value="数据库工具">数据库工具</option>
                             <option value="文件工具">文件工具</option>
                             <option value="系统工具">系统工具</option>
@@ -202,9 +202,9 @@
             </div>
         </div>
 
-        <!-- 源HTTP工具配置 -->
+        <!-- 原始HTTP接口配置 -->
         <div class="form-section" th:if="${httpTool != null}">
-            <h4 class="mb-3"><i class="fas fa-globe me-2"></i>源HTTP工具配置</h4>
+            <h4 class="mb-3"><i class="fas fa-globe me-2"></i>原始HTTP接口配置</h4>
 
             <div class="row">
                 <div class="col-md-6">
@@ -346,7 +346,7 @@
             jsonData[key] = value;
         }
 
-        // 收集源HTTP工具数据
+        // 收集原始HTTP接口数据
         const httpToolData = {};
         const httpToolFields = ['httpToolName', 'httpToolDesc', 'httpToolUrl', 'httpToolMethod', 'httpToolHeaders', 'httpToolInputSchema', 'httpToolOutputSchema'];
         httpToolFields.forEach(field => {

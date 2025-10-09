@@ -15,7 +15,7 @@ import lombok.Data;
 public class McpToolEditDto extends McpTool {
 
     /**
-     * 源HTTP工具信息
+     * 原始HTTP接口信息
      */
     private OriginToolHttp httpTool;
 

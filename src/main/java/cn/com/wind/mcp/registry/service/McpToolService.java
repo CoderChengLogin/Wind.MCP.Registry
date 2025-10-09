@@ -38,4 +38,20 @@ public interface McpToolService extends IService<McpTool> {
      * @return 工具信息
      */
     McpTool findByUniqueId(String uniqueId);
+
+    /**
+     * 统计指定用户创建的工具数量
+     *
+     * @param createBy 创建人
+     * @return 工具数量
+     */
+    long countByCreateBy(String createBy);
+
+    /**
+     * 统计指定提供者的工具数量
+     *
+     * @param providerId 提供者ID
+     * @return 工具数量
+     */
+    long countByProviderId(Long providerId);
 }

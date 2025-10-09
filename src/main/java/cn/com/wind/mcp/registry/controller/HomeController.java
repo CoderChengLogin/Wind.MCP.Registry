@@ -1,5 +1,8 @@
 package cn.com.wind.mcp.registry.controller;
 
+import javax.servlet.http.HttpSession;
+
+import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.McpToolService;
 import cn.com.wind.mcp.registry.service.OriginToolHttpService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +33,24 @@ public class HomeController {
      * 首页
      */
     @GetMapping("/")
-    public String index(Model model) {
+    public String index(Model model, HttpSession session) {
         log.info("访问首页");
 
-        // 统计数据
-        long mcpToolCount = mcpToolService.count();
-        long httpToolCount = originToolHttpService.count();
+        // 检查用户是否登录
+        Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+        if (currentProvider == null) {
+            // 未登录，重定向到登录页
+            log.info("用户未登录，重定向到登录页");
+            return "redirect:/provider/login";
+        }
+
+        // 已登录：只统计当前用户创建的数据
+        Long providerId = currentProvider.getId();
+        String username = currentProvider.getUsername();
+        log.info("用户 {} (ID: {}) 访问首页", username, providerId);
+
+        long mcpToolCount = mcpToolService.countByProviderId(providerId);
+        long httpToolCount = originToolHttpService.countByProviderId(providerId);
 
         model.addAttribute("mcpToolCount", mcpToolCount);
         model.addAttribute("httpToolCount", httpToolCount);

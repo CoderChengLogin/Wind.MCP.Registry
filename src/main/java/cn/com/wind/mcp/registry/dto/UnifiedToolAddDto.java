@@ -12,7 +12,7 @@ public class UnifiedToolAddDto {
     // ===== 工具类型 =====
     private String selectedToolType;  // 选择的工具类型
 
-    // ===== 源工具信息 (HTTP工具) - 对应Bug2.md第二步 =====
+    // ===== 源工具信息 (HTTP接口) - 对应Bug2.md第二步 =====
     private String nameDisplay;      // 名称 -> name_display
     private String descDisplay;      // 功能描述 -> desc_display
     private String reqUrl;          // 请求url -> req_url

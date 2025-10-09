@@ -48,7 +48,7 @@ public class ApiController {
                 new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<McpTool>()
                     .eq("provider_id", currentProvider.getId()));
 
-            // 查询用户的HTTP工具数量 - 需要导入OriginToolHttpService
+            // 查询用户的HTTP接口数量 - 需要导入OriginToolHttpService
             long httpToolCount = 0; // 暂时保持为0，后续实现
 
             result.put("success", true);

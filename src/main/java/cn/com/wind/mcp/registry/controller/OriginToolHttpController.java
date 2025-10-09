@@ -1,5 +1,6 @@
 package cn.com.wind.mcp.registry.controller;
 
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpSession;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * <p>
- * 原始HTTP工具Controller
+ * 原始HTTP接口Controller
  * </p>
  *
  * @author system
@@ -38,14 +39,14 @@ public class OriginToolHttpController {
     private OriginToolHttpService originToolHttpService;
 
     /**
-     * HTTP工具列表页面
+     * HTTP接口列表页面
      */
     @GetMapping
     public String list(Model model,
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
         HttpSession session) {
-        log.info("查询原始HTTP工具列表: page={}, size={}", page, size);
+        log.info("查询原始HTTP接口列表: page={}, size={}", page, size);
 
         Page<OriginToolHttp> toolPage = new Page<OriginToolHttp>(page, size);
         IPage<OriginToolHttp> result;
@@ -71,11 +72,11 @@ public class OriginToolHttpController {
     }
 
     /**
-     * HTTP工具详情页面
+     * HTTP接口详情页面
      */
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        log.info("查询原始HTTP工具详情: id={}", id);
+        log.info("查询原始HTTP接口详情: id={}", id);
 
         OriginToolHttp tool = originToolHttpService.getById(id);
         if (tool == null) {
@@ -87,7 +88,7 @@ public class OriginToolHttpController {
     }
 
     /**
-     * 新增HTTP工具页面
+     * 新增HTTP接口页面
      */
     @GetMapping("/add")
     public String addForm(Model model) {
@@ -96,7 +97,7 @@ public class OriginToolHttpController {
     }
 
     /**
-     * 新增HTTP工具页面 (new路径别名)
+     * 新增HTTP接口页面 (new路径别名)
      */
     @GetMapping("/new")
     public String newForm(Model model) {
@@ -105,11 +106,11 @@ public class OriginToolHttpController {
     }
 
     /**
-     * 编辑HTTP工具页面
+     * 编辑HTTP接口页面
      */
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model, HttpSession session) {
-        log.info("编辑原始HTTP工具: id={}", id);
+        log.info("编辑原始HTTP接口: id={}", id);
 
         OriginToolHttp tool = originToolHttpService.getById(id);
         if (tool == null) {
@@ -126,11 +127,11 @@ public class OriginToolHttpController {
     }
 
     /**
-     * 保存HTTP工具
+     * 保存HTTP接口
      */
     @PostMapping("/save")
     public String save(@ModelAttribute OriginToolHttp tool, HttpSession session) {
-        log.info("保存原始HTTP工具: {}", tool);
+        log.info("保存原始HTTP接口: {}", tool);
 
         // 获取当前登录用户
         Long currentProviderId = PermissionUtil.getCurrentProviderId(session);
@@ -167,36 +168,48 @@ public class OriginToolHttpController {
     }
 
     /**
-     * 删除HTTP工具
+     * 删除HTTP接口
      */
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, HttpSession session) {
-        log.info("删除原始HTTP工具: id={}", id);
+        log.info("删除原始HTTP接口: id={}", id);
 
         // 检查工具是否存在
         OriginToolHttp tool = originToolHttpService.getById(id);
         if (tool == null) {
-            return "redirect:/origin-http-tools?error=工具不存在";
+            try {
+                return "redirect:/origin-http-tools?error=" + URLEncoder.encode("工具不存在", "UTF-8");
+            } catch (Exception e) {
+                return "redirect:/origin-http-tools?error=tool_not_found";
+            }
         }
 
         // 检查权限：只有工具的创建者可以删除
         if (!PermissionUtil.hasPermission(session, tool.getProviderId())) {
-            return "redirect:/origin-http-tools?error=无权限删除此工具";
+            try {
+                return "redirect:/origin-http-tools?error=" + URLEncoder.encode("无权限删除此工具", "UTF-8");
+            } catch (Exception e) {
+                return "redirect:/origin-http-tools?error=no_permission";
+            }
         }
 
         originToolHttpService.removeById(id);
-        return "redirect:/origin-http-tools?success=工具删除成功";
+        try {
+            return "redirect:/origin-http-tools?success=" + URLEncoder.encode("工具删除成功", "UTF-8");
+        } catch (Exception e) {
+            return "redirect:/origin-http-tools?success=deleted";
+        }
     }
 
     /**
-     * 搜索HTTP工具
+     * 搜索HTTP接口
      */
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model,
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
         HttpSession session) {
-        log.info("搜索原始HTTP工具: keyword={}", keyword);
+        log.info("搜索原始HTTP接口: keyword={}", keyword);
 
         // 获取当前登录用户ID
         Long currentProviderId = PermissionUtil.getCurrentProviderId(session);

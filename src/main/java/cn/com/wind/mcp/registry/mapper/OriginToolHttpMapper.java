@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * <p>
- * 原始HTTP工具Mapper接口
+ * 原始HTTP接口Mapper接口
  * </p>
  *
  * @author system

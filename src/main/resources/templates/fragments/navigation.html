@@ -25,16 +25,16 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.startsWith(#request.requestURI, '/origin-tools') ? 'active' : ''}"
-                           th:href="@{/origin-tools}">
-                            <i class="fas fa-globe me-1"></i>源HTTP工具
+                           th:classappend="${#strings.startsWith(#request.requestURI, '/mcp-tools') ? 'active' : ''}"
+                           th:href="@{/mcp-tools}">
+                            <i class="fas fa-cogs me-1"></i>MCP工具
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.startsWith(#request.requestURI, '/mcp-tools') ? 'active' : ''}"
-                           th:href="@{/mcp-tools}">
-                            <i class="fas fa-cogs me-1"></i>MCP工具
+                           th:classappend="${#strings.startsWith(#request.requestURI, '/origin-http-tools') ? 'active' : ''}"
+                           th:href="@{/origin-http-tools}">
+                            <i class="fas fa-globe me-1"></i>原始HTTP接口
                         </a>
                     </li>
                 </ul>
@@ -100,6 +100,23 @@
         }
     </script>
 </div>
+
+<!-- 页脚片段 -->
+<footer class="bg-light mt-5 py-4" th:fragment="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>MCP工具注册中心</h5>
+                <p class="text-muted">统一管理和注册MCP工具的平台</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-muted">
+                    &copy; 2025 MCP工具注册中心. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
 
 </body>
 </html>

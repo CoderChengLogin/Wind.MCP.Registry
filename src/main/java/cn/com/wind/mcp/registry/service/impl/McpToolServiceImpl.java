@@ -78,4 +78,26 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
         queryWrapper.like("configuration", "\"uniqueId\":\"" + uniqueId + "\"");
         return getOne(queryWrapper);
     }
+
+    /**
+     * 统计指定用户创建的工具数量
+     *
+     * @param createBy 创建人
+     * @return 工具数量
+     */
+    @Override
+    public long countByCreateBy(String createBy) {
+        return count(new QueryWrapper<McpTool>().eq("create_by", createBy));
+    }
+
+    /**
+     * 统计指定提供者的工具数量
+     *
+     * @param providerId 提供者ID
+     * @return 工具数量
+     */
+    @Override
+    public long countByProviderId(Long providerId) {
+        return count(new QueryWrapper<McpTool>().eq("provider_id", providerId));
+    }
 }

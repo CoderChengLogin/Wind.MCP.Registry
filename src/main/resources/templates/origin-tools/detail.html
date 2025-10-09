@@ -98,7 +98,7 @@
                     <a class="nav-link" href="/mcp-tools">MCP工具</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/origin-tools">原始HTTP工具</a>
+                    <a class="nav-link active" href="/origin-http-tools">原始HTTP接口</a>
                 </li>
             </ul>
         </div>
@@ -110,7 +110,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">首页</a></li>
-            <li class="breadcrumb-item"><a href="/origin-tools">原始HTTP工具</a></li>
+            <li class="breadcrumb-item"><a href="/origin-http-tools">原始HTTP接口</a></li>
             <li class="breadcrumb-item active" th:text="${tool.nameDisplay}">工具名称</li>
         </ol>
     </nav>
@@ -133,7 +133,7 @@
                 <p class="mb-0 opacity-75" th:text="${tool.descDisplay}">工具描述</p>
             </div>
             <div class="text-end">
-                <a class="btn btn-light me-2" th:href="@{/origin-tools/{id}/edit(id=${tool.id})}">
+                <a class="btn btn-light me-2" th:href="@{/origin-http-tools/{id}/edit(id=${tool.id})}">
                     <i class="fas fa-edit me-2"></i>编辑
                 </a>
                 <button class="btn btn-outline-light" onclick="testTool()" type="button">
@@ -212,6 +212,18 @@
                 </div>
             </div>
 
+            <!-- 服务方app信息 -->
+            <div class="info-card card" th:if="${tool.providerAppNum}">
+                <div class="card-header">
+                    <i class="fas fa-info me-2"></i>服务方app信息
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">服务方app</small>
+                        <div th:text="${tool.providerAppNum}">应用名称</div>
+                    </div>
+                </div>
+            </div>
 
             <!-- 测试结果 -->
             <div class="test-result" id="testResult">
@@ -222,19 +234,6 @@
 
         <!-- 侧边栏 -->
         <div class="col-lg-4">
-            <div class="info-card card sidebar-card">
-                <div class="card-header">
-                    <i class="fas fa-info me-2"></i>服务方app信息
-                </div>
-                <div class="card-body">
-                    <div class="mb-3" th:if="${tool.providerAppNum}">
-                        <small class="text-muted">服务方app</small>
-                        <div th:text="${tool.providerAppNum}">应用名称</div>
-                    </div>
-                </div>
-            </div>
-
-
             <!-- 操作按钮 -->
             <div class="info-card card">
                 <div class="card-header">
@@ -245,14 +244,14 @@
                         <button class="btn btn-primary" onclick="testTool()" type="button">
                             <i class="fas fa-play me-2"></i>测试工具
                         </button>
-                        <a class="btn btn-outline-secondary" th:href="@{/origin-tools/{id}/edit(id=${tool.id})}">
+                        <a class="btn btn-outline-secondary" th:href="@{/origin-http-tools/{id}/edit(id=${tool.id})}">
                             <i class="fas fa-edit me-2"></i>编辑工具
                         </a>
                         <button class="btn btn-outline-danger" data-bs-target="#deleteModal"
                                 data-bs-toggle="modal" type="button">
                             <i class="fas fa-trash me-2"></i>删除工具
                         </button>
-                        <a class="btn btn-outline-primary" href="/origin-tools">
+                        <a class="btn btn-outline-primary" href="/origin-http-tools">
                             <i class="fas fa-arrow-left me-2"></i>返回列表
                         </a>
                     </div>
@@ -276,7 +275,8 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
-                <form method="post" style="display: inline;" th:action="@{/origin-tools/{id}/delete(id=${tool.id})}">
+                <form method="post" style="display: inline;"
+                      th:action="@{/origin-http-tools/{id}/delete(id=${tool.id})}">
                     <button class="btn btn-danger" type="submit">确认删除</button>
                 </form>
             </div>
@@ -308,7 +308,7 @@
         };
 
         // 发送测试请求
-        fetch('/api/origin-tools/test', {
+        fetch('/api/origin-http-tools/test', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

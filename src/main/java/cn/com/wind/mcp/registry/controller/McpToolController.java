@@ -108,7 +108,7 @@ public class McpToolController {
                 return "redirect:/mcp-tools?error=" + URLEncoder.encode("无权限编辑此工具", StandardCharsets.UTF_8.name());
             }
 
-            // 查询关联的源HTTP工具信息
+            // 查询关联的原始HTTP接口信息
             OriginToolHttp httpTool = null;
             if (tool.getToolNum() != null) {
                 QueryWrapper<OriginToolHttp> httpWrapper = new QueryWrapper<>();
@@ -214,7 +214,7 @@ public class McpToolController {
             // 保存MCP工具
             mcpToolService.saveOrUpdateWithValidation(tool);
 
-            // 处理源HTTP工具数据
+            // 处理原始HTTP接口数据
             if (toolDto.getHttpTool() != null) {
                 updateHttpTool(toolDto.getHttpTool(), tool, currentProviderId, session);
             }
@@ -252,10 +252,10 @@ public class McpToolController {
     }
 
     /**
-     * 更新源HTTP工具信息
+     * 更新原始HTTP接口信息
      */
     private void updateHttpTool(OriginToolHttp httpToolData, McpTool mcpTool, Long providerId, HttpSession session) {
-        // 查询已存在的HTTP工具
+        // 查询已存在的HTTP接口
         QueryWrapper<OriginToolHttp> wrapper = new QueryWrapper<>();
         wrapper.eq("provider_tool_num", mcpTool.getToolNum());
         OriginToolHttp existingHttpTool = originToolHttpMapper.selectOne(wrapper);

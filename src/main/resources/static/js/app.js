@@ -49,7 +49,7 @@ const MCPRegistry = {
                 if (toolNameSpan) toolNameSpan.textContent = toolName;
                 if (deleteForm) {
                     const currentPath = window.location.pathname;
-                    const basePath = currentPath.includes('mcp-tools') ? '/mcp-tools' : '/origin-tools';
+                    const basePath = currentPath.includes('mcp-tools') ? '/mcp-tools' : '/origin-http-tools';
                     deleteForm.action = `${basePath}/${toolId}/delete`;
                 }
             });
