@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${tool.nameDisplay} + ' - 工具详情 - MCP工具注册中心'">工具详情 - MCP工具注册中心</title>
+    <link href="/vendor/bootstrap/bootstrap-5.3.0.min.css" rel="stylesheet">
+    <link href="/vendor/fontawesome/all-6.4.0.min.css" rel="stylesheet">
+    <link href="/vendor/prism/prism-1.29.0.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-card .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: bold;
+        }
+
+        .xml-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .status-badge {
+            font-size: 0.9em;
+        }
+
+        .function-badge {
+            font-size: 0.8em;
+            padding: 0.3em 0.6em;
+        }
+
+        .sidebar-card {
+            position: sticky;
+            top: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item"><a href="/origin-expo-tools">原始Expo接口</a></li>
+            <li class="breadcrumb-item active" th:text="${tool.nameDisplay}">工具名称</li>
+        </ol>
+    </nav>
+
+    <!-- 工具标题和操作 -->
+    <div class="tool-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-puzzle-piece me-2"></i>
+                    <span th:text="${tool.nameDisplay}">工具名称</span>
+                    <span class="badge function-badge bg-light text-dark ms-2"
+                          th:text="${tool.functionName}">functionName</span>
+                </h1>
+                <p class="mb-2 opacity-75">
+                    <i class="fas fa-layer-group me-1"></i> 应用类别: <span th:text="${tool.appClass}">0</span>
+                    <span class="ms-3"><i class="fas fa-terminal me-1"></i> 命令ID: <span
+                            th:text="${tool.commandId}">0</span></span>
+                </p>
+                <p class="mb-0 opacity-75" th:text="${tool.descDisplay}">工具描述</p>
+            </div>
+            <div class="text-end">
+                <a class="btn btn-light me-2" th:href="@{/origin-expo-tools/edit/{id}(id=${tool.id})}">
+                    <i class="fas fa-edit me-2"></i>编辑
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 主要内容 -->
+        <div class="col-lg-8">
+            <!-- 描述信息 -->
+            <div class="info-card card" th:if="${tool.descDisplay}">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>功能描述
+                </div>
+                <div class="card-body">
+                    <p class="mb-0" th:text="${tool.descDisplay}">工具的详细描述信息</p>
+                </div>
+            </div>
+
+            <!-- Expo配置 -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-cog me-2"></i>Expo配置
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>函数名称:</strong></div>
+                        <div class="col-sm-9">
+                            <code th:text="${tool.functionName}">functionName</code>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>应用类别:</strong></div>
+                        <div class="col-sm-9">
+                            <span th:text="${tool.appClass}">0</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>命令ID:</strong></div>
+                        <div class="col-sm-9">
+                            <span th:text="${tool.commandId}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API定义 -->
+            <div class="info-card card" th:if="${tool.expoApiDefine}">
+                <div class="card-header">
+                    <i class="fas fa-file-code me-2"></i>API定义 (XML)
+                </div>
+                <div class="card-body">
+                    <div class="xml-display" th:text="${tool.expoApiDefine}">
+                        <?xml version="1.0"?>
+                        <api>...</api>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提供者信息 -->
+            <div class="info-card card"
+                 th:if="${tool.providerToolNum != null || tool.providerToolName != null || tool.providerAppNum != null}">
+                <div class="card-header">
+                    <i class="fas fa-info me-2"></i>提供者信息
+                </div>
+                <div class="card-body">
+                    <div class="mb-3" th:if="${tool.providerToolNum != null}">
+                        <small class="text-muted">提供者工具编号</small>
+                        <div th:text="${tool.providerToolNum}">12345</div>
+                    </div>
+                    <div class="mb-3" th:if="${tool.providerToolName != null}">
+                        <small class="text-muted">提供者工具名称</small>
+                        <div th:text="${tool.providerToolName}">工具名称</div>
+                    </div>
+                    <div class="mb-3" th:if="${tool.providerAppNum != null}">
+                        <small class="text-muted">提供者App编号</small>
+                        <div th:text="${tool.providerAppNum}">67890</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="col-lg-4">
+            <!-- 操作按钮 -->
+            <div class="info-card card sidebar-card">
+                <div class="card-header">
+                    <i class="fas fa-tools me-2"></i>操作
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-outline-secondary" th:href="@{/origin-expo-tools/edit/{id}(id=${tool.id})}">
+                            <i class="fas fa-edit me-2"></i>编辑工具
+                        </a>
+                        <button class="btn btn-outline-danger" data-bs-target="#deleteModal"
+                                data-bs-toggle="modal" type="button">
+                            <i class="fas fa-trash me-2"></i>删除工具
+                        </button>
+                        <a class="btn btn-outline-primary" href="/origin-expo-tools">
+                            <i class="fas fa-arrow-left me-2"></i>返回列表
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 元数据信息 -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>元数据
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">创建时间</small>
+                        <div th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01
+                            12:00:00
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">创建人</small>
+                        <div th:text="${tool.createBy}">admin</div>
+                    </div>
+                    <div class="mb-3" th:if="${tool.updateTime != null}">
+                        <small class="text-muted">更新时间</small>
+                        <div th:text="${#temporals.format(tool.updateTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01
+                            12:00:00
+                        </div>
+                    </div>
+                    <div class="mb-0" th:if="${tool.updateBy != null}">
+                        <small class="text-muted">更新人</small>
+                        <div th:text="${tool.updateBy}">admin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除工具 "<span th:text="${tool.nameDisplay}">工具名称</span>" 吗？</p>
+                <p class="text-danger">此操作不可撤销！</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+                <form method="post" style="display: inline;"
+                      th:action="@{/origin-expo-tools/delete/{id}(id=${tool.id})}">
+                    <button class="btn btn-danger" type="submit">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/vendor/bootstrap/bootstrap-5.3.0.bundle.min.js"></script>
+<script src="/vendor/prism/prism-core-1.29.0.min.js"></script>
+<script src="/vendor/prism/prism-autoloader-1.29.0.min.js"></script>
+<script>
+    // 格式化XML显示
+    document.addEventListener('DOMContentLoaded', function () {
+        const xmlDisplay = document.querySelector('.xml-display');
+        if (xmlDisplay) {
+            try {
+                const xml = xmlDisplay.textContent.trim();
+                if (xml) {
+                    // 简单的XML格式化
+                    const formatted = formatXml(xml);
+                    xmlDisplay.textContent = formatted;
+                }
+            } catch (error) {
+                // 如果格式化失败，保持原样
+            }
+        }
+    });
+
+    function formatXml(xml) {
+        const PADDING = '  ';
+        const reg = /(>)(<)(\/*)/g;
+        let pad = 0;
+
+        xml = xml.replace(reg, '$1\r\n$2$3');
+
+        return xml.split('\r\n').map((node) => {
+            let indent = 0;
+            if (node.match(/.+<\/\w[^>]*>$/)) {
+                indent = 0;
+            } else if (node.match(/^<\/\w/) && pad > 0) {
+                pad -= 1;
+            } else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+                indent = 1;
+            } else {
+                indent = 0;
+            }
+
+            pad += indent;
+
+            return PADDING.repeat(Math.max(pad - indent, 0)) + node;
+        }).join('\r\n');
+    }
+</script>
+</body>
+</html>

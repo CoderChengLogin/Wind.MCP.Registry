@@ -76,55 +76,22 @@
             </div>
         </div>
 
-    </div>
-
-    <!-- 功能介绍 -->
-    <div class="row">
         <div class="col-md-6">
-            <div class="card h-100">
+            <div class="card text-white bg-success">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-cogs text-primary me-2"></i>MCP工具管理
-                    </h5>
-                    <p class="card-text">
-                        注册和管理MCP（Model Context Protocol）工具，支持工具的增删改查操作，
-                        提供完整的工具信息管理功能。
-                    </p>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-check text-success me-2"></i>工具信息录入</li>
-                        <li><i class="fas fa-check text-success me-2"></i>工具搜索查询</li>
-                        <li><i class="fas fa-check text-success me-2"></i>工具详情查看</li>
-                        <li><i class="fas fa-check text-success me-2"></i>工具编辑更新</li>
-                    </ul>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">原始Expo接口</h5>
+                            <h2 class="mb-0" th:text="${httpToolCount}">0</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-globe fa-2x"></i>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-footer">
-                    <a class="btn btn-primary" th:href="@{/mcp-tools}">
-                        <i class="fas fa-arrow-right me-1"></i>进入管理
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-globe text-success me-2"></i>原始HTTP接口管理
-                    </h5>
-                    <p class="card-text">
-                        管理原始HTTP接口信息，支持HTTP接口工具的注册和维护，
-                        为工具转换提供数据源。
-                    </p>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-check text-success me-2"></i>HTTP接口录入</li>
-                        <li><i class="fas fa-check text-success me-2"></i>接口信息管理</li>
-                        <li><i class="fas fa-check text-success me-2"></i>工具状态跟踪</li>
-                        <li><i class="fas fa-check text-success me-2"></i>批量操作支持</li>
-                    </ul>
-                </div>
-                <div class="card-footer">
-                    <a class="btn btn-success" th:href="@{/origin-http-tools}">
-                        <i class="fas fa-arrow-right me-1"></i>进入管理
+                    <a class="text-white text-decoration-none" th:href="@{/origin-expo-tools}">
+                        查看详情 <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>

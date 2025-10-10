@@ -40,10 +40,16 @@ public class UnifiedToolAddDto {
     private String convertType;        // 转换模板类型 -> convert_type
     private String toolType;           // MCP工具类型 -> tool_type
 
-    // ===== 配置模板转换器 - 对应Bug2.md第四步 =====
+    // ===== HTTP模板转换器 - 对应Bug2.md第四步 =====
     private String templateReqUrl;     // 请求路径 -> req_url
     private String templateReqMethod;  // 请求方式 -> req_method
     private String templateReqHeaders; // 请求头（jinja2） -> req_headers
     private String reqBody;            // 请求体（jinja2） -> req_body
     private String respBody;           // 响应体（jinja2） -> resp_body
+
+    // ===== Expo模板转换器 - 对应Bug2.md第四步(当选择Expo工具时) =====
+    private Integer templateAppClass;      // App Class -> app_class
+    private Integer templateCommandId;     // Command ID -> command_id
+    private String templateInputArgs;      // 输入参数（jinja2） -> input_args
+    private String templateOutputArgs;     // 输出参数（jinja2） -> output_args
 }

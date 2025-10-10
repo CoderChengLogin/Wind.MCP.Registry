@@ -168,7 +168,20 @@
                         <dd class="col-sm-9" th:text="${tool.streamOutput == '1' ? '是' : '否'}">流式输出</dd>
 
                         <dt class="col-sm-3">转换模板类型:</dt>
-                        <dd class="col-sm-9" th:text="${tool.convertType == '1' ? 'HTTP工具' : '其他'}">转换类型</dd>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-success"
+                                  th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http')}">
+                                <i class="fas fa-globe me-1"></i>HTTP转换模板
+                            </span>
+                            <span class="badge bg-primary"
+                                  th:if="${tool.convertType != null and tool.convertType.equalsIgnoreCase('expo')}">
+                                <i class="fas fa-server me-1"></i>Expo转换模板
+                            </span>
+                            <span class="badge bg-secondary"
+                                  th:if="${tool.convertType == null or (!tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo'))}">
+                                未知
+                            </span>
+                        </dd>
 
                         <dt class="col-sm-3">MCP工具类型:</dt>
                         <dd class="col-sm-9"
@@ -180,71 +193,132 @@
             </div>
 
             <!-- HTTP转换模板信息 -->
-            <div class="card mb-4" th:if="${converter != null}">
-                <div class="card-header">
+            <div class="card mb-4" th:if="${httpConverter != null}">
+                <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>HTTP转换模板信息</h5>
                 </div>
                 <div class="card-body">
                     <dl class="row">
                         <dt class="col-sm-3">请求路径:</dt>
                         <dd class="col-sm-9">
-                            <code th:text="${converter.reqUrl}">服务方URL</code>
+                            <code th:text="${httpConverter.reqUrl}">服务方URL</code>
                         </dd>
 
                         <dt class="col-sm-3">工具编号:</dt>
-                        <dd class="col-sm-9" th:text="${converter.toolNum}">工具编号</dd>
+                        <dd class="col-sm-9" th:text="${httpConverter.toolNum}">工具编号</dd>
 
                         <dt class="col-sm-3">工具版本:</dt>
-                        <dd class="col-sm-9" th:text="${converter.toolVersion}">工具版本</dd>
-
+                        <dd class="col-sm-9" th:text="${httpConverter.toolVersion}">工具版本</dd>
 
                         <dt class="col-sm-3">请求方式:</dt>
                         <dd class="col-sm-9">
-                            <span class="badge bg-info" th:text="${converter.reqMethod}">方法</span>
+                            <span class="badge bg-info" th:text="${httpConverter.reqMethod}">方法</span>
                         </dd>
 
                         <dt class="col-sm-3">请求头（jinja2）:</dt>
                         <dd class="col-sm-9">
-                            <pre th:if="${converter.reqHeaders != null and !#strings.isEmpty(converter.reqHeaders)}"
-                                 th:text="${converter.reqHeaders}">请求头</pre>
+                            <pre th:if="${httpConverter.reqHeaders != null and !#strings.isEmpty(httpConverter.reqHeaders)}"
+                                 th:text="${httpConverter.reqHeaders}">请求头</pre>
                             <span class="text-muted"
-                                  th:if="${converter.reqHeaders == null or converter.reqHeaders.isEmpty()}">无</span>
+                                  th:if="${httpConverter.reqHeaders == null or httpConverter.reqHeaders.isEmpty()}">无</span>
                         </dd>
 
                         <dt class="col-sm-3">请求体（jinja2）:</dt>
                         <dd class="col-sm-9">
-                            <pre th:if="${converter.reqBody != null and !#strings.isEmpty(converter.reqBody)}"
-                                 th:text="${converter.reqBody}">请求体模板</pre>
+                            <pre th:if="${httpConverter.reqBody != null and !#strings.isEmpty(httpConverter.reqBody)}"
+                                 th:text="${httpConverter.reqBody}">请求体模板</pre>
                             <span class="text-muted"
-                                  th:if="${converter.reqBody == null or converter.reqBody.isEmpty()}">无</span>
+                                  th:if="${httpConverter.reqBody == null or httpConverter.reqBody.isEmpty()}">无</span>
                         </dd>
 
                         <dt class="col-sm-3">响应体（jinja2）:</dt>
                         <dd class="col-sm-9">
-                            <pre th:if="${converter.respBody != null and !#strings.isEmpty(converter.respBody)}"
-                                 th:text="${converter.respBody}">响应体模板</pre>
+                            <pre th:if="${httpConverter.respBody != null and !#strings.isEmpty(httpConverter.respBody)}"
+                                 th:text="${httpConverter.respBody}">响应体模板</pre>
                             <span class="text-muted"
-                                  th:if="${converter.respBody == null or converter.respBody.isEmpty()}">无</span>
+                                  th:if="${httpConverter.respBody == null or httpConverter.respBody.isEmpty()}">无</span>
                         </dd>
 
                         <dt class="col-sm-3">提供者工具编号:</dt>
-                        <dd class="col-sm-9" th:text="${converter.providerToolNum}">提供者工具编号</dd>
+                        <dd class="col-sm-9" th:text="${httpConverter.providerToolNum}">提供者工具编号</dd>
                     </dl>
                 </div>
             </div>
 
-            <!-- 缺失数据提示 -->
-            <div class="alert alert-warning" th:if="${httpTool == null and converter == null}">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <strong>提示:</strong> 该MCP工具缺少关联的原始HTTP接口和转换模板信息。
+            <!-- Expo转换模板信息 -->
+            <div class="card mb-4" th:if="${expoConverter != null}">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Expo转换模板信息</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">工具编号:</dt>
+                        <dd class="col-sm-9" th:text="${expoConverter.toolNum}">工具编号</dd>
+
+                        <dt class="col-sm-3">工具版本:</dt>
+                        <dd class="col-sm-9" th:text="${expoConverter.toolVersion}">工具版本</dd>
+
+                        <dt class="col-sm-3">App Class:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-info" th:text="${expoConverter.appClass}">App Class</span>
+                        </dd>
+
+                        <dt class="col-sm-3">Command ID:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-info" th:text="${expoConverter.commandId}">Command ID</span>
+                        </dd>
+
+                        <dt class="col-sm-3">输入参数（jinja2）:</dt>
+                        <dd class="col-sm-9">
+                            <pre th:if="${expoConverter.inputArgs != null and !#strings.isEmpty(expoConverter.inputArgs)}"
+                                 th:text="${expoConverter.inputArgs}">输入参数模板</pre>
+                            <span class="text-muted"
+                                  th:if="${expoConverter.inputArgs == null or expoConverter.inputArgs.isEmpty()}">无</span>
+                        </dd>
+
+                        <dt class="col-sm-3">输出参数（jinja2）:</dt>
+                        <dd class="col-sm-9">
+                            <pre th:if="${expoConverter.outputArgs != null and !#strings.isEmpty(expoConverter.outputArgs)}"
+                                 th:text="${expoConverter.outputArgs}">输出参数模板</pre>
+                            <span class="text-muted"
+                                  th:if="${expoConverter.outputArgs == null or expoConverter.outputArgs.isEmpty()}">无</span>
+                        </dd>
+
+                        <dt class="col-sm-3">提供者工具编号:</dt>
+                        <dd class="col-sm-9" th:text="${expoConverter.providerToolNum}">提供者工具编号</dd>
+                    </dl>
+                </div>
             </div>
-            <div class="alert alert-warning" th:if="${httpTool == null and converter != null}">
+
+            <!-- 缺失数据提示 - HTTP类型 -->
+            <div class="alert alert-warning"
+                 th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http') and httpTool == null and httpConverter == null}">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>提示:</strong> 该MCP工具缺少关联的原始HTTP接口和HTTP转换模板信息。
+            </div>
+            <div class="alert alert-warning"
+                 th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http') and httpTool == null and httpConverter != null}">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>提示:</strong> 该MCP工具缺少关联的原始HTTP接口信息。
             </div>
-            <div class="alert alert-warning" th:if="${httpTool != null and converter == null}">
+            <div class="alert alert-warning"
+                 th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http') and httpTool != null and httpConverter == null}">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                <strong>提示:</strong> 该MCP工具缺少关联的转换模板信息。
+                <strong>提示:</strong> 该MCP工具缺少关联的HTTP转换模板信息。
+            </div>
+
+            <!-- 缺失数据提示 - Expo类型 -->
+            <div class="alert alert-warning"
+                 th:if="${tool.convertType != null and tool.convertType.equalsIgnoreCase('expo') and expoConverter == null}">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>提示:</strong> 该MCP工具缺少关联的Expo转换模板信息。
+            </div>
+
+            <!-- 缺失数据提示 - 未知类型或无convertType -->
+            <div class="alert alert-warning"
+                 th:if="${tool.convertType == null or (!tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo'))}">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>提示:</strong> 该MCP工具的转换模板类型未设置或无效,请检查convertType字段。
             </div>
         </div>
 
@@ -282,25 +356,6 @@
                         <dt class="col-sm-4" th:if="${tool.updateBy}">更新者:</dt>
                         <dd class="col-sm-8" th:if="${tool.updateBy}" th:text="${tool.updateBy}">更新者</dd>
                     </dl>
-                </div>
-            </div>
-
-            <!-- JSON Schema信息 -->
-            <div class="card mb-4" th:if="${tool.inputSchema != null or tool.outputSchema != null}">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-code me-2"></i>Schema信息</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3" th:if="${tool.inputSchema != null}">
-                        <h6>输入Schema:</h6>
-                        <pre class="bg-light p-2 rounded" style="max-height: 200px; overflow-y: auto;"
-                             th:text="${tool.inputSchema}">输入Schema</pre>
-                    </div>
-                    <div th:if="${tool.outputSchema != null}">
-                        <h6>输出Schema:</h6>
-                        <pre class="bg-light p-2 rounded" style="max-height: 200px; overflow-y: auto;"
-                             th:text="${tool.outputSchema}">输出Schema</pre>
-                    </div>
                 </div>
             </div>
 

@@ -37,6 +37,13 @@
                             <i class="fas fa-globe me-1"></i>原始HTTP接口
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#strings.startsWith(#request.requestURI, '/origin-expo-tools') ? 'active' : ''}"
+                           th:href="@{/origin-expo-tools}">
+                            <i class="fas fa-puzzle-piece me-1"></i>原始Expo接口
+                        </a>
+                    </li>
                 </ul>
 
                 <ul class="navbar-nav">

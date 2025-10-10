@@ -160,9 +160,13 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="convertType">转换模板类型 <span class="required">*</span></label>
-                        <input class="form-control" id="convertType" required th:field="${tool.convertType}"
-                               type="text">
-                        <div class="form-text">请输入转换模板类型</div>
+                        <select class="form-select" id="convertType" required th:field="${tool.convertType}">
+                            <option value="">请选择转换模板类型</option>
+                            <option value="http">HTTP转换模板</option>
+                            <option value="expo">Expo转换模板</option>
+                            <option value="manual">手动转换模板</option>
+                        </select>
+                        <div class="form-text">选择工具的转换模板类型</div>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -261,26 +265,26 @@
             </div>
         </div>
 
-        <!-- 转换器配置 -->
-        <div class="form-section" th:if="${converter != null}">
-            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>转换器配置</h4>
+        <!-- HTTP转换器配置 -->
+        <div class="form-section" th:if="${httpConverter != null}">
+            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>HTTP转换器配置</h4>
 
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="converterReqUrl">请求URL模板（jinja2）</label>
-                        <input class="form-control" id="converterReqUrl" th:value="${converter.reqUrl}" type="text">
+                        <input class="form-control" id="converterReqUrl" th:value="${httpConverter.reqUrl}" type="text">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="converterReqMethod">请求方法</label>
-                        <select class="form-select" id="converterReqMethod" th:value="${converter.reqMethod}">
-                            <option th:selected="${converter.reqMethod == 'GET'}" value="GET">GET</option>
-                            <option th:selected="${converter.reqMethod == 'POST'}" value="POST">POST</option>
-                            <option th:selected="${converter.reqMethod == 'PUT'}" value="PUT">PUT</option>
-                            <option th:selected="${converter.reqMethod == 'DELETE'}" value="DELETE">DELETE</option>
-                            <option th:selected="${converter.reqMethod == 'PATCH'}" value="PATCH">PATCH</option>
+                        <select class="form-select" id="converterReqMethod" th:value="${httpConverter.reqMethod}">
+                            <option th:selected="${httpConverter.reqMethod == 'GET'}" value="GET">GET</option>
+                            <option th:selected="${httpConverter.reqMethod == 'POST'}" value="POST">POST</option>
+                            <option th:selected="${httpConverter.reqMethod == 'PUT'}" value="PUT">PUT</option>
+                            <option th:selected="${httpConverter.reqMethod == 'DELETE'}" value="DELETE">DELETE</option>
+                            <option th:selected="${httpConverter.reqMethod == 'PATCH'}" value="PATCH">PATCH</option>
                         </select>
                     </div>
                 </div>
@@ -289,18 +293,53 @@
             <div class="mb-3">
                 <label class="form-label" for="converterReqHeaders">请求头模板（jinja2）</label>
                 <textarea class="form-control" id="converterReqHeaders" rows="3"
-                          th:text="${converter.reqHeaders}"></textarea>
+                          th:text="${httpConverter.reqHeaders}"></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label" for="converterReqBody">请求体模板（jinja2）</label>
-                <textarea class="form-control" id="converterReqBody" rows="3" th:text="${converter.reqBody}"></textarea>
+                <textarea class="form-control" id="converterReqBody" rows="3"
+                          th:text="${httpConverter.reqBody}"></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label" for="converterRespBody">响应体模板（jinja2）</label>
                 <textarea class="form-control" id="converterRespBody" rows="3"
-                          th:text="${converter.respBody}"></textarea>
+                          th:text="${httpConverter.respBody}"></textarea>
+            </div>
+        </div>
+
+        <!-- Expo转换器配置 -->
+        <div class="form-section" th:if="${expoConverter != null}">
+            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>Expo转换器配置</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="expoAppClass">App Class</label>
+                        <input class="form-control" id="expoAppClass" th:value="${expoConverter.appClass}"
+                               type="number">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="expoCommandId">Command ID</label>
+                        <input class="form-control" id="expoCommandId" th:value="${expoConverter.commandId}"
+                               type="number">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="expoInputArgs">输入参数模板（jinja2）</label>
+                <textarea class="form-control" id="expoInputArgs" rows="3"
+                          th:text="${expoConverter.inputArgs}"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="expoOutputArgs">输出参数模板（jinja2）</label>
+                <textarea class="form-control" id="expoOutputArgs" rows="3"
+                          th:text="${expoConverter.outputArgs}"></textarea>
             </div>
         </div>
 
