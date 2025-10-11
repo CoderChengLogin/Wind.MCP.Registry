@@ -258,10 +258,11 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label required">服务方app <span class="text-danger">*</span></label>
-                                <input class="form-control" disabled id="providerAppNum" name="providerAppNum"
-                                       placeholder="请输入服务方app编号"
-                                       required type="text">
-                                <div class="form-text">对应数据库字段：provider_app_num</div>
+                                <select class="form-select" disabled id="providerAppNum" name="providerAppNum" required>
+                                    <option value="">请选择服务方app</option>
+                                    <!-- 动态加载已注册的应用节点 -->
+                                </select>
+                                <div class="form-text">只能选择已注册的应用服务节点</div>
                             </div>
                         </div>
                     </div>
