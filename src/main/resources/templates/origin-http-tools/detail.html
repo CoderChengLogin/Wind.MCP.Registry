@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${tool.nameDisplay} + ' - 工具详情 - MCP工具注册中心'">工具详情 - MCP工具注册中心</title>
+    <!-- Bootstrap CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/css/fontawesome-fonts.css" rel="stylesheet">
+    <link href="/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, #28a745, #20833a);
+            color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-card .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: bold;
+        }
+
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .method-badge {
+            font-size: 0.9em;
+            padding: 0.4em 0.8em;
+        }
+
+        .sidebar-card {
+            position: sticky;
+            top: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item"><a href="/origin-http-tools">原始HTTP接口</a></li>
+            <li class="breadcrumb-item active" th:text="${tool.nameDisplay}">工具名称</li>
+        </ol>
+    </nav>
+
+    <!-- 工具标题和操作 -->
+    <div class="tool-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-globe me-2"></i>
+                    <span th:text="${tool.nameDisplay}">工具名称</span>
+                    <span class="badge method-badge bg-light text-dark ms-2"
+                          th:text="${tool.reqMethod}">GET</span>
+                </h1>
+                <p class="mb-2 opacity-75">
+                    <i class="fas fa-link me-1"></i> <span th:text="${tool.reqUrl}">http://example.com/api</span>
+                </p>
+                <p class="mb-0 opacity-75" th:text="${tool.descDisplay}">工具描述</p>
+            </div>
+            <div class="text-end">
+                <a class="btn btn-light me-2" th:href="@{/origin-http-tools/edit/{id}(id=${tool.id})}">
+                    <i class="fas fa-edit me-2"></i>编辑
+                </a>
+                <a class="btn btn-outline-light" href="/origin-http-tools">
+                    <i class="fas fa-arrow-left me-2"></i>返回列表
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 主要内容 -->
+        <div class="col-lg-8">
+            <!-- 功能描述 -->
+            <div class="info-card card" th:if="${tool.descDisplay}">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>功能描述
+                </div>
+                <div class="card-body">
+                    <p class="mb-0" th:text="${tool.descDisplay}">工具的详细描述信息</p>
+                </div>
+            </div>
+
+            <!-- HTTP配置 -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-exchange-alt me-2"></i>HTTP配置
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3">请求URL:</dt>
+                        <dd class="col-sm-9"><code th:text="${tool.reqUrl}">http://example.com</code></dd>
+
+                        <dt class="col-sm-3">请求方法:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-success" th:text="${tool.reqMethod}">GET</span>
+                        </dd>
+
+                        <dt class="col-sm-3">请求头:</dt>
+                        <dd class="col-sm-9">
+                            <div class="json-display" th:if="${tool.reqHeaders}">
+                                <pre class="mb-0"
+                                     th:text="${tool.reqHeaders}">{"Content-Type": "application/json"}</pre>
+                            </div>
+                            <span class="text-muted"
+                                  th:if="${tool.reqHeaders == null or tool.reqHeaders.isEmpty()}">未配置</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Schema配置 -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-file-code me-2"></i>Schema配置
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-2">输入Schema:</h6>
+                    <div class="json-display mb-3" th:if="${tool.inputSchema}">
+                        <pre class="mb-0" th:text="${tool.inputSchema}">{"type": "object"}</pre>
+                    </div>
+                    <p class="text-muted" th:if="${tool.inputSchema == null or tool.inputSchema.isEmpty()}">
+                        未配置输入Schema</p>
+
+                    <h6 class="mb-2">输出Schema:</h6>
+                    <div class="json-display" th:if="${tool.outputSchema}">
+                        <pre class="mb-0" th:text="${tool.outputSchema}">{"type": "object"}</pre>
+                    </div>
+                    <p class="text-muted mb-0" th:if="${tool.outputSchema == null or tool.outputSchema.isEmpty()}">
+                        未配置输出Schema</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 侧边栏信息 -->
+        <div class="col-lg-4">
+            <!-- 基本信息 -->
+            <div class="info-card card sidebar-card">
+                <div class="card-header">
+                    <i class="fas fa-tag me-2"></i>基本信息
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-5">工具ID:</dt>
+                        <dd class="col-sm-7" th:text="${tool.id}">1</dd>
+
+                        <dt class="col-sm-5">提供者工具编号:</dt>
+                        <dd class="col-sm-7" th:text="${tool.providerToolNum != null ? tool.providerToolNum : '-'}">-
+                        </dd>
+
+                        <dt class="col-sm-5">创建时间:</dt>
+                        <dd class="col-sm-7" th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm')}">
+                            2024-01-01
+                        </dd>
+
+                        <dt class="col-sm-5">创建者:</dt>
+                        <dd class="col-sm-7" th:text="${tool.createBy != null ? tool.createBy : '-'}">system</dd>
+
+                        <dt class="col-sm-5">更新时间:</dt>
+                        <dd class="col-sm-7"
+                            th:text="${tool.updateTime != null ? #temporals.format(tool.updateTime, 'yyyy-MM-dd HH:mm') : '-'}">
+                            -
+                        </dd>
+
+                        <dt class="col-sm-5">更新者:</dt>
+                        <dd class="col-sm-7 mb-0" th:text="${tool.updateBy != null ? tool.updateBy : '-'}">-</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-wrench me-2"></i>操作
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" th:href="@{/origin-http-tools/edit/{id}(id=${tool.id})}">
+                            <i class="fas fa-edit me-2"></i>编辑工具
+                        </a>
+                        <button class="btn btn-danger" data-bs-target="#deleteModal"
+                                data-bs-toggle="modal" th:data-tool-id="${tool.id}"
+                                th:data-tool-name="${tool.nameDisplay}" type="button">
+                            <i class="fas fa-trash me-2"></i>删除工具
+                        </button>
+                        <a class="btn btn-secondary" href="/origin-http-tools">
+                            <i class="fas fa-arrow-left me-2"></i>返回列表
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除工具 "<span id="deleteToolName"></span>" 吗?</p>
+                <p class="text-danger mb-0">此操作不可撤销!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button class="btn btn-danger" type="submit">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 页脚 -->
+<div th:replace="~{fragments/navigation :: footer}"></div>
+
+<!-- Bootstrap JS -->
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 删除确认模态框处理
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const toolId = button.getAttribute('data-tool-id');
+            const toolName = button.getAttribute('data-tool-name');
+
+            document.getElementById('deleteToolName').textContent = toolName;
+            document.getElementById('deleteForm').action = '/origin-http-tools/delete/' + toolId;
+        });
+    }
+</script>
+</body>
+</html>

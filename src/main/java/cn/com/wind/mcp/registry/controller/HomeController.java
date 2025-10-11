@@ -4,6 +4,7 @@ import javax.servlet.http.HttpSession;
 
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.McpToolService;
+import cn.com.wind.mcp.registry.service.OriginToolExpoService;
 import cn.com.wind.mcp.registry.service.OriginToolHttpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class HomeController {
     @Autowired
     private OriginToolHttpService originToolHttpService;
 
+    @Autowired
+    private OriginToolExpoService originToolExpoService;
+
     /**
      * 首页
      */
@@ -51,10 +55,12 @@ public class HomeController {
 
         long mcpToolCount = mcpToolService.countByProviderId(providerId);
         long httpToolCount = originToolHttpService.countByProviderId(providerId);
+        long expoToolCount = originToolExpoService.countByProviderId(providerId);
 
         model.addAttribute("mcpToolCount", mcpToolCount);
         model.addAttribute("httpToolCount", httpToolCount);
-        model.addAttribute("totalToolCount", mcpToolCount + httpToolCount);
+        model.addAttribute("expoToolCount", expoToolCount);
+        model.addAttribute("totalToolCount", mcpToolCount + httpToolCount + expoToolCount);
 
         return "index";
     }
