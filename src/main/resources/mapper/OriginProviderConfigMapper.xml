@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.wind.mcp.registry.mapper.OriginProviderConfigMapper">
+
+    <!-- 根据应用编号查询配置 -->
+    <select id="selectByAppNum" resultType="cn.com.wind.mcp.registry.entity.OriginProviderConfig">
+        SELECT *
+        FROM origin_provider_config
+        WHERE app_num = #{appNum}
+          AND status != -1
+        LIMIT 1
+    </select>
+
+    <!-- 根据提供商ID查询所有应用配置 -->
+    <select id="selectByProviderId" resultType="cn.com.wind.mcp.registry.entity.OriginProviderConfig">
+        SELECT *
+        FROM origin_provider_config
+        WHERE provider_id = #{providerId}
+          AND status != -1
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据站点类型查询应用配置 -->
+    <select id="selectBySiteType" resultType="cn.com.wind.mcp.registry.entity.OriginProviderConfig">
+        SELECT *
+        FROM origin_provider_config
+        WHERE site_type = #{siteType}
+          AND status != -1
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询所有启用的应用配置 -->
+    <select id="selectEnabledConfigs" resultType="cn.com.wind.mcp.registry.entity.OriginProviderConfig">
+        SELECT *
+        FROM origin_provider_config
+        WHERE is_enabled = 1
+          AND status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据应用编号和环境查询配置项 -->
+    <select id="selectConfigsByAppNumAndEnv" resultType="cn.com.wind.mcp.registry.entity.OriginProviderConfig">
+        SELECT *
+        FROM origin_provider_config
+        WHERE app_num = #{appNum}
+          AND env = #{env}
+          AND config_key IS NOT NULL
+          AND status != -1
+        ORDER BY config_key
+    </select>
+
+</mapper>

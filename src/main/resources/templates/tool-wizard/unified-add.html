@@ -688,6 +688,38 @@
         let selectedConverterType = ''; // 用于跟踪选中的转换器类型
 
         /**
+         * 加载已注册的应用节点列表
+         * 用于填充服务方app下拉选择框
+         */
+        function loadProviderApps() {
+            fetch('/provider-app/listEnabled')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.apps) {
+                        const select = document.getElementById('providerAppNum');
+                        // 清空现有选项(保留第一个"请选择"选项)
+                        select.innerHTML = '<option value="">请选择服务方app</option>';
+
+                        // 添加应用节点选项
+                        data.apps.forEach(app => {
+                            const option = document.createElement('option');
+                            option.value = app.appName;
+                            option.textContent = `${app.appName} (${app.appIp}:${app.appPort})`;
+                            select.appendChild(option);
+                        });
+                    } else {
+                        console.warn('未能加载应用节点列表:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('加载应用节点列表失败:', error);
+                });
+        }
+
+        // 页面加载时立即加载应用列表
+        loadProviderApps();
+
+        /**
          * 显示对应类型的模板转换器表单
          * @param {string} converterType - 转换器类型 ('http' 或 'expo')
          */

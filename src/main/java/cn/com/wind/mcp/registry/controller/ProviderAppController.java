@@ -6,9 +6,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.Provider;
-import cn.com.wind.mcp.registry.entity.ProviderApp;
-import cn.com.wind.mcp.registry.service.ProviderAppService;
+import cn.com.wind.mcp.registry.service.OriginProviderConfigService;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ProviderAppController {
 
     @Autowired
-    private ProviderAppService providerAppService;
+    private OriginProviderConfigService originProviderConfigService;
 
     /**
      * 应用节点管理页面
@@ -88,7 +88,7 @@ public class ProviderAppController {
             }
 
             // 构建查询条件
-            QueryWrapper<ProviderApp> queryWrapper = new QueryWrapper<>();
+            QueryWrapper<OriginProviderConfig> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("provider_id", provider.getId());
             queryWrapper.ne("status", -1); // 排除已删除的
 
@@ -105,8 +105,8 @@ public class ProviderAppController {
             queryWrapper.orderByDesc("create_time");
 
             // 分页查询
-            Page<ProviderApp> page = new Page<>(pageNum, pageSize);
-            Page<ProviderApp> pageResult = providerAppService.page(page, queryWrapper);
+            Page<OriginProviderConfig> page = new Page<>(pageNum, pageSize);
+            Page<OriginProviderConfig> pageResult = originProviderConfigService.page(page, queryWrapper);
 
             result.put("success", true);
             result.put("total", pageResult.getTotal());
@@ -143,7 +143,12 @@ public class ProviderAppController {
                 return result;
             }
 
-            List<ProviderApp> apps = providerAppService.listByProviderIdAndAppName(provider.getId(), appName);
+            // 根据提供商ID和应用名称查询
+            QueryWrapper<OriginProviderConfig> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("provider_id", provider.getId());
+            queryWrapper.eq("app_name", appName);
+            queryWrapper.ne("status", -1);
+            List<OriginProviderConfig> apps = originProviderConfigService.list(queryWrapper);
             result.put("success", true);
             result.put("apps", apps);
         } catch (Exception e) {
@@ -167,7 +172,7 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            ProviderApp app = providerAppService.getById(id);
+            OriginProviderConfig app = originProviderConfigService.getById(id);
             if (app != null && app.getStatus() != -1) {
                 result.put("success", true);
                 result.put("app", app);
@@ -193,7 +198,7 @@ public class ProviderAppController {
      */
     @PostMapping("/create")
     @ResponseBody
-    public Map<String, Object> create(@RequestBody ProviderApp providerApp, HttpSession session) {
+    public Map<String, Object> create(@RequestBody OriginProviderConfig providerConfig, HttpSession session) {
         Map<String, Object> result = new HashMap<>();
 
         try {
@@ -205,11 +210,11 @@ public class ProviderAppController {
             }
 
             // 设置提供者ID和创建人
-            providerApp.setProviderId(provider.getId());
-            providerApp.setCreateBy(provider.getUsername());
-            providerApp.setUpdateBy(provider.getUsername());
+            providerConfig.setProviderId(provider.getId());
+            providerConfig.setCreateBy(provider.getUsername());
+            providerConfig.setUpdateBy(provider.getUsername());
 
-            boolean success = providerAppService.createApp(providerApp);
+            boolean success = originProviderConfigService.createConfig(providerConfig);
             if (success) {
                 result.put("success", true);
                 result.put("message", "创建成功");
@@ -235,7 +240,7 @@ public class ProviderAppController {
      */
     @PostMapping("/update")
     @ResponseBody
-    public Map<String, Object> update(@RequestBody ProviderApp providerApp, HttpSession session) {
+    public Map<String, Object> update(@RequestBody OriginProviderConfig providerConfig, HttpSession session) {
         Map<String, Object> result = new HashMap<>();
 
         try {
@@ -247,9 +252,9 @@ public class ProviderAppController {
             }
 
             // 设置更新人
-            providerApp.setUpdateBy(provider.getUsername());
+            providerConfig.setUpdateBy(provider.getUsername());
 
-            boolean success = providerAppService.updateApp(providerApp);
+            boolean success = originProviderConfigService.updateConfig(providerConfig);
             if (success) {
                 result.put("success", true);
                 result.put("message", "更新成功");
@@ -279,7 +284,9 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            boolean success = providerAppService.toggleEnable(id, isEnabled);
+            boolean success = isEnabled
+                ? originProviderConfigService.enableConfig(id)
+                : originProviderConfigService.disableConfig(id);
             if (success) {
                 result.put("success", true);
                 result.put("message", isEnabled ? "启用成功" : "禁用成功");
@@ -308,7 +315,7 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            boolean success = providerAppService.deleteApp(id);
+            boolean success = originProviderConfigService.deleteConfig(id);
             if (success) {
                 result.put("success", true);
                 result.put("message", "删除成功");
@@ -337,7 +344,14 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            boolean success = providerAppService.batchDeleteApps(ids);
+            // 批量删除
+            boolean success = true;
+            for (Long id : ids) {
+                if (!originProviderConfigService.deleteConfig(id)) {
+                    success = false;
+                    break;
+                }
+            }
             if (success) {
                 result.put("success", true);
                 result.put("message", "批量删除成功");
@@ -366,9 +380,17 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            String healthStatus = providerAppService.checkHealth(id);
-            result.put("success", true);
-            result.put("healthStatus", healthStatus);
+            // 获取应用配置并检查健康状态
+            OriginProviderConfig config = originProviderConfigService.getById(id);
+            if (config != null && config.getHealthCheckUrl() != null) {
+                // 简单返回配置的健康检查URL，具体检查逻辑可以后续实现
+                result.put("success", true);
+                result.put("healthStatus", "健康检查URL: " + config.getHealthCheckUrl());
+                result.put("message", "请访问健康检查URL进行验证");
+            } else {
+                result.put("success", false);
+                result.put("message", "应用配置不存在或未配置健康检查URL");
+            }
         } catch (Exception e) {
             log.error("检查健康状态失败", e);
             result.put("success", false);
@@ -401,7 +423,12 @@ public class ProviderAppController {
                 return result;
             }
 
-            List<ProviderApp> enabledApps = providerAppService.listEnabledByProviderId(provider.getId());
+            // 查询已启用的应用配置
+            QueryWrapper<OriginProviderConfig> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("provider_id", provider.getId());
+            queryWrapper.eq("is_enabled", true);
+            queryWrapper.eq("status", 1);
+            List<OriginProviderConfig> enabledApps = originProviderConfigService.list(queryWrapper);
             result.put("success", true);
             result.put("apps", enabledApps);
         } catch (Exception e) {
