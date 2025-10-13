@@ -1,8 +1,7 @@
 package cn.com.wind.mcp.registry.util;
 
-import javax.servlet.http.HttpSession;
-
 import cn.com.wind.mcp.registry.entity.Provider;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * 权限控制工具类

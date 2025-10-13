@@ -24,7 +24,7 @@ spring:
       connection-timeout: 30000
   # Flyway配置
   flyway:
-    enabled: true
+    enabled: false
     # 迁移前校验 SQL 文件是否存在问题
     validate-on-migrate: false
     # 生产环境一定要关闭
