@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.com.wind.mcp.registry</groupId>
-    <artifactId>wind-mcp-registry</artifactId>
+    <groupId>cn.com.wind</groupId>
+    <artifactId>Wind.MCP.Registry</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -24,7 +24,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <mybatis.plus.version>3.5.14</mybatis.plus.version>
+        <mybatis.plus.version>3.5.10</mybatis.plus.version>
         <!-- Spring Boot 3.3.6已包含安全版本的依赖 -->
         <snakeyaml.version>2.0</snakeyaml.version>
     </properties>
@@ -88,14 +88,14 @@
         </dependency>
 
         <!-- 添加 flyway 的依赖,使用Spring Boot管理的版本 -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.flywaydb</groupId>-->
+        <!--            <artifactId>flyway-core</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.flywaydb</groupId>-->
+        <!--            <artifactId>flyway-mysql</artifactId>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.mysql</groupId>
@@ -174,36 +174,36 @@
                     <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>10.10.0</version>
-                <configuration>
-                    <url>jdbc:mysql://192.168.248.208:3306/mcp_registry?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</url>
-                    <user>root</user>
-                    <password>root</password>
-                    <driver>com.mysql.cj.jdbc.Driver</driver>
-                    <locations>
-                        <location>classpath:db/migration</location>
-                    </locations>
-                    <baselineOnMigrate>true</baselineOnMigrate>
-                    <baselineVersion>0</baselineVersion>
-                    <validateOnMigrate>false</validateOnMigrate>
-                    <cleanDisabled>false</cleanDisabled>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.flywaydb</groupId>
-                        <artifactId>flyway-mysql</artifactId>
-                        <version>10.10.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.mysql</groupId>
-                        <artifactId>mysql-connector-j</artifactId>
-                        <version>9.1.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.flywaydb</groupId>-->
+            <!--                <artifactId>flyway-maven-plugin</artifactId>-->
+            <!--                <version>10.10.0</version>-->
+            <!--                <configuration>-->
+            <!--                    <url>jdbc:mysql://192.168.248.208:3306/mcp_registry?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</url>-->
+            <!--                    <user>root</user>-->
+            <!--                    <password>root</password>-->
+            <!--                    <driver>com.mysql.cj.jdbc.Driver</driver>-->
+            <!--                    <locations>-->
+            <!--                        <location>classpath:db/migration</location>-->
+            <!--                    </locations>-->
+            <!--                    <baselineOnMigrate>true</baselineOnMigrate>-->
+            <!--                    <baselineVersion>0</baselineVersion>-->
+            <!--                    <validateOnMigrate>false</validateOnMigrate>-->
+            <!--                    <cleanDisabled>false</cleanDisabled>-->
+            <!--                </configuration>-->
+            <!--                <dependencies>-->
+            <!--                    <dependency>-->
+            <!--                        <groupId>org.flywaydb</groupId>-->
+            <!--                        <artifactId>flyway-mysql</artifactId>-->
+            <!--                        <version>10.10.0</version>-->
+            <!--                    </dependency>-->
+            <!--                    <dependency>-->
+            <!--                        <groupId>com.mysql</groupId>-->
+            <!--                        <artifactId>mysql-connector-j</artifactId>-->
+            <!--                        <version>9.1.0</version>-->
+            <!--                    </dependency>-->
+            <!--                </dependencies>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 
