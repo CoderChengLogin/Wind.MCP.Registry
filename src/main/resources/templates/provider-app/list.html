@@ -16,35 +16,137 @@
             font-weight: bold;
         }
 
-        .search-box {
-            background: #f8f9fa;
-            border-radius: 10px;
+        .load-balancer-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .load-balancer-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .load-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 20px;
-            margin-bottom: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .status-badge {
+        .load-header:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .load-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .load-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
             font-size: 0.875rem;
+            opacity: 0.9;
         }
 
-        .app-table th {
-            background-color: #f8f9fa;
+        .load-actions {
+            display: flex;
+            gap: 10px;
         }
 
-        .app-table td {
-            vertical-align: middle;
+        .load-content {
+            padding: 20px;
+            background: #f8f9fa;
+            display: none;
         }
 
-        .modal-lg {
-            max-width: 900px;
+        .load-content.show {
+            display: block;
         }
 
-        .node-table {
-            font-size: 0.9rem;
+        .site-group {
+            background: white;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
 
-        .node-table th {
-            background-color: #e9ecef;
+        .site-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .node-item {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .node-info {
+            flex: 1;
+        }
+
+        .node-ip {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .node-status {
+            margin-left: 10px;
+        }
+
+        .node-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .expand-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
         }
     </style>
 </head>
@@ -65,66 +167,62 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-server me-2"></i>应用服务节点管理</h1>
         <button class="btn btn-primary" data-bs-target="#addAppModal" data-bs-toggle="modal">
-            <i class="fas fa-plus me-2"></i>添加应用
+            <i class="fas fa-plus me-2"></i>添加节点
         </button>
     </div>
 
-    <!-- 搜索框 -->
-    <div class="search-box">
-        <div class="row">
-            <div class="col-md-4">
-                <input class="form-control" id="searchAppName" placeholder="应用名称" type="text">
-            </div>
-            <div class="col-md-3">
-                <input class="form-control" id="searchSiteType" placeholder="站点类型" type="text">
-            </div>
-            <div class="col-md-3">
-                <select class="form-select" id="searchIsEnabled">
-                    <option value="">全部状态</option>
-                    <option value="true">已启用</option>
-                    <option value="false">已禁用</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100" onclick="loadAppList()">
-                    <i class="fas fa-search me-2"></i>搜索
-                </button>
+    <!-- 负载均衡器列表 -->
+    <div id="loadBalancerList">
+        <div th:if="${loadBalancers != null and #lists.size(loadBalancers) > 0}">
+            <div class="load-balancer-card" th:each="load : ${loadBalancers}">
+                <!-- 负载均衡器头部 -->
+                <div class="load-header" onclick="toggleNodes(this)"
+                     th:data-load-name="${load.loadName}">
+                    <div>
+                        <h3 class="load-title">
+                            <i class="fas fa-layer-group me-2"></i>
+                            <span th:text="${load.loadName}">应用名称</span>
+                        </h3>
+                    </div>
+                    <div class="load-stats">
+                        <div class="stat-item">
+                            <span class="stat-number"
+                                  th:text="${load.healthyNodes} + '/' + ${load.totalNodes}">3/3</span>
+                            <span class="stat-label">健康节点</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" th:text="${load.siteTypeCount}">3</span>
+                            <span class="stat-label">站点类型</span>
+                        </div>
+                        <div class="load-actions">
+                            <button class="btn btn-light btn-sm" onclick="event.stopPropagation(); addNodeToLoad(this)"
+                                    th:data-load-name="${load.loadName}">
+                                <i class="fas fa-plus"></i> 添加节点
+                            </button>
+                        </div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                </div>
+                <!-- 节点列表（折叠内容） -->
+                <div class="load-content" th:data-load-name="${load.loadName}">
+                    <div class="text-center p-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">加载中...</span>
+                        </div>
+                        <p class="mt-2 text-muted">正在加载节点信息...</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- 应用列表表格 -->
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover app-table">
-                    <thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>应用名称</th>
-                        <th>站点类型</th>
-                        <th>节点数量</th>
-                        <th>启用状态</th>
-                        <th>创建时间</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody id="appTableBody">
-                    <tr>
-                        <td class="text-center" colspan="7">加载中...</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <!-- 分页 -->
-            <nav id="paginationNav" style="display: none;">
-                <ul class="pagination justify-content-center" id="pagination"></ul>
-            </nav>
+        <div class="empty-state" th:unless="${loadBalancers != null and #lists.size(loadBalancers) > 0}">
+            <i class="fas fa-server"></i>
+            <h3>暂无应用节点</h3>
+            <p class="text-muted">点击上方"添加节点"按钮创建您的第一个应用节点</p>
         </div>
     </div>
 </div>
 
-<!-- 添加应用模态框 -->
+<!-- 添加应用节点模态框 -->
 <div class="modal fade" id="addAppModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -136,13 +234,19 @@
                 <form id="addAppForm">
                     <div class="mb-3">
                         <label class="form-label" for="addAppName">应用名称 <span class="text-danger">*</span></label>
-                        <input class="form-control" id="addAppName" name="appName" required type="text">
+                        <input class="form-control" id="addAppName" name="appName" placeholder="相同应用名称的节点将自动聚合" required
+                               type="text">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="addSiteType">站点类型</label>
-                        <input class="form-control" id="addSiteType" name="siteType"
-                               placeholder="如: 测试站、河西、外高桥"
-                               type="text">
+                        <label class="form-label" for="addSiteType">站点类型 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="addSiteType" name="siteType" required>
+                            <option value="">请选择站点类型</option>
+                            <option value="开发站">开发站</option>
+                            <option value="测试站">测试站</option>
+                            <option value="体验站">体验站</option>
+                            <option value="河西">河西</option>
+                            <option value="外高桥">外高桥</option>
+                        </select>
                     </div>
                     <div class="row">
                         <div class="col-md-8">
@@ -216,43 +320,175 @@
     </div>
 </div>
 
-<!-- 服务节点详情模态框 -->
-<div class="modal fade" id="nodeDetailModal" tabindex="-1">
+<!-- 查看节点详情模态框 -->
+<div class="modal fade" id="viewNodeModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="nodeModalTitle">服务节点详情</h5>
-                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>节点详细信息</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    <button class="btn btn-sm btn-success" onclick="showAddNodeForm()">
-                        <i class="fas fa-plus me-1"></i>添加一行数据
-                    </button>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">应用名称</label>
+                        <p class="fw-bold" id="viewAppName">-</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">站点类型</label>
+                        <p class="fw-bold" id="viewSiteType">-</p>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered node-table">
-                        <thead>
-                        <tr>
-                            <th>序号</th>
-                            <th>应用IP</th>
-                            <th>应用端口</th>
-                            <th>负载因子</th>
-                            <th>超时(s)</th>
-                            <th>最大失败次数</th>
-                            <th>是否启用</th>
-                            <th>站点类型</th>
-                            <th>节点描述</th>
-                            <th>操作</th>
-                        </tr>
-                        </thead>
-                        <tbody id="nodeTableBody">
-                        </tbody>
-                    </table>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="text-muted small">应用IP地址</label>
+                        <p class="fw-bold" id="viewAppIp">-</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small">端口号</label>
+                        <p class="fw-bold" id="viewAppPort">-</p>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="text-primary mb-3"><i class="fas fa-cogs me-2"></i>负载配置</h6>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small">负载因子</label>
+                        <p class="fw-bold" id="viewLoadFactor">-</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small">请求超时(秒)</label>
+                        <p class="fw-bold" id="viewRequestTimeout">-</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small">最大失败次数</label>
+                        <p class="fw-bold" id="viewMaxFailCount">-</p>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="text-success mb-3"><i class="fas fa-heartbeat me-2"></i>健康检查</h6>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="text-muted small">健康检查URL</label>
+                        <p class="fw-bold" id="viewHealthCheckUrl">-</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small">检查间隔(毫秒)</label>
+                        <p class="fw-bold" id="viewHealthCheckInterval">-</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <label class="text-muted small">节点描述</label>
+                    <p class="text-secondary" id="viewAppDescription">-</p>
+                </div>
+                <div class="mb-3">
+                    <label class="text-muted small">状态</label>
+                    <p id="viewIsEnabled">-</p>
+                </div>
+                <hr>
+                <div class="row text-muted small">
+                    <div class="col-md-6">
+                        <i class="fas fa-user me-1"></i>创建人: <span id="viewCreateBy">-</span><br>
+                        <i class="fas fa-clock me-1"></i>创建时间: <span id="viewCreateTime">-</span>
+                    </div>
+                    <div class="col-md-6">
+                        <i class="fas fa-user-edit me-1"></i>更新人: <span id="viewUpdateBy">-</span><br>
+                        <i class="fas fa-clock me-1"></i>更新时间: <span id="viewUpdateTime">-</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">关闭</button>
+                <button class="btn btn-warning" onclick="switchToEdit()" type="button">
+                    <i class="fas fa-edit me-1"></i>编辑
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑节点模态框 -->
+<div class="modal fade" id="editNodeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>编辑节点信息</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editNodeForm">
+                    <input id="editNodeId" type="hidden">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="editAppName">应用名称 <span
+                                    class="text-danger">*</span></label>
+                            <input class="form-control" id="editAppName" readonly type="text">
+                            <small class="text-muted">应用名称不可修改</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="editSiteType">站点类型 <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="editSiteType" required>
+                                <option value="">请选择站点类型</option>
+                                <option value="开发站">开发站</option>
+                                <option value="测试站">测试站</option>
+                                <option value="体验站">体验站</option>
+                                <option value="河西">河西</option>
+                                <option value="外高桥">外高桥</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label" for="editAppIp">应用IP <span class="text-danger">*</span></label>
+                            <input class="form-control" id="editAppIp" placeholder="如: 10.10.13.148" required
+                                   type="text">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="editAppPort">端口 <span class="text-danger">*</span></label>
+                            <input class="form-control" id="editAppPort" placeholder="如: 8499" required
+                                   type="number">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="editLoadFactor">负载因子</label>
+                            <input class="form-control" id="editLoadFactor" type="number" value="1">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="editRequestTimeout">超时(秒)</label>
+                            <input class="form-control" id="editRequestTimeout" type="number" value="60">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="editMaxFailCount">最大失败次数</label>
+                            <input class="form-control" id="editMaxFailCount" type="number" value="3">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editHealthCheckUrl">健康检查地址</label>
+                        <input class="form-control" id="editHealthCheckUrl" placeholder="如: http://10.10.13.148:8499/health"
+                               type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editHealthCheckInterval">健康检查间隔(毫秒)</label>
+                        <input class="form-control" id="editHealthCheckInterval" type="number" value="5000">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editAppDescription">节点描述</label>
+                        <textarea class="form-control" id="editAppDescription" rows="2"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="editIsEnabled" type="checkbox">
+                        <label class="form-check-label" for="editIsEnabled">启用</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+                <button class="btn btn-primary" onclick="updateNode()" type="button">
+                    <i class="fas fa-save me-1"></i>保存修改
+                </button>
             </div>
         </div>
     </div>
@@ -262,196 +498,119 @@
 <script src="/js/bootstrap.bundle.min.js"></script>
 <script src="/js/jquery-3.6.0.min.js"></script>
 <script>
-    let currentPage = 1;
-    let pageSize = 10;
-    let currentAppName = '';
+    let loadedNodes = {}; // 缓存已加载的节点数据
 
-    // 页面加载时获取应用列表
-    $(document).ready(function () {
-        loadAppList();
-    });
+    // 切换节点列表展开/折叠
+    function toggleNodes(element) {
+        const loadName = element.getAttribute('data-load-name');
+        const content = document.querySelector(`.load-content[data-load-name="${loadName}"]`);
+        const icon = element.querySelector('.expand-icon');
 
-    // 加载应用列表
-    function loadAppList(page = 1) {
-        currentPage = page;
-        const appName = $('#searchAppName').val();
-        const siteType = $('#searchSiteType').val();
-        const isEnabled = $('#searchIsEnabled').val();
-
-        $.ajax({
-            url: '/provider-app/page',
-            type: 'GET',
-            data: {
-                pageNum: currentPage,
-                pageSize: pageSize,
-                appName: appName,
-                siteType: siteType,
-                isEnabled: isEnabled
-            },
-            success: function (response) {
-                if (response.success) {
-                    renderAppList(response);
-                    renderPagination(response);
-                } else {
-                    alert('加载失败: ' + response.message);
-                }
-            },
-            error: function () {
-                alert('加载失败,请稍后重试');
-            }
-        });
-    }
-
-    // 渲染应用列表
-    function renderAppList(data) {
-        const tbody = $('#appTableBody');
-        tbody.empty();
-
-        if (data.records && data.records.length > 0) {
-            // 统计每个应用的节点数
-            const appNodeCount = {};
-            data.records.forEach(app => {
-                if (!appNodeCount[app.appName]) {
-                    appNodeCount[app.appName] = 0;
-                }
-                appNodeCount[app.appName]++;
-            });
-
-            // 去重,只显示应用名称
-            const uniqueApps = {};
-            data.records.forEach(app => {
-                if (!uniqueApps[app.appName]) {
-                    uniqueApps[app.appName] = {
-                        ...app,
-                        nodeCount: appNodeCount[app.appName]
-                    };
-                }
-            });
-
-            let index = (currentPage - 1) * pageSize + 1;
-            Object.values(uniqueApps).forEach(app => {
-                const enabledBadge = app.isEnabled
-                    ? '<span class="badge bg-success">已启用</span>'
-                    : '<span class="badge bg-secondary">已禁用</span>';
-
-                const row = `
-                    <tr>
-                        <td>${index++}</td>
-                        <td><strong>${app.appName}</strong></td>
-                        <td>${app.siteType || '-'}</td>
-                        <td><span class="badge bg-info">${app.nodeCount}</span></td>
-                        <td>${enabledBadge}</td>
-                        <td>${formatDate(app.createTime)}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="showNodeDetail('${app.appName}')">
-                                <i class="fas fa-list me-1"></i>服务节点
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                tbody.append(row);
-            });
+        if (content.classList.contains('show')) {
+            // 折叠
+            content.classList.remove('show');
+            icon.classList.remove('rotated');
         } else {
-            tbody.append('<tr><td colspan="7" class="text-center text-muted">暂无数据</td></tr>');
+            // 展开
+            content.classList.add('show');
+            icon.classList.add('rotated');
+
+            // 如果还没有加载过节点数据，则加载
+            if (!loadedNodes[loadName]) {
+                loadNodes(loadName);
+            }
         }
     }
 
-    // 渲染分页
-    function renderPagination(data) {
-        const nav = $('#paginationNav');
-        const pagination = $('#pagination');
-        pagination.empty();
-
-        if (data.pages > 1) {
-            nav.show();
-
-            // 上一页
-            const prevDisabled = currentPage === 1 ? 'disabled' : '';
-            pagination.append(`
-                <li class="page-item ${prevDisabled}">
-                    <a class="page-link" href="javascript:void(0)" onclick="loadAppList(${currentPage - 1})">上一页</a>
-                </li>
-            `);
-
-            // 页码
-            for (let i = 1; i <= data.pages; i++) {
-                const active = i === currentPage ? 'active' : '';
-                pagination.append(`
-                    <li class="page-item ${active}">
-                        <a class="page-link" href="javascript:void(0)" onclick="loadAppList(${i})">${i}</a>
-                    </li>
-                `);
-            }
-
-            // 下一页
-            const nextDisabled = currentPage === data.pages ? 'disabled' : '';
-            pagination.append(`
-                <li class="page-item ${nextDisabled}">
-                    <a class="page-link" href="javascript:void(0)" onclick="loadAppList(${currentPage + 1})">下一页</a>
-                </li>
-            `);
-        } else {
-            nav.hide();
-        }
-    }
-
-    // 显示节点详情
-    function showNodeDetail(appName) {
-        currentAppName = appName;
-        $('#nodeModalTitle').text(appName + ' - 服务节点');
+    // 加载节点列表
+    function loadNodes(loadName) {
+        const content = document.querySelector(`.load-content[data-load-name="${loadName}"]`);
 
         $.ajax({
             url: '/provider-app/listByAppName',
             type: 'GET',
-            data: {appName: appName},
+            data: {appName: loadName},
             success: function (response) {
                 if (response.success) {
-                    renderNodeList(response.apps);
-                    $('#nodeDetailModal').modal('show');
+                    loadedNodes[loadName] = response.nodesBySite;
+                    renderNodes(loadName, response.nodesBySite);
                 } else {
-                    alert('加载节点失败: ' + response.message);
+                    content.innerHTML = `<div class="alert alert-danger">加载失败: ${response.message}</div>`;
                 }
             },
             error: function () {
-                alert('加载节点失败,请稍后重试');
+                content.innerHTML = '<div class="alert alert-danger">加载失败，请稍后重试</div>';
             }
         });
     }
 
-    // 渲染节点列表
-    function renderNodeList(nodes) {
-        const tbody = $('#nodeTableBody');
-        tbody.empty();
+    // 渲染节点列表（按站点分组）
+    function renderNodes(loadName, nodesBySite) {
+        const content = document.querySelector(`.load-content[data-load-name="${loadName}"]`);
 
-        if (nodes && nodes.length > 0) {
-            nodes.forEach((node, index) => {
-                const enabledText = node.isEnabled ? '是' : '否';
-                const row = `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${node.appIp}</td>
-                        <td>${node.appPort}</td>
-                        <td>${node.loadFactor}</td>
-                        <td>${node.requestTimeout}</td>
-                        <td>${node.maxFailCount}</td>
-                        <td>${enabledText}</td>
-                        <td>${node.siteType || '-'}</td>
-                        <td>${node.appDescription || '-'}</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="editNode(${node.id})">修改</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteNode(${node.id})">删除</button>
-                            <button class="btn btn-sm btn-info" onclick="checkHealth(${node.id})">节点状态</button>
-                        </td>
-                    </tr>
-                `;
-                tbody.append(row);
-            });
-        } else {
-            tbody.append('<tr><td colspan="10" class="text-center text-muted">暂无节点数据</td></tr>');
+        if (!nodesBySite || Object.keys(nodesBySite).length === 0) {
+            content.innerHTML = '<div class="alert alert-info">暂无节点数据</div>';
+            return;
         }
+
+        let html = '';
+        for (const [siteType, nodes] of Object.entries(nodesBySite)) {
+            html += `
+                <div class="site-group">
+                    <div class="site-header">
+                        <i class="fas fa-map-marker-alt me-2"></i>${siteType}
+                        <span class="badge bg-secondary ms-2">${nodes.length}个节点</span>
+                    </div>
+            `;
+
+            nodes.forEach(node => {
+                const statusBadge = node.isEnabled
+                    ? '<span class="badge bg-success node-status">已启用</span>'
+                    : '<span class="badge bg-secondary node-status">已禁用</span>';
+
+                html += `
+                    <div class="node-item">
+                        <div class="node-info">
+                            <span class="node-ip">
+                                <i class="fas fa-network-wired me-1"></i>
+                                ${node.appIp}:${node.appPort}
+                            </span>
+                            ${statusBadge}
+                            ${node.appDescription ? `<br><small class="text-muted">${node.appDescription}</small>` : ''}
+                        </div>
+                        <div class="node-actions">
+                            <button class="btn btn-sm btn-primary" onclick="viewNodeDetail(${node.id})" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="checkHealth(${node.id})" title="健康检查">
+                                <i class="fas fa-heartbeat"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editNode(${node.id})" title="编辑节点">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteNode(${node.id}, '${loadName}')" title="删除节点">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+        }
+
+        content.innerHTML = html;
     }
 
-    // 保存应用
+    // 为特定负载添加节点
+    function addNodeToLoad(element) {
+        const loadName = element.getAttribute('data-load-name');
+        $('#addAppName').val(loadName);
+        $('#addAppName').prop('readonly', true);
+        $('#addAppModal').modal('show');
+    }
+
+    // 保存应用节点
     function saveApp() {
         const form = $('#addAppForm')[0];
         if (!form.checkValidity()) {
@@ -480,23 +639,25 @@
             data: JSON.stringify(formData),
             success: function (response) {
                 if (response.success) {
-                    alert('创建成功');
                     $('#addAppModal').modal('hide');
                     $('#addAppForm')[0].reset();
-                    loadAppList();
+                    $('#addAppName').prop('readonly', false);
+                    // 清除缓存并重新加载
+                    loadedNodes = {};
+                    location.reload();
                 } else {
                     alert('创建失败: ' + response.message);
                 }
             },
             error: function () {
-                alert('创建失败,请稍后重试');
+                alert('创建失败，请稍后重试');
             }
         });
     }
 
     // 删除节点
-    function deleteNode(id) {
-        if (!confirm('确认删除此节点吗?')) {
+    function deleteNode(id, loadName) {
+        if (!confirm('确认删除此节点吗？')) {
             return;
         }
 
@@ -507,14 +668,15 @@
             success: function (response) {
                 if (response.success) {
                     alert('删除成功');
-                    showNodeDetail(currentAppName);
-                    loadAppList();
+                    // 清除该负载的缓存并重新加载
+                    delete loadedNodes[loadName];
+                    loadNodes(loadName);
                 } else {
                     alert('删除失败: ' + response.message);
                 }
             },
             error: function () {
-                alert('删除失败,请稍后重试');
+                alert('删除失败，请稍后重试');
             }
         });
     }
@@ -532,27 +694,165 @@
                 }
             },
             error: function () {
-                alert('检查失败,请稍后重试');
+                alert('检查失败，请稍后重试');
             }
         });
     }
 
-    // 格式化日期
-    function formatDate(dateStr) {
-        if (!dateStr) return '-';
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('zh-CN');
+    // 查看节点详情
+    function viewNodeDetail(id) {
+        $.ajax({
+            url: '/provider-app/detail/' + id,
+            type: 'GET',
+            success: function (response) {
+                if (response.success && response.data) {
+                    const node = response.data;
+
+                    // 填充查看模态框
+                    $('#viewAppName').text(node.appName || '-');
+                    $('#viewSiteType').text(node.siteType || '-');
+                    $('#viewAppIp').text(node.appIp || '-');
+                    $('#viewAppPort').text(node.appPort || '-');
+                    $('#viewLoadFactor').text(node.loadFactor || '-');
+                    $('#viewRequestTimeout').text(node.requestTimeout || '-');
+                    $('#viewMaxFailCount').text(node.maxFailCount || '-');
+                    $('#viewHealthCheckUrl').text(node.healthCheckUrl || '未配置');
+                    $('#viewHealthCheckInterval').text(node.healthCheckInterval || '-');
+                    $('#viewAppDescription').text(node.appDescription || '无描述');
+
+                    // 状态徽章
+                    const statusHtml = node.isEnabled
+                        ? '<span class="badge bg-success">已启用</span>'
+                        : '<span class="badge bg-secondary">已禁用</span>';
+                    $('#viewIsEnabled').html(statusHtml);
+
+                    // 创建和更新信息
+                    $('#viewCreateBy').text(node.createBy || '-');
+                    $('#viewCreateTime').text(node.createTime || '-');
+                    $('#viewUpdateBy').text(node.updateBy || '-');
+                    $('#viewUpdateTime').text(node.updateTime || '-');
+
+                    // 保存当前节点ID用于后续编辑
+                    $('#viewNodeModal').data('currentNodeId', id);
+
+                    // 显示模态框
+                    $('#viewNodeModal').modal('show');
+                } else {
+                    alert('获取节点详情失败: ' + (response.message || '未知错误'));
+                }
+            },
+            error: function () {
+                alert('获取节点详情失败，请稍后重试');
+            }
+        });
     }
 
-    // 显示添加节点表单(暂未实现)
-    function showAddNodeForm() {
-        alert('此功能正在开发中');
+    // 从查看模态框切换到编辑模态框
+    function switchToEdit() {
+        const nodeId = $('#viewNodeModal').data('currentNodeId');
+        $('#viewNodeModal').modal('hide');
+        setTimeout(function () {
+            editNode(nodeId);
+        }, 300);
     }
 
-    // 编辑节点(暂未实现)
+    // 编辑节点
     function editNode(id) {
-        alert('此功能正在开发中');
+        $.ajax({
+            url: '/provider-app/detail/' + id,
+            type: 'GET',
+            success: function (response) {
+                if (response.success && response.data) {
+                    const node = response.data;
+
+                    // 填充编辑表单
+                    $('#editNodeId').val(node.id);
+                    $('#editAppName').val(node.appName);
+                    $('#editSiteType').val(node.siteType);
+                    $('#editAppIp').val(node.appIp);
+                    $('#editAppPort').val(node.appPort);
+                    $('#editLoadFactor').val(node.loadFactor || 1);
+                    $('#editRequestTimeout').val(node.requestTimeout || 60);
+                    $('#editMaxFailCount').val(node.maxFailCount || 3);
+                    $('#editHealthCheckUrl').val(node.healthCheckUrl || '');
+                    $('#editHealthCheckInterval').val(node.healthCheckInterval || 5000);
+                    $('#editAppDescription').val(node.appDescription || '');
+                    $('#editIsEnabled').prop('checked', node.isEnabled);
+
+                    // 保存原始appName用于后续刷新
+                    $('#editNodeModal').data('originalAppName', node.appName);
+
+                    // 显示模态框
+                    $('#editNodeModal').modal('show');
+                } else {
+                    alert('获取节点信息失败: ' + (response.message || '未知错误'));
+                }
+            },
+            error: function () {
+                alert('获取节点信息失败，请稍后重试');
+            }
+        });
     }
+
+    // 更新节点
+    function updateNode() {
+        const form = $('#editNodeForm')[0];
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const nodeId = $('#editNodeId').val();
+        const originalAppName = $('#editNodeModal').data('originalAppName');
+
+        const formData = {
+            id: parseInt(nodeId),
+            appName: $('#editAppName').val(),
+            siteType: $('#editSiteType').val(),
+            appIp: $('#editAppIp').val(),
+            appPort: parseInt($('#editAppPort').val()),
+            loadFactor: parseInt($('#editLoadFactor').val()) || 1,
+            requestTimeout: parseInt($('#editRequestTimeout').val()) || 60,
+            maxFailCount: parseInt($('#editMaxFailCount').val()) || 3,
+            healthCheckUrl: $('#editHealthCheckUrl').val(),
+            healthCheckInterval: parseInt($('#editHealthCheckInterval').val()) || 5000,
+            appDescription: $('#editAppDescription').val(),
+            isEnabled: $('#editIsEnabled').is(':checked')
+        };
+
+        $.ajax({
+            url: '/provider-app/update',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                if (response.success) {
+                    alert('更新成功！');
+                    $('#editNodeModal').modal('hide');
+                    $('#editNodeForm')[0].reset();
+
+                    // 清除该应用的缓存并重新加载
+                    delete loadedNodes[originalAppName];
+                    loadNodes(originalAppName);
+                } else {
+                    alert('更新失败: ' + response.message);
+                }
+            },
+            error: function () {
+                alert('更新失败，请稍后重试');
+            }
+        });
+    }
+
+    // 模态框关闭时重置表单
+    $('#addAppModal').on('hidden.bs.modal', function () {
+        $('#addAppForm')[0].reset();
+        $('#addAppName').prop('readonly', false);
+    });
+
+    $('#editNodeModal').on('hidden.bs.modal', function () {
+        $('#editNodeForm')[0].reset();
+    });
 </script>
 </body>
 </html>

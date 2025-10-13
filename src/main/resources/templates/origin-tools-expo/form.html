@@ -163,12 +163,12 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label" for="providerAppNum">提供者App编号</label>
-                        <input class="form-control" id="providerAppNum"
-                               placeholder="提供者App编号"
-                               th:field="${tool.providerAppNum}"
-                               type="number">
-                        <div class="form-text">对应数据库字段：provider_app_num</div>
+                        <label class="form-label" for="providerAppNum">服务方app</label>
+                        <select class="form-select" id="providerAppNum" th:field="${tool.providerAppNum}">
+                            <option value="">请选择服务方app</option>
+                            <!-- 动态加载已注册的应用节点 -->
+                        </select>
+                        <div class="form-text">只能选择已注册的应用服务节点,对应数据库字段：provider_app_num</div>
                     </div>
                 </div>
             </div>
@@ -238,8 +238,47 @@
         }).join('\r\n');
     }
 
+    /**
+     * 加载已注册的应用节点列表
+     * 用于填充服务方app下拉选择框
+     */
+    function loadProviderApps() {
+        fetch('/provider-app/listEnabled')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.apps) {
+                    const select = document.getElementById('providerAppNum');
+                    const currentValue = select.value; // 保存当前值(编辑时使用)
+
+                    // 清空现有选项(保留第一个"请选择"选项)
+                    select.innerHTML = '<option value="">请选择服务方app</option>';
+
+                    // 添加应用节点选项
+                    data.apps.forEach(app => {
+                        const option = document.createElement('option');
+                        option.value = app.id;
+                        option.textContent = `${app.appName} - ${app.siteType} (${app.appIp}:${app.appPort})`;
+                        select.appendChild(option);
+                    });
+
+                    // 如果是编辑模式,恢复之前选中的值
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                } else {
+                    console.error('加载应用节点失败:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('加载应用节点时出错:', error);
+            });
+    }
+
     // 为XML编辑器添加格式化功能
     document.addEventListener('DOMContentLoaded', function () {
+        // 加载应用节点列表
+        loadProviderApps();
+
         const xmlEditor = document.getElementById('expoApiDefine');
         if (xmlEditor) {
             xmlEditor.addEventListener('blur', function () {

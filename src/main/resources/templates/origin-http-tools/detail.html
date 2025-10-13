@@ -180,6 +180,19 @@
                         <dd class="col-sm-7" th:text="${tool.providerToolNum != null ? tool.providerToolNum : '-'}">-
                         </dd>
 
+                        <dt class="col-sm-5">服务方App:</dt>
+                        <dd class="col-sm-7">
+                            <span th:if="${providerApp != null}">
+                                <strong th:text="${providerApp.appName}">应用名称</strong><br>
+                                <small class="text-muted">
+                                    <span th:text="${providerApp.siteType}">站点类型</span> -
+                                    <span th:text="${providerApp.appIp}">IP</span>:<span
+                                        th:text="${providerApp.appPort}">端口</span>
+                                </small>
+                            </span>
+                            <span class="text-muted" th:if="${providerApp == null}">未配置</span>
+                        </dd>
+
                         <dt class="col-sm-5">创建时间:</dt>
                         <dd class="col-sm-7" th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm')}">
                             2024-01-01

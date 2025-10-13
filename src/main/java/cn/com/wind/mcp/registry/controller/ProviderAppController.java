@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
+import cn.com.wind.mcp.registry.entity.OriginToolExpo;
+import cn.com.wind.mcp.registry.entity.OriginToolHttp;
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.OriginProviderConfigService;
 import cn.hutool.core.util.StrUtil;
@@ -43,6 +45,9 @@ public class ProviderAppController {
 
     /**
      * 应用节点管理页面
+     * <p>
+     * 集成负载均衡器聚合视图,展示按app_name分组的节点统计信息
+     * </p>
      *
      * @param session HttpSession
      * @param model   Model
@@ -54,7 +59,63 @@ public class ProviderAppController {
         if (provider == null) {
             return "redirect:/provider/login";
         }
-        model.addAttribute("providerId", provider.getId());
+
+        try {
+            // 获取当前用户的所有负载均衡器名称(app_name去重)
+            QueryWrapper<OriginProviderConfig> wrapper = new QueryWrapper<>();
+            wrapper.select("DISTINCT app_name");
+            wrapper.eq("provider_id", provider.getId());
+            wrapper.eq("status", 1);
+            wrapper.isNotNull("app_name");
+            wrapper.ne("app_name", "");
+            List<OriginProviderConfig> configs = originProviderConfigService.list(wrapper);
+
+            // 提取app_name列表并按字母排序
+            List<String> loadBalancerNames = configs.stream()
+                .map(OriginProviderConfig::getAppName)
+                .distinct()
+                .sorted()
+                .collect(java.util.stream.Collectors.toList());
+
+            // 为每个负载均衡器计算统计信息
+            List<Map<String, Object>> loadBalancers = new java.util.ArrayList<>();
+            for (String loadName : loadBalancerNames) {
+                Map<String, Object> loadInfo = new HashMap<>();
+                loadInfo.put("loadName", loadName);
+
+                // 查询该负载下的所有节点
+                QueryWrapper<OriginProviderConfig> nodeWrapper = new QueryWrapper<>();
+                nodeWrapper.eq("provider_id", provider.getId());
+                nodeWrapper.eq("app_name", loadName);
+                nodeWrapper.eq("status", 1);
+                List<OriginProviderConfig> nodes = originProviderConfigService.list(nodeWrapper);
+
+                // 统计节点数和健康节点数
+                long healthyCount = nodes.stream()
+                    .filter(n -> n.getIsEnabled() != null && n.getIsEnabled())
+                    .count();
+                loadInfo.put("totalNodes", nodes.size());
+                loadInfo.put("healthyNodes", healthyCount);
+
+                // 统计站点类型数量
+                long siteTypeCount = nodes.stream()
+                    .map(OriginProviderConfig::getSiteType)
+                    .filter(st -> st != null && !st.isEmpty())
+                    .distinct()
+                    .count();
+                loadInfo.put("siteTypeCount", siteTypeCount);
+
+                loadBalancers.add(loadInfo);
+            }
+
+            model.addAttribute("loadBalancers", loadBalancers);
+            model.addAttribute("providerId", provider.getId());
+        } catch (Exception e) {
+            log.error("加载负载均衡器信息失败", e);
+            model.addAttribute("loadBalancers", new java.util.ArrayList<>());
+            model.addAttribute("providerId", provider.getId());
+        }
+
         return "provider-app/list";
     }
 
@@ -125,12 +186,15 @@ public class ProviderAppController {
 
     /**
      * 根据应用名称查询节点列表(用于弹窗展示)
+     * <p>
+     * 按站点类型分组返回节点列表，用于负载均衡器展开视图
+     * </p>
      *
      * @param appName 应用名称
      * @param session HttpSession
-     * @return 节点列表
+     * @return 按站点类型分组的节点列表
      */
-    @GetMapping("/listByAppName")
+    @GetMapping(value = "/listByAppName", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public Map<String, Object> listByAppName(@RequestParam String appName, HttpSession session) {
         Map<String, Object> result = new HashMap<>();
@@ -147,12 +211,23 @@ public class ProviderAppController {
             QueryWrapper<OriginProviderConfig> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("provider_id", provider.getId());
             queryWrapper.eq("app_name", appName);
-            queryWrapper.ne("status", -1);
-            List<OriginProviderConfig> apps = originProviderConfigService.list(queryWrapper);
+            queryWrapper.eq("status", 1); // 只查询有效的
+            queryWrapper.orderByAsc("site_type", "app_ip");
+            List<OriginProviderConfig> nodes = originProviderConfigService.list(queryWrapper);
+
+            // 按站点类型分组
+            Map<String, List<OriginProviderConfig>> nodesBySite = nodes.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                    node -> node.getSiteType() != null && !node.getSiteType().isEmpty()
+                        ? node.getSiteType()
+                        : "未分类"
+                ));
+
             result.put("success", true);
-            result.put("apps", apps);
+            result.put("nodesBySite", nodesBySite);
+            result.put("totalCount", nodes.size());
         } catch (Exception e) {
-            log.error("查询应用节点失败", e);
+            log.error("查询应用节点失败: appName={}", appName, e);
             result.put("success", false);
             result.put("message", "查询失败: " + e.getMessage());
         }
@@ -162,6 +237,9 @@ public class ProviderAppController {
 
     /**
      * 获取应用节点详情
+     * <p>
+     * 用于查看和编辑功能,返回节点的完整信息
+     * </p>
      *
      * @param id 应用节点ID
      * @return 应用节点信息
@@ -175,7 +253,7 @@ public class ProviderAppController {
             OriginProviderConfig app = originProviderConfigService.getById(id);
             if (app != null && app.getStatus() != -1) {
                 result.put("success", true);
-                result.put("app", app);
+                result.put("data", app);  // 使用data作为key,匹配前端期望
             } else {
                 result.put("success", false);
                 result.put("message", "应用节点不存在");
@@ -435,6 +513,95 @@ public class ProviderAppController {
             log.error("获取已启用应用列表失败", e);
             result.put("success", false);
             result.put("message", "获取失败: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
+     * 根据app_num查询关联的HTTP工具
+     * <p>
+     * 返回该应用节点关联的所有HTTP工具列表
+     * </p>
+     *
+     * @param appNum 应用编号
+     * @return HTTP工具列表
+     */
+    @GetMapping("/relatedHttpTools/{appNum}")
+    @ResponseBody
+    public Map<String, Object> getRelatedHttpTools(@PathVariable Long appNum) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            List<OriginToolHttp> httpTools = originProviderConfigService.getRelatedHttpTools(appNum);
+            result.put("success", true);
+            result.put("tools", httpTools);
+            result.put("count", httpTools.size());
+        } catch (Exception e) {
+            log.error("查询关联HTTP工具失败, appNum={}", appNum, e);
+            result.put("success", false);
+            result.put("message", "查询失败: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
+     * 根据app_num查询关联的Expo工具
+     * <p>
+     * 返回该应用节点关联的所有Expo工具列表
+     * </p>
+     *
+     * @param appNum 应用编号
+     * @return Expo工具列表
+     */
+    @GetMapping("/relatedExpoTools/{appNum}")
+    @ResponseBody
+    public Map<String, Object> getRelatedExpoTools(@PathVariable Long appNum) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            List<OriginToolExpo> expoTools = originProviderConfigService.getRelatedExpoTools(appNum);
+            result.put("success", true);
+            result.put("tools", expoTools);
+            result.put("count", expoTools.size());
+        } catch (Exception e) {
+            log.error("查询关联Expo工具失败, appNum={}", appNum, e);
+            result.put("success", false);
+            result.put("message", "查询失败: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
+     * 根据app_num查询关联的所有工具(HTTP + Expo)
+     * <p>
+     * 返回该应用节点关联的所有工具的汇总信息
+     * </p>
+     *
+     * @param appNum 应用编号
+     * @return 关联工具汇总
+     */
+    @GetMapping("/relatedTools/{appNum}")
+    @ResponseBody
+    public Map<String, Object> getRelatedTools(@PathVariable Long appNum) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            List<OriginToolHttp> httpTools = originProviderConfigService.getRelatedHttpTools(appNum);
+            List<OriginToolExpo> expoTools = originProviderConfigService.getRelatedExpoTools(appNum);
+
+            result.put("success", true);
+            result.put("httpTools", httpTools);
+            result.put("httpCount", httpTools.size());
+            result.put("expoTools", expoTools);
+            result.put("expoCount", expoTools.size());
+            result.put("totalCount", httpTools.size() + expoTools.size());
+        } catch (Exception e) {
+            log.error("查询关联工具失败, appNum={}", appNum, e);
+            result.put("success", false);
+            result.put("message", "查询失败: " + e.getMessage());
         }
 
         return result;

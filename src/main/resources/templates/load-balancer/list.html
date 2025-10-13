@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>负载均衡器管理 - MCP工具注册中心</title>
+    <!-- Bootstrap CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/css/fontawesome-fonts.css" rel="stylesheet">
+    <link href="/css/all.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .load-balancer-item {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .load-balancer-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .load-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .load-header:hover {
+            background-color: #e9ecef;
+        }
+
+        .load-info {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex: 1;
+        }
+
+        .load-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            min-width: 200px;
+        }
+
+        .load-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .health-status {
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .health-status-good {
+            color: #28a745;
+        }
+
+        .health-status-bad {
+            color: #dc3545;
+        }
+
+        .load-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nodes-container {
+            background-color: #fff;
+            padding: 0;
+            display: none;
+        }
+
+        .nodes-container.show {
+            display: block;
+        }
+
+        .node-table {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .node-table th {
+            background-color: #f1f3f5;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-top: none;
+        }
+
+        .node-table td {
+            vertical-align: middle;
+        }
+
+        .site-type-section {
+            border-left: 4px solid #0d6efd;
+            padding-left: 15px;
+            margin: 15px 20px;
+        }
+
+        .site-type-header {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .expand-icon {
+            transition: transform 0.2s;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="container-fluid mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item active">负载均衡器管理</li>
+        </ol>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-balance-scale me-2"></i>负载均衡器管理</h1>
+            <p class="text-muted mb-0">以负载名称作为主实体，聚合各个站点的服务节点配置信息</p>
+        </div>
+        <button class="btn btn-primary" data-bs-target="#addNodeModal" data-bs-toggle="modal">
+            <i class="fas fa-plus me-2"></i>添加服务节点
+        </button>
+    </div>
+
+    <!-- 负载均衡器嵌套列表 -->
+    <div class="alert alert-info" th:if="${#lists.isEmpty(loadBalancers)}">
+        <i class="fas fa-info-circle me-2"></i>暂无负载均衡器数据,请点击右上角"添加服务节点"开始创建
+    </div>
+
+    <!-- 负载均衡器项目列表 -->
+    <div class="load-balancer-item" th:each="load, stat : ${loadBalancers}">
+        <!-- 负载均衡器头部 -->
+        <div class="load-header" onclick="toggleNodesByElement(this)" th:data-load-name="${load.loadName}">
+            <div class="load-info">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-chevron-right expand-icon me-2" th:id="'icon-' + ${load.loadName}"></i>
+                    <span class="load-name" th:text="${load.loadName}"></span>
+                </div>
+                <div class="health-status"
+                     th:classappend="${load.healthyNodes == load.totalNodes} ? 'health-status-good' : 'health-status-bad'">
+                    <i th:class="${load.healthyNodes == load.totalNodes} ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i>
+                    <span th:if="${load.healthyNodes == load.totalNodes}">正常</span>
+                    <span th:unless="${load.healthyNodes == load.totalNodes}">异常</span>
+                    <span th:text="${load.healthyNodes} + '/' + ${load.totalNodes}"></span>
+                </div>
+                <div class="load-meta">
+                    <div>
+                        <i class="fas fa-server me-1"></i>
+                        <span class="badge bg-info" th:text="${load.totalNodes}"></span> 个节点
+                    </div>
+                    <div th:if="${load.healthCheckUrl != null}">
+                        <i class="fas fa-heartbeat me-1"></i>
+                        <small th:text="${load.healthCheckUrl}"></small>
+                    </div>
+                    <div th:if="${load.healthCheckInterval != null}">
+                        <i class="fas fa-clock me-1"></i>
+                        <small th:text="${load.healthCheckInterval} + 'ms'"></small>
+                    </div>
+                    <div>
+                        <i class="fas fa-calendar me-1"></i>
+                        <small th:text="${#temporals.format(load.createTime, 'yyyy-MM-dd HH:mm')}"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="load-actions" onclick="event.stopPropagation();">
+                <button class="btn btn-sm btn-primary" onclick="addNodeToLoadByElement(this)"
+                        th:data-load-name="${load.loadName}">
+                    <i class="fas fa-plus"></i> 添加节点
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="configureLoadByElement(this)"
+                        th:data-load-name="${load.loadName}">
+                    <i class="fas fa-cog"></i> 配置
+                </button>
+            </div>
+        </div>
+
+        <!-- 服务节点容器(可展开/收起) -->
+        <div class="nodes-container" th:id="'nodes-' + ${load.loadName}">
+            <div class="text-center p-3" th:id="'loading-' + ${load.loadName}">
+                <i class="fas fa-spinner fa-spin me-2"></i>加载中...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加服务节点模态框 -->
+<div class="modal fade" id="addNodeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>添加服务节点</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addNodeForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="addAppName">
+                                    负载名称(应用名称) <span class="text-danger">*</span>
+                                </label>
+                                <input class="form-control" id="addAppName" list="loadNameList" name="appName"
+                                       placeholder="输入或选择已有负载名称" required type="text">
+                                <datalist id="loadNameList">
+                                    <option th:each="load : ${loadBalancers}" th:value="${load.loadName}"></option>
+                                </datalist>
+                                <small class="form-text text-muted">
+                                    相同负载名称的节点将被聚合为一个负载均衡器
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="addSiteType">站点类型</label>
+                                <input class="form-control" id="addSiteType" name="siteType"
+                                       placeholder="如: 测试站、河西、外高桥" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label" for="addAppIp">
+                                    节点IP <span class="text-danger">*</span>
+                                </label>
+                                <input class="form-control" id="addAppIp" name="appIp"
+                                       placeholder="如: 10.26.80.129" required type="text">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="addAppPort">
+                                    端口 <span class="text-danger">*</span>
+                                </label>
+                                <input class="form-control" id="addAppPort" name="appPort"
+                                       placeholder="如: 8499" required type="number">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="addLoadFactor">负载因子</label>
+                                <input class="form-control" id="addLoadFactor" name="loadFactor"
+                                       placeholder="默认: 1" type="number" value="1">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="addRequestTimeout">请求超时时间(秒)</label>
+                                <input class="form-control" id="addRequestTimeout" name="requestTimeout"
+                                       placeholder="默认: 60" type="number" value="60">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="addMaxFailCount">最大失败次数</label>
+                                <input class="form-control" id="addMaxFailCount" name="maxFailCount"
+                                       placeholder="默认: 3" type="number" value="3">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="addHealthCheckUrl">健康检查地址</label>
+                        <input class="form-control" id="addHealthCheckUrl" name="healthCheckUrl"
+                               placeholder="如: http://10.26.80.129:8499/health" type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="addHealthCheckInterval">健康检查间隔(毫秒)</label>
+                        <input class="form-control" id="addHealthCheckInterval" name="healthCheckInterval"
+                               placeholder="默认: 5000" type="number" value="5000">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="addAppDescription">节点描述</label>
+                        <textarea class="form-control" id="addAppDescription" name="appDescription"
+                                  rows="2"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input checked class="form-check-input" id="addIsEnabled" name="isEnabled"
+                               type="checkbox" value="true">
+                        <label class="form-check-label" for="addIsEnabled">启用节点</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+                <button class="btn btn-primary" onclick="saveNode()" type="button">
+                    <i class="fas fa-save me-1"></i>保存
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/jquery-3.6.0.min.js"></script>
+<script>
+    // 存储每个负载的展开状态
+    const expandedLoads = new Set();
+
+    /**
+     * 从元素中获取负载名称并切换节点显示
+     * @param element 点击的元素
+     */
+    function toggleNodesByElement(element) {
+        const loadName = element.dataset.loadName;
+        toggleNodes(loadName);
+    }
+
+    /**
+     * 切换服务节点的显示/隐藏
+     * @param loadName 负载名称
+     */
+    function toggleNodes(loadName) {
+        const container = $('#nodes-' + loadName);
+        const icon = $('#icon-' + loadName);
+
+        if (expandedLoads.has(loadName)) {
+            // 收起
+            container.removeClass('show');
+            icon.removeClass('expanded');
+            expandedLoads.delete(loadName);
+        } else {
+            // 展开
+            expandedLoads.add(loadName);
+            icon.addClass('expanded');
+            container.addClass('show');
+
+            // 如果还没加载过数据,则加载
+            if (container.data('loaded') !== true) {
+                loadNodes(loadName);
+            }
+        }
+    }
+
+    /**
+     * 加载指定负载的服务节点
+     * @param loadName 负载名称
+     */
+    function loadNodes(loadName) {
+        const container = $('#nodes-' + loadName);
+        const loading = $('#loading-' + loadName);
+
+        $.ajax({
+            url: `/load-balancer/nodes/${encodeURIComponent(loadName)}`,
+            type: 'GET',
+            success: function (response) {
+                loading.hide();
+                if (response.success) {
+                    renderNodesInline(loadName, response.data);
+                    container.data('loaded', true);
+                } else {
+                    container.html('<div class="alert alert-danger m-3">查询失败: ' + response.message + '</div>');
+                }
+            },
+            error: function (xhr, status, error) {
+                loading.hide();
+                console.error('查询失败:', error);
+                container.html('<div class="alert alert-danger m-3">查询失败,请稍后重试</div>');
+            }
+        });
+    }
+
+    /**
+     * 在内联容器中渲染节点(按站点类型分组)
+     * @param loadName 负载名称
+     * @param nodesBySite Map<站点类型, 节点列表>
+     */
+    function renderNodesInline(loadName, nodesBySite) {
+        const container = $('#nodes-' + loadName);
+        container.empty();
+
+        if (!nodesBySite || Object.keys(nodesBySite).length === 0) {
+            container.html('<div class="alert alert-info m-3">该负载下暂无服务节点</div>');
+            return;
+        }
+
+        // 按站点类型遍历
+        let globalIndex = 1;
+        for (const [siteType, nodes] of Object.entries(nodesBySite)) {
+            const siteSection = `
+                <div class="site-type-section">
+                    <div class="site-type-header">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${siteType}</span>
+                        <span class="badge bg-secondary">${nodes.length}个节点</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover node-table">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>应用IP</th>
+                                    <th>应用端口</th>
+                                    <th>负载因子</th>
+                                    <th>请求超时(s)</th>
+                                    <th>最大失败次数</th>
+                                    <th>是否启用</th>
+                                    <th>节点描述</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="siteNodes_${loadName}_${siteType}">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            container.append(siteSection);
+
+            // 渲染该站点的节点列表
+            const tbody = $(`#siteNodes_${loadName}_${siteType}`);
+            nodes.forEach(node => {
+                const enabledBadge = node.isEnabled
+                    ? '<span class="badge bg-success">是</span>'
+                    : '<span class="badge bg-secondary">否</span>';
+
+                const row = `
+                    <tr>
+                        <td>${globalIndex++}</td>
+                        <td><code>${node.appIp}</code></td>
+                        <td><code>${node.appPort}</code></td>
+                        <td>${node.loadFactor || 1}</td>
+                        <td>${node.requestTimeout || 60}</td>
+                        <td>${node.maxFailCount || 3}</td>
+                        <td>${enabledBadge}</td>
+                        <td><small>${node.appDescription || '-'}</small></td>
+                        <td>
+                            <button class="btn btn-xs btn-warning" onclick="editNode(${node.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-xs btn-danger" onclick="deleteNode(${node.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+    }
+
+    /**
+     * 保存新服务节点
+     */
+    function saveNode() {
+        const form = $('#addNodeForm')[0];
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const formData = {
+            appName: $('#addAppName').val(),
+            siteType: $('#addSiteType').val(),
+            appIp: $('#addAppIp').val(),
+            appPort: parseInt($('#addAppPort').val()),
+            loadFactor: parseInt($('#addLoadFactor').val()) || 1,
+            requestTimeout: parseInt($('#addRequestTimeout').val()) || 60,
+            maxFailCount: parseInt($('#addMaxFailCount').val()) || 3,
+            healthCheckUrl: $('#addHealthCheckUrl').val(),
+            healthCheckInterval: parseInt($('#addHealthCheckInterval').val()) || 5000,
+            appDescription: $('#addAppDescription').val(),
+            isEnabled: $('#addIsEnabled').is(':checked')
+        };
+
+        console.log('提交数据:', formData);
+
+        $.ajax({
+            url: '/load-balancer/node/create',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                if (response.success) {
+                    $('#addNodeModal').modal('hide');
+                    $('#addNodeForm')[0].reset();
+                    alert('创建成功');
+                    location.reload(); // 刷新页面
+                } else {
+                    alert('创建失败: ' + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('创建失败:', error);
+                alert('创建失败,请稍后重试');
+            }
+        });
+    }
+
+    /**
+     * 从元素中获取负载名称并添加节点
+     * @param element 点击的按钮元素
+     */
+    function addNodeToLoadByElement(element) {
+        const loadName = element.dataset.loadName;
+        addNodeToLoad(loadName);
+    }
+
+    /**
+     * 从元素中获取负载名称并配置
+     * @param element 点击的按钮元素
+     */
+    function configureLoadByElement(element) {
+        const loadName = element.dataset.loadName;
+        configureLoad(loadName);
+    }
+
+    /**
+     * 为指定负载添加节点
+     * @param loadName 负载名称
+     */
+    function addNodeToLoad(loadName) {
+        $('#addAppName').val(loadName);
+        $('#addNodeModal').modal('show');
+    }
+
+    /**
+     * 配置负载均衡器
+     * @param loadName 负载名称
+     */
+    function configureLoad(loadName) {
+        alert('配置功能开发中: ' + loadName);
+        // TODO: 实现负载配置功能
+    }
+
+    /**
+     * 编辑服务节点
+     * @param id 节点ID
+     */
+    function editNode(id) {
+        alert('编辑功能开发中...');
+        // TODO: 实现编辑功能
+    }
+
+    /**
+     * 删除服务节点
+     * @param id 节点ID
+     */
+    function deleteNode(id) {
+        if (!confirm('确认删除此服务节点吗?')) {
+            return;
+        }
+
+        $.ajax({
+            url: `/load-balancer/node/delete/${id}`,
+            type: 'POST',
+            success: function (response) {
+                if (response.success) {
+                    alert('删除成功');
+                    location.reload();
+                } else {
+                    alert('删除失败: ' + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('删除失败:', error);
+                alert('删除失败,请稍后重试');
+            }
+        });
+    }
+</script>
+</body>
+</html>

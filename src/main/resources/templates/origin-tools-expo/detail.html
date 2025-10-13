@@ -154,7 +154,7 @@
 
             <!-- 提供者信息 -->
             <div class="info-card card"
-                 th:if="${tool.providerToolNum != null || tool.providerToolName != null || tool.providerAppNum != null}">
+                 th:if="${tool.providerToolNum != null || tool.providerToolName != null || providerApp != null}">
                 <div class="card-header">
                     <i class="fas fa-info me-2"></i>提供者信息
                 </div>
@@ -167,9 +167,21 @@
                         <small class="text-muted">提供者工具名称</small>
                         <div th:text="${tool.providerToolName}">工具名称</div>
                     </div>
-                    <div class="mb-3" th:if="${tool.providerAppNum != null}">
-                        <small class="text-muted">提供者App编号</small>
-                        <div th:text="${tool.providerAppNum}">67890</div>
+                    <div class="mb-0" th:if="${providerApp != null}">
+                        <small class="text-muted">服务方App</small>
+                        <div>
+                            <strong th:text="${providerApp.appName}">应用名称</strong><br>
+                            <small class="text-muted">
+                                <span th:text="${providerApp.siteType}">站点类型</span> -
+                                <span th:text="${providerApp.appIp}">IP</span>:<span
+                                    th:text="${providerApp.appPort}">端口</span>
+                            </small>
+                        </div>
+                    </div>
+                    <div class="mb-0" th:if="${providerApp == null && tool.providerAppNum != null}">
+                        <small class="text-muted">服务方App</small>
+                        <div class="text-warning">App编号: <span th:text="${tool.providerAppNum}">-</span> (配置不存在)
+                        </div>
                     </div>
                 </div>
             </div>

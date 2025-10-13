@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpSession;
 
+import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.OriginToolExpo;
+import cn.com.wind.mcp.registry.service.OriginProviderConfigService;
 import cn.com.wind.mcp.registry.service.OriginToolExpoService;
 import cn.com.wind.mcp.registry.util.PermissionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,6 +40,9 @@ public class OriginToolExpoController {
 
     @Autowired
     private OriginToolExpoService originToolExpoService;
+
+    @Autowired
+    private OriginProviderConfigService originProviderConfigService;
 
     /**
      * Expo接口列表页面
@@ -93,6 +98,14 @@ public class OriginToolExpoController {
         OriginToolExpo tool = originToolExpoService.getById(id);
         if (tool == null) {
             return "redirect:/origin-expo-tools";
+        }
+
+        // 加载服务方App信息
+        if (tool.getProviderAppNum() != null) {
+            OriginProviderConfig providerApp = originProviderConfigService.getById(tool.getProviderAppNum());
+            if (providerApp != null) {
+                model.addAttribute("providerApp", providerApp);
+            }
         }
 
         model.addAttribute("tool", tool);

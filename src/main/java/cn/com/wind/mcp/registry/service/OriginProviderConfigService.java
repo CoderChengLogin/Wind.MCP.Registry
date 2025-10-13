@@ -3,6 +3,8 @@ package cn.com.wind.mcp.registry.service;
 import java.util.List;
 
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
+import cn.com.wind.mcp.registry.entity.OriginToolExpo;
+import cn.com.wind.mcp.registry.entity.OriginToolHttp;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -95,4 +97,46 @@ public interface OriginProviderConfigService extends IService<OriginProviderConf
      * @return 是否成功
      */
     boolean disableConfig(Long id);
+
+    /**
+     * 根据app_num查询关联的HTTP工具列表
+     *
+     * @param appNum 应用编号
+     * @return HTTP工具列表
+     */
+    List<OriginToolHttp> getRelatedHttpTools(Long appNum);
+
+    /**
+     * 根据app_num查询关联的Expo工具列表
+     *
+     * @param appNum 应用编号
+     * @return Expo工具列表
+     */
+    List<OriginToolExpo> getRelatedExpoTools(Long appNum);
+
+    /**
+     * 获取所有负载均衡器列表(根据app_name聚合)
+     * <p>
+     * 将相同app_name的多条记录视为一个负载均衡器的多个服务节点
+     * </p>
+     *
+     * @return 负载均衡器名称列表(去重的app_name列表)
+     */
+    List<String> getAllLoadBalancerNames();
+
+    /**
+     * 根据负载名称(app_name)查询该负载下的所有服务节点
+     *
+     * @param loadName 负载名称(即app_name)
+     * @return 该负载下的所有服务节点列表
+     */
+    List<OriginProviderConfig> getNodesByLoadName(String loadName);
+
+    /**
+     * 根据负载名称查询节点并按站点类型分组
+     *
+     * @param loadName 负载名称(即app_name)
+     * @return Map<站点类型, 节点列表>
+     */
+    java.util.Map<String, List<OriginProviderConfig>> getNodesGroupBySiteType(String loadName);
 }

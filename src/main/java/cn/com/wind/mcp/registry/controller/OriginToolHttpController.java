@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpSession;
 
+import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.OriginToolHttp;
+import cn.com.wind.mcp.registry.service.OriginProviderConfigService;
 import cn.com.wind.mcp.registry.service.OriginToolHttpService;
 import cn.com.wind.mcp.registry.util.PermissionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -37,6 +39,9 @@ public class OriginToolHttpController {
 
     @Autowired
     private OriginToolHttpService originToolHttpService;
+
+    @Autowired
+    private OriginProviderConfigService originProviderConfigService;
 
     /**
      * HTTP接口列表页面
@@ -73,6 +78,10 @@ public class OriginToolHttpController {
 
     /**
      * HTTP接口详情页面
+     *
+     * @param id 工具ID
+     * @param model 模型
+     * @return 详情页面视图
      */
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
@@ -81,6 +90,14 @@ public class OriginToolHttpController {
         OriginToolHttp tool = originToolHttpService.getById(id);
         if (tool == null) {
             return "redirect:/origin-http-tools";
+        }
+
+        // 加载服务方App信息
+        if (tool.getProviderAppNum() != null) {
+            OriginProviderConfig providerApp = originProviderConfigService.getById(tool.getProviderAppNum());
+            if (providerApp != null) {
+                model.addAttribute("providerApp", providerApp);
+            }
         }
 
         model.addAttribute("tool", tool);
