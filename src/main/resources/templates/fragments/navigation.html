@@ -18,35 +18,35 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#request.requestURI == '/' ? 'active' : ''}"
+                           th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}"
                            th:href="@{/}">
                             <i class="fas fa-home me-1"></i>首页
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.startsWith(#request.requestURI, '/mcp-tools') ? 'active' : ''}"
+                           th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/mcp-tools') ? 'active' : ''}"
                            th:href="@{/mcp-tools}">
                             <i class="fas fa-cogs me-1"></i>MCP工具
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.startsWith(#request.requestURI, '/origin-http-tools') ? 'active' : ''}"
+                           th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/origin-http-tools') ? 'active' : ''}"
                            th:href="@{/origin-http-tools}">
                             <i class="fas fa-globe me-1"></i>原始HTTP接口
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.startsWith(#request.requestURI, '/origin-expo-tools') ? 'active' : ''}"
+                           th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/origin-expo-tools') ? 'active' : ''}"
                            th:href="@{/origin-expo-tools}">
                             <i class="fas fa-puzzle-piece me-1"></i>原始Expo接口
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.startsWith(#request.requestURI, '/provider-app') ? 'active' : ''}"
+                           th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/provider-app') ? 'active' : ''}"
                            th:href="@{/provider-app/list}">
                             <i class="fas fa-server me-1"></i>应用服务节点
                         </a>

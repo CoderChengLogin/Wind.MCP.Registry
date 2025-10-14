@@ -31,9 +31,9 @@ public class ToolValidationServiceImpl implements ToolValidationService {
     // 版本号规范：语义化版本 (Semantic Versioning)
     private static final Pattern VERSION_PATTERN = Pattern.compile("^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$");
     @Autowired
-    private McpToolMapper mcpToolMapper;
+    public McpToolMapper mcpToolMapper;
     @Autowired
-    private OriginToolHttpMapper originToolHttpMapper;
+    public OriginToolHttpMapper originToolHttpMapper;
 
     @Override
     public ValidationResult validateMcpTool(McpTool tool) {
