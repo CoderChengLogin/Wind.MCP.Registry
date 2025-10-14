@@ -43,6 +43,9 @@ spring:
     cache: false
     mode: HTML
     encoding: UTF-8
+    # Spring Boot 3.X / Thymeleaf 3.1+ 启用request等对象访问
+    enable-spring-el-compiler: false
+    render-hidden-markers-before-checkboxes: false
 logging:
   level:
     cn.com.wind.mcp.registry: debug
