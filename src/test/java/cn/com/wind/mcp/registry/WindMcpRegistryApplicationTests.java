@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
  * @date Created in 2018-11-08 18:10
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("jenkins")
 public class WindMcpRegistryApplicationTests {
 
     /**
