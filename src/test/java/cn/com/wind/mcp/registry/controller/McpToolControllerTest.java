@@ -30,7 +30,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -250,7 +249,7 @@ class McpToolControllerTest {
         provider.setUsername("testuser");
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
-        doNothing().when(mcpToolService).saveOrUpdateWithValidation(any(McpTool.class));
+        when(mcpToolService.saveOrUpdateWithValidation(any(McpTool.class))).thenReturn(true);
 
         McpToolEditDto dto = new McpToolEditDto();
         dto.setToolName("New Tool");
@@ -305,7 +304,7 @@ class McpToolControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(mcpToolService.getById(1L)).thenReturn(existingTool);
-        doNothing().when(mcpToolService).saveOrUpdateWithValidation(any(McpTool.class));
+        when(mcpToolService.saveOrUpdateWithValidation(any(McpTool.class))).thenReturn(true);
 
         McpToolEditDto dto = new McpToolEditDto();
         dto.setId(1L);
