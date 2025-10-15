@@ -141,27 +141,6 @@
 
     <build>
         <finalName>wind-mcp-registry</finalName>
-
-        <!-- 资源文件配置 -->
-        <resources>
-            <!-- 默认的resources目录 -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-            <!-- config目录下的配置文件 -->
-            <resource>
-                <directory>config</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.yml</include>
-                    <include>**/*.yaml</include>
-                    <include>**/*.properties</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
