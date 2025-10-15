@@ -62,6 +62,8 @@
     <!-- 工具表单 -->
     <form id="toolForm" method="post" th:action="@{/origin-http-tools/save}">
         <input th:field="${tool.id}" type="hidden">
+        <!-- 隐藏字段:保存当前应用名称用于编辑时回显 -->
+        <input id="currentAppName" th:value="${providerApp != null ? providerApp.appName : ''}" type="hidden">
 
         <!-- 基本信息 -->
         <div class="form-section">
@@ -203,22 +205,35 @@
             .then(data => {
                 if (data.success && data.apps) {
                     const select = document.getElementById('providerAppNum');
-                    const currentValue = select.value; // 保存当前值(编辑时使用)
+                    // 获取当前应用名称(编辑模式时使用)
+                    const currentAppName = document.getElementById('currentAppName')?.value;
 
                     // 清空现有选项(保留第一个"请选择"选项)
                     select.innerHTML = '<option value="">请选择服务方app</option>';
 
-                    // 添加应用节点选项
+                    // 添加应用节点选项(只显示应用名称,系统会自动负载均衡选择最佳节点)
                     data.apps.forEach(app => {
                         const option = document.createElement('option');
                         option.value = app.id;
-                        option.textContent = `${app.appName} - ${app.siteType} (${app.appIp}:${app.appPort})`;
+                        // 只显示应用名称,不显示具体站点信息
+                        option.textContent = app.appName;
+                        // 如果需要显示更多信息,可以添加到title属性
+                        option.title = `${app.appName} - ${app.siteType || '默认站点'} (${app.appIp}:${app.appPort})`;
+                        // 保存应用名称到option的data属性,用于匹配
+                        option.dataset.appName = app.appName;
                         select.appendChild(option);
                     });
 
-                    // 如果是编辑模式,恢复之前选中的值
-                    if (currentValue) {
-                        select.value = currentValue;
+                    // 如果是编辑模式,根据应用名称匹配选中项
+                    if (currentAppName) {
+                        // 遍历所有option,找到匹配的应用名称
+                        for (let i = 0; i < select.options.length; i++) {
+                            const option = select.options[i];
+                            if (option.dataset.appName === currentAppName) {
+                                select.selectedIndex = i;
+                                break;
+                            }
+                        }
                     }
                 } else {
                     console.error('加载应用节点失败:', data.message);

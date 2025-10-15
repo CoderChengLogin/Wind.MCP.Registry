@@ -53,11 +53,6 @@
             font-size: 0.9em;
             padding: 0.4em 0.8em;
         }
-
-        .sidebar-card {
-            position: sticky;
-            top: 20px;
-        }
     </style>
 </head>
 <body>
@@ -167,7 +162,7 @@
         <!-- 侧边栏信息 -->
         <div class="col-lg-4">
             <!-- 基本信息 -->
-            <div class="info-card card sidebar-card">
+            <div class="info-card card">
                 <div class="card-header">
                     <i class="fas fa-tag me-2"></i>基本信息
                 </div>
@@ -183,12 +178,7 @@
                         <dt class="col-sm-5">服务方App:</dt>
                         <dd class="col-sm-7">
                             <span th:if="${providerApp != null}">
-                                <strong th:text="${providerApp.appName}">应用名称</strong><br>
-                                <small class="text-muted">
-                                    <span th:text="${providerApp.siteType}">站点类型</span> -
-                                    <span th:text="${providerApp.appIp}">IP</span>:<span
-                                        th:text="${providerApp.appPort}">端口</span>
-                                </small>
+                                <strong th:text="${providerApp.appName}">应用名称</strong>
                             </span>
                             <span class="text-muted" th:if="${providerApp == null}">未配置</span>
                         </dd>

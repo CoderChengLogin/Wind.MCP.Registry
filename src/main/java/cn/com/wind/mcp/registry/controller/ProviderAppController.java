@@ -481,11 +481,11 @@ public class ProviderAppController {
      * 获取所有已启用的应用列表(用于下拉选择)
      * <p>
      * 此接口用于在工具录入页面中,将服务方app字段从输入框改为下拉选择
-     * 只返回当前登录用户已启用的应用
+     * 只返回当前登录用户已启用的应用,按app_name分组去重
      * </p>
      *
      * @param session HttpSession
-     * @return 已启用的应用列表
+     * @return 已启用的应用列表(按app_name去重)
      */
     @GetMapping("/listEnabled")
     @ResponseBody
@@ -505,9 +505,31 @@ public class ProviderAppController {
             queryWrapper.eq("provider_id", provider.getId());
             queryWrapper.eq("is_enabled", true);
             queryWrapper.eq("status", 1);
-            List<OriginProviderConfig> enabledApps = originProviderConfigService.list(queryWrapper);
+            queryWrapper.orderByAsc("app_name");
+            List<OriginProviderConfig> allApps = originProviderConfigService.list(queryWrapper);
+
+            // 按app_name分组,每个应用只保留一个代表节点(优先选择负载因子最高的)
+            Map<String, OriginProviderConfig> appMap = new java.util.LinkedHashMap<>();
+            for (OriginProviderConfig app : allApps) {
+                String appName = app.getAppName();
+                if (appName != null && !appName.isEmpty()) {
+                    // 如果该应用名已存在,比较负载因子,保留更高的
+                    if (!appMap.containsKey(appName)) {
+                        appMap.put(appName, app);
+                    } else {
+                        OriginProviderConfig existing = appMap.get(appName);
+                        int existingFactor = existing.getLoadFactor() != null ? existing.getLoadFactor() : 0;
+                        int currentFactor = app.getLoadFactor() != null ? app.getLoadFactor() : 0;
+                        if (currentFactor > existingFactor) {
+                            appMap.put(appName, app);
+                        }
+                    }
+                }
+            }
+
+            List<OriginProviderConfig> uniqueApps = new java.util.ArrayList<>(appMap.values());
             result.put("success", true);
-            result.put("apps", enabledApps);
+            result.put("apps", uniqueApps);
         } catch (Exception e) {
             log.error("获取已启用应用列表失败", e);
             result.put("success", false);

@@ -157,6 +157,14 @@ public class OriginToolExpoController {
             return "redirect:/origin-expo-tools?error=无权限编辑此工具";
         }
 
+        // 加载服务方App信息(用于前端回显应用名称)
+        if (tool.getProviderAppNum() != null) {
+            OriginProviderConfig providerApp = originProviderConfigService.getById(tool.getProviderAppNum());
+            if (providerApp != null) {
+                model.addAttribute("providerApp", providerApp);
+            }
+        }
+
         model.addAttribute("tool", tool);
         return "origin-tools-expo/form";
     }

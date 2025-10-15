@@ -742,6 +742,97 @@ class ProviderAppControllerTest {
     }
 
     /**
+     * Test list enabled - deduplicate by app_name
+     * 测试同一个应用有多个站点时的去重逻辑
+     */
+    @Test
+    void testListEnabled_DeduplicateByAppName() {
+        Provider provider = new Provider();
+        provider.setId(1L);
+
+        // 创建同一个应用的多个节点(不同站点,不同负载因子)
+        List<OriginProviderConfig> allApps = new ArrayList<>();
+
+        // MyApp - 测试站 - 负载因子10
+        OriginProviderConfig app1 = new OriginProviderConfig();
+        app1.setId(1L);
+        app1.setAppName("MyApp");
+        app1.setSiteType("测试站");
+        app1.setAppIp("192.168.1.1");
+        app1.setAppPort(8080);
+        app1.setLoadFactor(10);
+        app1.setIsEnabled(true);
+        app1.setStatus(1);
+        allApps.add(app1);
+
+        // MyApp - 河西 - 负载因子20 (最高)
+        OriginProviderConfig app2 = new OriginProviderConfig();
+        app2.setId(2L);
+        app2.setAppName("MyApp");
+        app2.setSiteType("河西");
+        app2.setAppIp("192.168.1.2");
+        app2.setAppPort(8080);
+        app2.setLoadFactor(20);
+        app2.setIsEnabled(true);
+        app2.setStatus(1);
+        allApps.add(app2);
+
+        // MyApp - 外高桥 - 负载因子15
+        OriginProviderConfig app3 = new OriginProviderConfig();
+        app3.setId(3L);
+        app3.setAppName("MyApp");
+        app3.setSiteType("外高桥");
+        app3.setAppIp("192.168.1.3");
+        app3.setAppPort(8080);
+        app3.setLoadFactor(15);
+        app3.setIsEnabled(true);
+        app3.setStatus(1);
+        allApps.add(app3);
+
+        // 另一个应用 - 只有一个节点
+        OriginProviderConfig app4 = new OriginProviderConfig();
+        app4.setId(4L);
+        app4.setAppName("AnotherApp");
+        app4.setSiteType("生产站");
+        app4.setAppIp("192.168.1.4");
+        app4.setAppPort(9090);
+        app4.setLoadFactor(30);
+        app4.setIsEnabled(true);
+        app4.setStatus(1);
+        allApps.add(app4);
+
+        when(session.getAttribute("currentProvider")).thenReturn(provider);
+        when(originProviderConfigService.list(any(QueryWrapper.class))).thenReturn(allApps);
+
+        Map<String, Object> result = providerAppController.listEnabled(session);
+
+        assertTrue((Boolean)result.get("success"));
+        @SuppressWarnings("unchecked")
+        List<OriginProviderConfig> apps = (List<OriginProviderConfig>)result.get("apps");
+
+        // 验证去重后只有2个应用
+        assertEquals(2, apps.size());
+
+        // 验证MyApp选择了负载因子最高的节点(河西站,ID=2)
+        OriginProviderConfig myApp = apps.stream()
+            .filter(app -> "MyApp".equals(app.getAppName()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(myApp);
+        assertEquals(2L, myApp.getId());
+        assertEquals("河西", myApp.getSiteType());
+        assertEquals(20, myApp.getLoadFactor());
+
+        // 验证AnotherApp存在
+        OriginProviderConfig anotherApp = apps.stream()
+            .filter(app -> "AnotherApp".equals(app.getAppName()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(anotherApp);
+        assertEquals(4L, anotherApp.getId());
+    }
+
+    /**
      * Test list enabled - exception handling
      */
     @Test

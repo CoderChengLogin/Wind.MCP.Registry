@@ -53,11 +53,6 @@
             font-size: 0.8em;
             padding: 0.3em 0.6em;
         }
-
-        .sidebar-card {
-            position: sticky;
-            top: 20px;
-        }
     </style>
 </head>
 <body>
@@ -170,12 +165,7 @@
                     <div class="mb-0" th:if="${providerApp != null}">
                         <small class="text-muted">服务方App</small>
                         <div>
-                            <strong th:text="${providerApp.appName}">应用名称</strong><br>
-                            <small class="text-muted">
-                                <span th:text="${providerApp.siteType}">站点类型</span> -
-                                <span th:text="${providerApp.appIp}">IP</span>:<span
-                                    th:text="${providerApp.appPort}">端口</span>
-                            </small>
+                            <strong th:text="${providerApp.appName}">应用名称</strong>
                         </div>
                     </div>
                     <div class="mb-0" th:if="${providerApp == null && tool.providerAppNum != null}">
@@ -189,52 +179,65 @@
 
         <!-- 侧边栏 -->
         <div class="col-lg-4">
-            <!-- 操作按钮 -->
-            <div class="info-card card sidebar-card">
+            <!-- 基本信息 -->
+            <div class="info-card card">
                 <div class="card-header">
-                    <i class="fas fa-tools me-2"></i>操作
+                    <i class="fas fa-tag me-2"></i>基本信息
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a class="btn btn-outline-secondary" th:href="@{/origin-expo-tools/edit/{id}(id=${tool.id})}">
-                            <i class="fas fa-edit me-2"></i>编辑工具
-                        </a>
-                        <button class="btn btn-outline-danger" data-bs-target="#deleteModal"
-                                data-bs-toggle="modal" type="button">
-                            <i class="fas fa-trash me-2"></i>删除工具
-                        </button>
-                        <a class="btn btn-outline-primary" href="/origin-expo-tools">
-                            <i class="fas fa-arrow-left me-2"></i>返回列表
-                        </a>
-                    </div>
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-5">工具ID:</dt>
+                        <dd class="col-sm-7" th:text="${tool.id}">1</dd>
+
+                        <dt class="col-sm-5">提供者工具编号:</dt>
+                        <dd class="col-sm-7" th:text="${tool.providerToolNum != null ? tool.providerToolNum : '-'}">-
+                        </dd>
+
+                        <dt class="col-sm-5">服务方App:</dt>
+                        <dd class="col-sm-7">
+                            <span th:if="${providerApp != null}">
+                                <strong th:text="${providerApp.appName}">应用名称</strong>
+                            </span>
+                            <span class="text-muted" th:if="${providerApp == null}">未配置</span>
+                        </dd>
+
+                        <dt class="col-sm-5">创建时间:</dt>
+                        <dd class="col-sm-7" th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm')}">
+                            2024-01-01
+                        </dd>
+
+                        <dt class="col-sm-5">创建者:</dt>
+                        <dd class="col-sm-7" th:text="${tool.createBy != null ? tool.createBy : '-'}">system</dd>
+
+                        <dt class="col-sm-5">更新时间:</dt>
+                        <dd class="col-sm-7"
+                            th:text="${tool.updateTime != null ? #temporals.format(tool.updateTime, 'yyyy-MM-dd HH:mm') : '-'}">
+                            -
+                        </dd>
+
+                        <dt class="col-sm-5">更新者:</dt>
+                        <dd class="col-sm-7 mb-0" th:text="${tool.updateBy != null ? tool.updateBy : '-'}">-</dd>
+                    </dl>
                 </div>
             </div>
 
-            <!-- 元数据信息 -->
+            <!-- 操作按钮 -->
             <div class="info-card card">
                 <div class="card-header">
-                    <i class="fas fa-info-circle me-2"></i>元数据
+                    <i class="fas fa-wrench me-2"></i>操作
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <small class="text-muted">创建时间</small>
-                        <div th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01
-                            12:00:00
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <small class="text-muted">创建人</small>
-                        <div th:text="${tool.createBy}">admin</div>
-                    </div>
-                    <div class="mb-3" th:if="${tool.updateTime != null}">
-                        <small class="text-muted">更新时间</small>
-                        <div th:text="${#temporals.format(tool.updateTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01
-                            12:00:00
-                        </div>
-                    </div>
-                    <div class="mb-0" th:if="${tool.updateBy != null}">
-                        <small class="text-muted">更新人</small>
-                        <div th:text="${tool.updateBy}">admin</div>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" th:href="@{/origin-expo-tools/edit/{id}(id=${tool.id})}">
+                            <i class="fas fa-edit me-2"></i>编辑工具
+                        </a>
+                        <button class="btn btn-danger" data-bs-target="#deleteModal"
+                                data-bs-toggle="modal" type="button">
+                            <i class="fas fa-trash me-2"></i>删除工具
+                        </button>
+                        <a class="btn btn-secondary" href="/origin-expo-tools">
+                            <i class="fas fa-arrow-left me-2"></i>返回列表
+                        </a>
                     </div>
                 </div>
             </div>
