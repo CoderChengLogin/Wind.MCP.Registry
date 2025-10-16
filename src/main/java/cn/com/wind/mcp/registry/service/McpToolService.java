@@ -2,6 +2,7 @@ package cn.com.wind.mcp.registry.service;
 
 import java.util.List;
 
+import cn.com.wind.mcp.registry.dto.mcptool.McpToolDTO;
 import cn.com.wind.mcp.registry.entity.McpTool;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -54,4 +55,29 @@ public interface McpToolService extends IService<McpTool> {
      * @return 工具数量
      */
     long countByProviderId(Long providerId);
+
+    /**
+     * 根据ID查询MCP工具
+     *
+     * @param id MCP工具ID
+     * @return MCP工具DTO
+     */
+    McpToolDTO getMcpToolById(Long id);
+
+    /**
+     * 根据工具编号和有效状态查询MCP工具列表
+     *
+     * @param toolNum 工具编号
+     * @param valid   有效状态
+     * @return MCP工具DTO列表
+     */
+    List<McpToolDTO> getMcpToolsByNumValid(Long toolNum, String valid);
+
+    /**
+     * 查询所有MCP工具
+     *
+     * @return MCP工具DTO列表
+     */
+    List<McpToolDTO> getAllMcpTools();
+
 }

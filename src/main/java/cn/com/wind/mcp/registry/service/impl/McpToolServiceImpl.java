@@ -1,7 +1,9 @@
 package cn.com.wind.mcp.registry.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import cn.com.wind.mcp.registry.dto.mcptool.McpToolDTO;
 import cn.com.wind.mcp.registry.entity.McpTool;
 import cn.com.wind.mcp.registry.mapper.McpToolMapper;
 import cn.com.wind.mcp.registry.service.McpToolService;
@@ -9,6 +11,7 @@ import cn.com.wind.mcp.registry.service.ToolValidationService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -99,5 +102,42 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
     @Override
     public long countByProviderId(Long providerId) {
         return count(new QueryWrapper<McpTool>().eq("provider_id", providerId));
+    }
+
+    @Autowired
+    private McpToolMapper mcpToolMapper;
+
+    @Override
+    public McpToolDTO getMcpToolById(Long id) {
+        McpTool mcpTool = mcpToolMapper.selectById(id);
+        if (mcpTool == null) {
+            throw new RuntimeException("找不到ID为" + id + "的MCP工具");
+        }
+        return convertToDTO(mcpTool);
+    }
+
+    @Override
+    public List<McpToolDTO> getMcpToolsByNumValid(Long toolNum, String valid) {
+        List<McpTool> entities = mcpToolMapper.selectList(
+            new QueryWrapper<McpTool>()
+                .eq("tool_num", toolNum)
+                .eq("valid", valid)
+        );
+        return entities.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<McpToolDTO> getAllMcpTools() {
+        List<McpTool> entities = mcpToolMapper.selectList(new QueryWrapper<>());
+        return entities.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * 将实体转换为DTO
+     */
+    private McpToolDTO convertToDTO(McpTool mcpTool) {
+        McpToolDTO dto = new McpToolDTO();
+        BeanUtils.copyProperties(mcpTool, dto);
+        return dto;
     }
 }

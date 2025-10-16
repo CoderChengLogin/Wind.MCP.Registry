@@ -358,24 +358,53 @@
                     </div>
                 </div>
 
+                <!-- 多语言名称 - 拆分为中英文 -->
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label required">多语言名称 <span class="text-danger">*</span></label>
-                            <input class="form-control" disabled id="mcpNameDisplay" name="mcpNameDisplay"
-                                   placeholder="请输入多语言名称" required type="text">
-                            <div class="form-text">对应数据库字段：name_display</div>
+                            <label class="form-label required">多语言名称 (英文) <span
+                                    class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="mcpNameDisplayEn"
+                                   placeholder="Tool Name in English" required type="text">
+                            <div class="form-text">工具的英文显示名称</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label required">多语言描述 <span class="text-danger">*</span></label>
-                            <input class="form-control" disabled id="descriptionDisplay" name="descriptionDisplay"
-                                   placeholder="请输入多语言描述" required type="text">
-                            <div class="form-text">对应数据库字段：description_display</div>
+                            <label class="form-label required">多语言名称 (中文) <span
+                                    class="text-danger">*</span></label>
+                            <input class="form-control" disabled id="mcpNameDisplayZh"
+                                   placeholder="工具中文名称" required type="text">
+                            <div class="form-text">工具的中文显示名称</div>
                         </div>
                     </div>
                 </div>
+
+                <!-- 多语言描述 - 拆分为中英文 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">多语言描述 (英文) <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" disabled id="descriptionDisplayEn"
+                                      placeholder="Tool description in English" required rows="3"></textarea>
+                            <div class="form-text">工具的英文功能描述</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label required">多语言描述 (中文) <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" disabled id="descriptionDisplayZh"
+                                      placeholder="工具中文功能描述" required rows="3"></textarea>
+                            <div class="form-text">工具的中文功能描述</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 隐藏字段:用于提交合并后的数据 -->
+                <input id="mcpNameDisplay" name="mcpNameDisplay" type="hidden">
+                <input id="descriptionDisplay" name="descriptionDisplay" type="hidden">
 
                 <div class="row">
                     <div class="col-md-6">
@@ -383,9 +412,11 @@
                             <label class="form-label required">input_json_schema <span
                                     class="text-danger">*</span></label>
                             <textarea class="form-control" disabled id="mcpInputSchema" name="mcpInputSchema"
-                                      placeholder='请输入JSON Schema格式的输入参数定义'
-                                      required rows="3"></textarea>
+                                      placeholder='{"type":"object","properties":{"param1":{"type":"string"}}}'
+                                      required rows="5"></textarea>
                             <div class="form-text">对应数据库字段：input_schema</div>
+                            <div class="invalid-feedback" id="mcpInputSchemaError"></div>
+                            <div class="valid-feedback">JSON Schema格式正确</div>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -393,9 +424,11 @@
                             <label class="form-label required">output_json_schema <span
                                     class="text-danger">*</span></label>
                             <textarea class="form-control" disabled id="mcpOutputSchema" name="mcpOutputSchema"
-                                      placeholder='请输入JSON Schema格式的输出参数定义'
-                                      required rows="3"></textarea>
+                                      placeholder='{"type":"object","properties":{"result":{"type":"string"}}}'
+                                      required rows="5"></textarea>
                             <div class="form-text">对应数据库字段：output_schema</div>
+                            <div class="invalid-feedback" id="mcpOutputSchemaError"></div>
+                            <div class="valid-feedback">JSON Schema格式正确</div>
                         </div>
                     </div>
                 </div>
@@ -499,23 +532,34 @@
 
                     <div class="mb-3">
                         <label class="form-label required">请求头（jinja2） <span class="text-danger">*</span></label>
-                        <textarea class="form-control" disabled id="templateReqHeaders" name="templateReqHeaders"
-                                  placeholder='请输入jinja2格式的请求头模板' rows="3"></textarea>
-                        <div class="form-text">对应数据库字段：req_headers</div>
+                        <textarea class="form-control jinja2-field" disabled id="templateReqHeaders"
+                                  name="templateReqHeaders"
+                                  placeholder='{"Content-Type": "application/json", "X-Custom": "{{ custom_header }}"}'
+                                  rows="3"></textarea>
+                        <div class="form-text">对应数据库字段：req_headers | 支持Jinja2变量: {{ variable }}</div>
+                        <div class="invalid-feedback" id="templateReqHeadersError"></div>
+                        <div class="valid-feedback">Jinja2语法正确</div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label required">请求体（jinja2） <span class="text-danger">*</span></label>
-                        <textarea class="form-control" disabled id="reqBody" name="reqBody"
-                                  placeholder='请输入jinja2格式的请求体模板' rows="5"></textarea>
-                        <div class="form-text">对应数据库字段：req_body</div>
+                        <textarea class="form-control jinja2-field" disabled id="reqBody" name="reqBody"
+                                  placeholder='{"data": "{{ input.data }}", "timestamp": "{{ timestamp }}"}'
+                                  rows="5"></textarea>
+                        <div class="form-text">对应数据库字段：req_body | 支持Jinja2语法: {% if %}, {% for %}, {{ }}
+                        </div>
+                        <div class="invalid-feedback" id="reqBodyError"></div>
+                        <div class="valid-feedback">Jinja2语法正确</div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label required">响应体（jinja2） <span class="text-danger">*</span></label>
-                        <textarea class="form-control" disabled id="respBody" name="respBody"
-                                  placeholder='请输入jinja2格式的响应体模板' rows="5"></textarea>
-                        <div class="form-text">对应数据库字段：resp_body</div>
+                        <textarea class="form-control jinja2-field" disabled id="respBody" name="respBody"
+                                  placeholder='{"result": "{{ response.result }}", "status": "success"}'
+                                  rows="5"></textarea>
+                        <div class="form-text">对应数据库字段：resp_body | 用于提取和转换响应数据</div>
+                        <div class="invalid-feedback" id="respBodyError"></div>
+                        <div class="valid-feedback">Jinja2语法正确</div>
                     </div>
                 </div>
 
@@ -680,7 +724,7 @@
         const requiredFields = {
             section1: [], // 第一步只需要选择工具类型，通过点击事件验证
             section2: [], // 动态设置，根据选择的工具类型
-            section3: ['toolName', 'toolDescription', 'mcpNameDisplay', 'descriptionDisplay', 'mcpInputSchema', 'mcpOutputSchema', 'streamOutput', 'convertType', 'toolType'],
+            section3: ['toolName', 'toolDescription', 'mcpNameDisplayEn', 'mcpNameDisplayZh', 'descriptionDisplayEn', 'descriptionDisplayZh', 'mcpInputSchema', 'mcpOutputSchema', 'streamOutput', 'convertType', 'toolType'],
             section4: [] // 动态设置，根据选择的转换器类型
         };
 
@@ -703,7 +747,7 @@
                         // 添加应用节点选项
                         data.apps.forEach(app => {
                             const option = document.createElement('option');
-                            option.value = app.appName;
+                            option.value = app.id;  // 使用ID而不是appName
                             option.textContent = `${app.appName} (${app.appIp}:${app.appPort})`;
                             select.appendChild(option);
                         });
@@ -718,6 +762,17 @@
 
         // 页面加载时立即加载应用列表
         loadProviderApps();
+
+        // 页面加载完成后,为JSON Schema字段添加实时验证
+        setTimeout(() => {
+            addRealTimeValidation('mcpInputSchema', validateJsonSchema);
+            addRealTimeValidation('mcpOutputSchema', validateJsonSchema);
+
+            // 为Jinja2字段添加实时验证
+            addRealTimeValidation('templateReqHeaders', validateJinja2Template);
+            addRealTimeValidation('reqBody', validateJinja2Template);
+            addRealTimeValidation('respBody', validateJinja2Template);
+        }, 1000);
 
         /**
          * 显示对应类型的模板转换器表单
@@ -952,7 +1007,8 @@
                     this.name === 'outputSchema' || this.name === 'providerAppNum' ||
                     this.name.startsWith('expo')) currentSection = 2;
                 else if (this.name === 'toolName' || this.name === 'toolDescription' ||
-                    this.name === 'mcpNameDisplay' || this.name === 'descriptionDisplay' ||
+                    this.id === 'mcpNameDisplayEn' || this.id === 'mcpNameDisplayZh' ||
+                    this.id === 'descriptionDisplayEn' || this.id === 'descriptionDisplayZh' ||
                     this.name === 'mcpInputSchema' || this.name === 'mcpOutputSchema' ||
                     this.name === 'streamOutput' || this.name === 'convertType' || this.name === 'toolType') currentSection = 3;
                 else if (this.name === 'templateReqUrl' || this.name === 'templateReqMethod' ||
@@ -973,9 +1029,154 @@
             });
         });
 
+        /**
+         * 验证JSON Schema格式
+         * @param {string} schemaText - JSON Schema文本
+         * @returns {Object} {valid: boolean, error: string}
+         */
+        function validateJsonSchema(schemaText) {
+            if (!schemaText || schemaText.trim() === '') {
+                return {valid: false, error: '不能为空'};
+            }
+
+            try {
+                const schema = JSON.parse(schemaText);
+
+                // 基本的JSON Schema验证
+                if (typeof schema !== 'object' || schema === null) {
+                    return {valid: false, error: 'JSON Schema必须是一个对象'};
+                }
+
+                // 检查必需的type字段
+                if (!schema.type) {
+                    return {valid: false, error: '缺少必需的"type"字段'};
+                }
+
+                // 验证type的值
+                const validTypes = ['object', 'array', 'string', 'number', 'integer', 'boolean', 'null'];
+                if (!validTypes.includes(schema.type)) {
+                    return {valid: false, error: `无效的type值: ${schema.type}`};
+                }
+
+                return {valid: true, error: null};
+            } catch (e) {
+                return {valid: false, error: `JSON格式错误: ${e.message}`};
+            }
+        }
+
+        /**
+         * 验证Jinja2模板语法
+         * @param {string} template - Jinja2模板文本
+         * @returns {Object} {valid: boolean, error: string}
+         */
+        function validateJinja2Template(template) {
+            if (!template || template.trim() === '') {
+                return {valid: false, error: '不能为空'};
+            }
+
+            // 检查基本的Jinja2语法错误
+            const errors = [];
+
+            // 检查未闭合的变量标签 {{ }}
+            const varMatches = template.match(/\{\{/g);
+            const varCloses = template.match(/\}\}/g);
+            if (varMatches && varCloses && varMatches.length !== varCloses.length) {
+                errors.push('变量标签{{ }}未正确闭合');
+            }
+
+            // 检查未闭合的语句标签 {% %}
+            const stmtMatches = template.match(/\{%/g);
+            const stmtCloses = template.match(/%\}/g);
+            if (stmtMatches && stmtCloses && stmtMatches.length !== stmtCloses.length) {
+                errors.push('语句标签{% %}未正确闭合');
+            }
+
+            // 检查if/endif配对
+            const ifCount = (template.match(/\{%\s*if\s+/g) || []).length;
+            const endifCount = (template.match(/\{%\s*endif\s*%\}/g) || []).length;
+            if (ifCount !== endifCount) {
+                errors.push('if语句缺少对应的endif');
+            }
+
+            // 检查for/endfor配对
+            const forCount = (template.match(/\{%\s*for\s+/g) || []).length;
+            const endforCount = (template.match(/\{%\s*endfor\s*%\}/g) || []).length;
+            if (forCount !== endforCount) {
+                errors.push('for循环缺少对应的endfor');
+            }
+
+            if (errors.length > 0) {
+                return {valid: false, error: errors.join('; ')};
+            }
+
+            return {valid: true, error: null};
+        }
+
+        /**
+         * 合并中英文字段为JSON格式
+         * @param {string} enText - 英文文本
+         * @param {string} zhText - 中文文本
+         * @returns {string} JSON格式的多语言字符串
+         */
+        function mergeMultilingualField(enText, zhText) {
+            const data = {
+                en: enText.trim(),
+                zh: zhText.trim()
+            };
+            return JSON.stringify(data);
+        }
+
+        /**
+         * 为字段添加实时验证
+         * @param {string} fieldId - 字段ID
+         * @param {Function} validatorFn - 验证函数
+         */
+        function addRealTimeValidation(fieldId, validatorFn) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + 'Error');
+
+            if (!field) return;
+
+            field.addEventListener('blur', function () {
+                const result = validatorFn(this.value);
+
+                if (result.valid) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    if (errorDiv) errorDiv.textContent = '';
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    if (errorDiv) errorDiv.textContent = result.error;
+                }
+            });
+
+            // 输入时清除错误状态
+            field.addEventListener('input', function () {
+                if (this.classList.contains('is-invalid') && this.value.trim() !== '') {
+                    const result = validatorFn(this.value);
+                    if (result.valid) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                        if (errorDiv) errorDiv.textContent = '';
+                    }
+                }
+            });
+        }
+
         // 表单提交处理
         document.getElementById('unifiedForm').addEventListener('submit', function (e) {
             e.preventDefault();
+
+            // 合并多语言字段
+            const nameEn = document.getElementById('mcpNameDisplayEn').value;
+            const nameZh = document.getElementById('mcpNameDisplayZh').value;
+            const descEn = document.getElementById('descriptionDisplayEn').value;
+            const descZh = document.getElementById('descriptionDisplayZh').value;
+
+            // 设置隐藏字段的值
+            document.getElementById('mcpNameDisplay').value = mergeMultilingualField(nameEn, nameZh);
+            document.getElementById('descriptionDisplay').value = mergeMultilingualField(descEn, descZh);
 
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());

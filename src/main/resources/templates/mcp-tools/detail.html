@@ -150,16 +150,32 @@
 
                         <dt class="col-sm-3">input_json_schema:</dt>
                         <dd class="col-sm-9">
-                            <pre th:if="${tool.inputSchema != null and !#strings.isEmpty(tool.inputSchema)}"
-                                 th:text="${tool.inputSchema}">输入Schema</pre>
+                            <div class="schema-box"
+                                 th:if="${tool.inputSchema != null and !#strings.isEmpty(tool.inputSchema)}">
+                                <div class="schema-header" onclick="toggleSchema('inputSchema', this)">
+                                    <span class="schema-title">Input Schema</span>
+                                    <i class="fas fa-chevron-down schema-icon"></i>
+                                </div>
+                                <div class="schema-content collapsed" id="inputSchemaContent">
+                                    <pre class="schema-pre" th:text="${tool.inputSchema}">输入Schema</pre>
+                                </div>
+                            </div>
                             <span class="text-muted"
                                   th:if="${tool.inputSchema == null or tool.inputSchema.isEmpty()}">无</span>
                         </dd>
 
                         <dt class="col-sm-3">output_json_schema:</dt>
                         <dd class="col-sm-9">
-                            <pre th:if="${tool.outputSchema != null and !#strings.isEmpty(tool.outputSchema)}"
-                                 th:text="${tool.outputSchema}">输出Schema</pre>
+                            <div class="schema-box"
+                                 th:if="${tool.outputSchema != null and !#strings.isEmpty(tool.outputSchema)}">
+                                <div class="schema-header" onclick="toggleSchema('outputSchema', this)">
+                                    <span class="schema-title">Output Schema</span>
+                                    <i class="fas fa-chevron-down schema-icon"></i>
+                                </div>
+                                <div class="schema-content collapsed" id="outputSchemaContent">
+                                    <pre class="schema-pre" th:text="${tool.outputSchema}">输出Schema</pre>
+                                </div>
+                            </div>
                             <span class="text-muted"
                                   th:if="${tool.outputSchema == null or tool.outputSchema.isEmpty()}">无</span>
                         </dd>
@@ -403,6 +419,103 @@
     </div>
 </div>
 
+<!-- 自定义样式 -->
+<style>
+    /* Schema容器样式 */
+    .schema-box {
+        width: 100%;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+    .schema-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.2s ease;
+    }
+
+    .schema-header:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #6a4190 100%);
+    }
+
+    .schema-header:active {
+        background: linear-gradient(135deg, #4c5fc7 0%, #5e3a82 100%);
+    }
+
+    .schema-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .schema-icon {
+        transition: transform 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .schema-header.expanded .schema-icon {
+        transform: rotate(180deg);
+    }
+
+    .schema-content {
+        transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+
+    .schema-content.collapsed {
+        max-height: 150px;
+        padding: 0.5rem 1rem;
+    }
+
+    .schema-content.expanded {
+        max-height: 600px;
+        padding: 1rem;
+        overflow-y: auto;
+    }
+
+    .schema-pre {
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: #2d3748;
+    }
+
+    /* 滚动条样式 */
+    .schema-content.expanded::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .schema-content.expanded::-webkit-scrollbar-track {
+        background: #e2e8f0;
+        border-radius: 4px;
+    }
+
+    .schema-content.expanded::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 4px;
+    }
+
+    .schema-content.expanded::-webkit-scrollbar-thumb:hover {
+        background: #5568d3;
+    }
+</style>
+
 <!-- Bootstrap JS -->
 <script src="/js/bootstrap.bundle.min.js"></script>
 <!-- Prism.js for code highlighting -->
@@ -411,6 +524,29 @@
 
 <script>
     let currentToolId = null;
+
+    /**
+     * 切换Schema内容的展开/收起状态
+     * @param {string} schemaType - Schema类型 ('inputSchema' 或 'outputSchema')
+     * @param {HTMLElement} headerElement - 被点击的header元素
+     */
+    function toggleSchema(schemaType, headerElement) {
+        const content = document.getElementById(schemaType + 'Content');
+
+        if (!content || !headerElement) {
+            return;
+        }
+
+        if (content.classList.contains('collapsed')) {
+            content.classList.remove('collapsed');
+            content.classList.add('expanded');
+            headerElement.classList.add('expanded');
+        } else {
+            content.classList.remove('expanded');
+            content.classList.add('collapsed');
+            headerElement.classList.remove('expanded');
+        }
+    }
 
     function confirmDelete(toolId, toolName) {
         currentToolId = toolId;

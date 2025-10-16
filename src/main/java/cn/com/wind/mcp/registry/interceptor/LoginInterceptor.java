@@ -26,6 +26,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         // 允许访问的公开路径
         String[] allowedPaths = {
+            "/api/tools/",     // 登录页面
             "/provider/login",     // 登录页面
             "/provider/register",  // 注册页面
             "/css/",              // CSS静态资源

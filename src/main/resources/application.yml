@@ -75,3 +75,10 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: true
+
+mcp:
+  server:
+    url: http://10.106.17.4:81/Wind.MCP.Server/vserver/vserver_test/mcp/
+  client:
+    timeout: 30000
+    client-name: "aimarket-backend"
