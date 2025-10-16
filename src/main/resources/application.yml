@@ -47,6 +47,7 @@ spring:
     enable-spring-el-compiler: false
     render-hidden-markers-before-checkboxes: false
 logging:
+  config: classpath:config/logback-spring.xml
   level:
     cn.com.wind.mcp.registry: debug
     cn.com.wind.mcp.registry.mapper: trace
