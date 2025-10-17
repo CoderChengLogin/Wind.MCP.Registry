@@ -208,36 +208,36 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.flywaydb</groupId>-->
-            <!--                <artifactId>flyway-maven-plugin</artifactId>-->
-            <!--                <version>10.10.0</version>-->
-            <!--                <configuration>-->
-            <!--                    <url>jdbc:mysql://192.168.248.208:3306/mcp_registry?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</url>-->
-            <!--                    <user>root</user>-->
-            <!--                    <password>root</password>-->
-            <!--                    <driver>com.mysql.cj.jdbc.Driver</driver>-->
-            <!--                    <locations>-->
-            <!--                        <location>classpath:db/migration</location>-->
-            <!--                    </locations>-->
-            <!--                    <baselineOnMigrate>true</baselineOnMigrate>-->
-            <!--                    <baselineVersion>0</baselineVersion>-->
-            <!--                    <validateOnMigrate>false</validateOnMigrate>-->
-            <!--                    <cleanDisabled>false</cleanDisabled>-->
-            <!--                </configuration>-->
-            <!--                <dependencies>-->
-            <!--                    <dependency>-->
-            <!--                        <groupId>org.flywaydb</groupId>-->
-            <!--                        <artifactId>flyway-mysql</artifactId>-->
-            <!--                        <version>10.10.0</version>-->
-            <!--                    </dependency>-->
-            <!--                    <dependency>-->
-            <!--                        <groupId>com.mysql</groupId>-->
-            <!--                        <artifactId>mysql-connector-j</artifactId>-->
-            <!--                        <version>9.1.0</version>-->
-            <!--                    </dependency>-->
-            <!--                </dependencies>-->
-            <!--            </plugin>-->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>10.10.0</version>
+                <configuration>
+                    <url>jdbc:mysql://192.168.248.208:3306/mcp_registry?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</url>
+                    <user>root</user>
+                    <password>root</password>
+                    <driver>com.mysql.cj.jdbc.Driver</driver>
+                    <locations>
+                        <location>classpath:db/migration</location>
+                    </locations>
+                    <baselineOnMigrate>true</baselineOnMigrate>
+                    <baselineVersion>0</baselineVersion>
+                    <validateOnMigrate>false</validateOnMigrate>
+                    <cleanDisabled>false</cleanDisabled>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-mysql</artifactId>
+                        <version>10.10.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mysql</groupId>
+                        <artifactId>mysql-connector-j</artifactId>
+                        <version>9.1.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 

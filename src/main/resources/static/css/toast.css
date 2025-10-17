@@ -1,0 +1,160 @@
+/**
+ * Toast通知组件样式
+ *
+ * @author Claude
+ * @version 1.0.0
+ */
+
+/* Toast容器 - 固定在右上角 */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+/* Toast基础样式 */
+.toast {
+    display: flex;
+    align-items: center;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: all;
+    border-left: 4px solid;
+}
+
+/* Toast进入动画 */
+.toast.toast-enter {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Toast退出动画 */
+.toast.toast-exit {
+    opacity: 0;
+    transform: translateX(400px);
+}
+
+/* Toast图标容器 */
+.toast-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 12px;
+}
+
+/* Toast消息内容 */
+.toast-message {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    word-wrap: break-word;
+}
+
+/* Toast关闭按钮 */
+.toast-close {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0;
+    font-size: 14px;
+}
+
+.toast-close:hover {
+    color: #333;
+}
+
+/* 成功类型 - 绿色 */
+.toast.toast-success {
+    border-left-color: #198754;
+}
+
+.toast.toast-success .toast-icon {
+    color: #198754;
+}
+
+/* 错误类型 - 红色 */
+.toast.toast-error {
+    border-left-color: #dc3545;
+}
+
+.toast.toast-error .toast-icon {
+    color: #dc3545;
+}
+
+/* 警告类型 - 黄色 */
+.toast.toast-warning {
+    border-left-color: #ffc107;
+}
+
+.toast.toast-warning .toast-icon {
+    color: #ffc107;
+}
+
+/* 信息类型 - 蓝色 */
+.toast.toast-info {
+    border-left-color: #0d6efd;
+}
+
+.toast.toast-info .toast-icon {
+    color: #0d6efd;
+}
+
+/* 响应式设计 - 移动端 */
+@media (max-width: 768px) {
+    .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: none;
+        width: 100%;
+    }
+}
+
+/* 暗黑模式支持（可选） */
+@media (prefers-color-scheme: dark) {
+    .toast {
+        background: #2d3748;
+    }
+
+    .toast-message {
+        color: #e2e8f0;
+    }
+
+    .toast-close {
+        color: #a0aec0;
+    }
+
+    .toast-close:hover {
+        color: #e2e8f0;
+    }
+}

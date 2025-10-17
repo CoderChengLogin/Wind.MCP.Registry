@@ -100,7 +100,7 @@
                                     <i class="fas fa-user me-2"></i>用户名 <span class="text-danger">*</span>
                                 </label>
                                 <input class="form-control" id="username" name="username" placeholder="3-20个字符"
-                                       required type="text">
+                                       autocomplete="username" required type="text">
                                 <div class="form-text">只能包含字母、数字和下划线</div>
                             </div>
 
@@ -108,9 +108,20 @@
                                 <label class="form-label" for="email">
                                     <i class="fas fa-envelope me-2"></i>邮箱
                                 </label>
-                                <input class="form-control" id="email" name="email" placeholder="your@example.com"
-                                       type="email">
-                                <div class="form-text">用于找回密码和接收通知</div>
+                                <div class="input-group">
+                                    <input autocomplete="email" class="form-control" id="email" name="email"
+                                           placeholder="your@example.com" type="email">
+                                    <span class="input-group-text" id="emailValidationIcon" style="display: none;">
+                                        <i class="fas fa-check text-success" id="emailValidIcon"
+                                           style="display: none;"></i>
+                                        <i class="fas fa-times text-danger" id="emailInvalidIcon"
+                                           style="display: none;"></i>
+                                    </span>
+                                </div>
+                                <div class="form-text" id="emailHelp">用于找回密码和接收通知</div>
+                                <div class="invalid-feedback" id="emailInvalidFeedback" style="display: none;">
+                                    请输入有效的邮箱地址
+                                </div>
                             </div>
                         </div>
 
@@ -119,8 +130,13 @@
                                 <label class="form-label" for="password">
                                     <i class="fas fa-lock me-2"></i>密码 <span class="text-danger">*</span>
                                 </label>
-                                <input class="form-control" id="password" name="password" placeholder="至少6个字符"
-                                       required type="password">
+                                <div class="input-group">
+                                    <input autocomplete="new-password" class="form-control" id="password" name="password"
+                                           placeholder="至少6个字符" required type="password">
+                                    <button class="btn btn-outline-secondary" id="togglePassword" type="button">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 <div class="password-strength mt-1" id="passwordStrength"></div>
                                 <div class="form-text">建议包含大小写字母、数字和特殊字符</div>
                             </div>
@@ -129,9 +145,14 @@
                                 <label class="form-label" for="confirmPassword">
                                     <i class="fas fa-lock me-2"></i>确认密码 <span class="text-danger">*</span>
                                 </label>
-                                <input class="form-control" id="confirmPassword" name="confirmPassword"
-                                       placeholder="再次输入密码"
-                                       required type="password">
+                                <div class="input-group">
+                                    <input autocomplete="new-password" class="form-control" id="confirmPassword"
+                                           name="confirmPassword"
+                                           placeholder="再次输入密码" required type="password">
+                                    <button class="btn btn-outline-secondary" id="toggleConfirmPassword" type="button">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 <div class="invalid-feedback" id="passwordMismatch">
                                     两次输入的密码不一致
                                 </div>
@@ -144,7 +165,7 @@
                                     <i class="fas fa-phone me-2"></i>手机号码
                                 </label>
                                 <input class="form-control" id="phoneNumber" name="phoneNumber" placeholder="请输入手机号码"
-                                       type="tel">
+                                       autocomplete="tel" type="tel">
                                 <div class="form-text">选填，用于账户安全验证</div>
                             </div>
 
@@ -153,7 +174,7 @@
                                     <i class="fas fa-building me-2"></i>公司名称
                                 </label>
                                 <input class="form-control" id="companyName" name="companyName" placeholder="请输入公司名称"
-                                       type="text">
+                                       autocomplete="organization" type="text">
                                 <div class="form-text">选填，用于工具展示和认证</div>
                             </div>
                         </div>
@@ -161,8 +182,9 @@
                         <div class="mb-3 form-check">
                             <input class="form-check-input" id="agreeTerms" required type="checkbox">
                             <label class="form-check-label" for="agreeTerms">
-                                我已阅读并同意 <a class="text-decoration-none" href="#">《服务协议》</a> 和 <a
-                                    class="text-decoration-none" href="#">《隐私政策》</a>
+                                我已阅读并同意 <a class="text-decoration-none" href="/legal/terms" target="_blank">《服务协议》</a>
+                                和 <a
+                                    class="text-decoration-none" href="/legal/privacy" target="_blank">《隐私政策》</a>
                             </label>
                         </div>
 
@@ -200,6 +222,34 @@
 
 <script>
     $(document).ready(function () {
+        // 密码可见性切换
+        $('#togglePassword').on('click', function () {
+            const passwordField = $('#password');
+            const icon = $(this).find('i');
+
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
+        // 确认密码可见性切换
+        $('#toggleConfirmPassword').on('click', function () {
+            const confirmPasswordField = $('#confirmPassword');
+            const icon = $(this).find('i');
+
+            if (confirmPasswordField.attr('type') === 'password') {
+                confirmPasswordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                confirmPasswordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
         // 密码强度检测
         $('#password').on('input', function () {
             var password = $(this).val();
@@ -216,6 +266,41 @@
                 strengthBar.addClass('strength-medium').css('width', '60%');
             } else {
                 strengthBar.addClass('strength-strong').css('width', '100%');
+            }
+        });
+
+        // 邮箱实时验证
+        $('#email').on('input', function () {
+            var email = $(this).val();
+            var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+            var emailField = $(this);
+            var validationIcon = $('#emailValidationIcon');
+            var validIcon = $('#emailValidIcon');
+            var invalidIcon = $('#emailInvalidIcon');
+            var invalidFeedback = $('#emailInvalidFeedback');
+
+            if (email.length === 0) {
+                // 清空状态
+                emailField.removeClass('is-valid is-invalid');
+                validationIcon.hide();
+                validIcon.hide();
+                invalidIcon.hide();
+                invalidFeedback.hide();
+            } else if (emailRegex.test(email)) {
+                // 有效邮箱
+                emailField.removeClass('is-invalid').addClass('is-valid');
+                validationIcon.show();
+                validIcon.show();
+                invalidIcon.hide();
+                invalidFeedback.hide();
+            } else {
+                // 无效邮箱
+                emailField.removeClass('is-valid').addClass('is-invalid');
+                validationIcon.show();
+                validIcon.hide();
+                invalidIcon.show();
+                invalidFeedback.show();
             }
         });
 
