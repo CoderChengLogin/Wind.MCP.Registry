@@ -3,6 +3,7 @@ package cn.com.wind.mcp.registry;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
 /**
  * <p>
  * Wind MCP Registry 应用测试类

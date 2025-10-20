@@ -78,7 +78,7 @@ public class OriginToolHttpController {
     /**
      * HTTP接口详情页面
      *
-     * @param id 工具ID
+     * @param id    工具ID
      * @param model 模型
      * @return 详情页面视图
      */

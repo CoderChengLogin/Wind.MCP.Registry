@@ -1,4 +1,3 @@
-
 package cn.com.wind.mcp.registry.entity;
 
 import java.io.Serializable;

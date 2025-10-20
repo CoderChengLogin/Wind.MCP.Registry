@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title th:text="${tool.id != null ? '编辑工具 - ' + tool.nameDisplay : '添加新工具'} + ' - MCP工具注册中心'">添加新工具 -
+    <title th:text="${tool.id != null ? '编辑工具 - ' + tool.nameDisplay : '添加新工具'} + ' - MCP工具注册中心'">添加新工具
+        -
         MCP工具注册中心</title>
     <link href="/vendor/bootstrap/bootstrap-5.3.0.min.css" rel="stylesheet">
     <link href="/vendor/fontawesome/all-6.4.0.min.css" rel="stylesheet">
@@ -88,7 +89,8 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="name">名称 <span class="required">*</span></label>
-                        <input class="form-control" id="name" placeholder="请输入工具名称" required th:field="${tool.nameDisplay}"
+                        <input class="form-control" id="name" placeholder="请输入工具名称" required
+                               th:field="${tool.nameDisplay}"
                                type="text">
                         <div class="form-text">对应数据库字段：name_display</div>
                     </div>
@@ -107,7 +109,8 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label" for="url">请求url <span class="required">*</span></label>
-                        <input class="form-control" id="url" placeholder="https://api.example.com/endpoint" required th:field="${tool.reqUrl}"
+                        <input class="form-control" id="url" placeholder="https://api.example.com/endpoint" required
+                               th:field="${tool.reqUrl}"
                                type="url">
                         <div class="form-text">对应数据库字段：req_url</div>
                     </div>

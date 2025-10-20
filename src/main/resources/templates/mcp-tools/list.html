@@ -105,7 +105,8 @@
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title" th:text="${tool.toolName}">工具名称</h5>
-                    <p class="card-text text-muted" th:text="${#strings.abbreviate(tool.toolDescription, 100)}">工具描述</p>
+                    <p class="card-text text-muted" th:text="${#strings.abbreviate(tool.toolDescription, 100)}">
+                        工具描述</p>
 
                     <div class="mb-2">
                         <small class="text-muted">

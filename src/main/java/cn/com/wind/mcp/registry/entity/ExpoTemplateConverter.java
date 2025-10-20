@@ -86,7 +86,6 @@ public class ExpoTemplateConverter extends Model<ExpoTemplateConverter> {
      */
     private Long providerToolNum;
 
-
     /**
      * 主键值，ActiveRecord 模式这个必须有
      *

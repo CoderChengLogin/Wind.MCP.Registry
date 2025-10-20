@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title th:text="${tool.id != null ? '编辑工具 - ' + tool.toolName : '添加新工具'} + ' - MCP工具注册中心'">添加新工具 -
+    <title th:text="${tool.id != null ? '编辑工具 - ' + tool.toolName : '添加新工具'} + ' - MCP工具注册中心'">添加新工具
+        -
         MCP工具注册中心</title>
     <link href="/vendor/bootstrap/bootstrap-5.3.0.min.css" rel="stylesheet">
     <link href="/vendor/fontawesome/all-6.4.0.min.css" rel="stylesheet">
@@ -144,7 +145,8 @@
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label" for="streamOutput">是否流式输出 <span class="required">*</span></label>
+                        <label class="form-label" for="streamOutput">是否流式输出 <span
+                                class="required">*</span></label>
                         <select class="form-select" id="streamOutput" required th:field="${tool.streamOutput}">
                             <option value="">请选择是否流式输出</option>
                             <option value="0">否</option>
@@ -186,7 +188,8 @@
             <h4 class="mb-3"><i class="fas fa-sliders-h me-2"></i>输入输出的JSON Schema配置</h4>
 
             <div class="mb-3">
-                <label class="form-label" for="inputSchema">输入Schema (JSON格式) <span class="required">*</span></label>
+                <label class="form-label" for="inputSchema">输入Schema (JSON格式) <span
+                        class="required">*</span></label>
                 <textarea class="form-control json-editor" id="inputSchema"
                           placeholder='{"type": "object", "properties": {...}}'
                           required rows="6"
@@ -197,7 +200,8 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label" for="outputSchema">输出Schema (JSON格式) <span class="required">*</span></label>
+                <label class="form-label" for="outputSchema">输出Schema (JSON格式) <span
+                        class="required">*</span></label>
                 <textarea class="form-control json-editor" id="outputSchema"
                           placeholder='{"type": "object", "properties": {...}}'
                           required rows="6"
