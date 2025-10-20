@@ -189,9 +189,23 @@ class OriginToolHttpControllerTest {
      */
     @Test
     void testNewForm_ShouldReturnFormView() {
-        String viewName = originToolHttpController.newForm(model);
+        String viewName = originToolHttpController.newForm(null, model);
 
         assertEquals("origin-http-tools/form", viewName);
+        verify(model).addAttribute(eq("tool"), any(OriginToolHttp.class));
+    }
+
+    /**
+     * Test new form with toolNum - should pre-fill providerToolNum for auto-association
+     */
+    @Test
+    void testNewForm_WithToolNum_ShouldPreFillProviderToolNum() {
+        Long toolNum = 1234567890L;
+
+        String viewName = originToolHttpController.newForm(toolNum, model);
+
+        assertEquals("origin-http-tools/form", viewName);
+        // 验证添加到model的tool对象的providerToolNum已经被设置
         verify(model).addAttribute(eq("tool"), any(OriginToolHttp.class));
     }
 

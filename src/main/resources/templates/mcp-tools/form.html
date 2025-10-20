@@ -31,29 +31,7 @@
 </head>
 <body>
 <!-- 导航栏 -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="/">
-            <i class="fas fa-tools me-2"></i>MCP工具注册中心
-        </a>
-        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">首页</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/mcp-tools">MCP工具</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/origin-http-tools">原始HTTP接口</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
 
 <div class="container mt-4">
     <!-- 面包屑导航 -->
@@ -170,7 +148,7 @@
                         <select class="form-select" id="streamOutput" required th:field="${tool.streamOutput}">
                             <option value="">请选择是否流式输出</option>
                             <option value="0">否</option>
-                            <option value="1">是</option>
+                            <!--                            <option value="1">是</option>-->
                         </select>
                     </div>
                 </div>
@@ -182,9 +160,9 @@
                         <label class="form-label" for="convertType">转换模板类型 <span class="required">*</span></label>
                         <select class="form-select" id="convertType" required th:field="${tool.convertType}">
                             <option value="">请选择转换模板类型</option>
-                            <option value="http">HTTP转换模板</option>
-                            <option value="expo">Expo转换模板</option>
-                            <option value="manual">手动转换模板</option>
+                            <option value="1">HTTP转换模板</option>
+                            <option value="2">Expo转换模板</option>
+                            <option value="3">手动转换模板</option>
                         </select>
                         <div class="form-text">选择工具的转换模板类型</div>
                     </div>
@@ -205,7 +183,7 @@
 
         <!-- Schema配置 -->
         <div class="form-section">
-            <h4 class="mb-3"><i class="fas fa-sliders-h me-2"></i>Schema配置</h4>
+            <h4 class="mb-3"><i class="fas fa-sliders-h me-2"></i>输入输出的JSON Schema配置</h4>
 
             <div class="mb-3">
                 <label class="form-label" for="inputSchema">输入Schema (JSON格式) <span class="required">*</span></label>
@@ -289,9 +267,9 @@
             </div>
         </div>
 
-        <!-- HTTP转换器配置 -->
+        <!-- HTTP转换模板配置 -->
         <div class="form-section" th:if="${httpConverter != null}">
-            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>HTTP转换器配置</h4>
+            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>HTTP转换模板配置</h4>
 
             <div class="row">
                 <div class="col-md-6">
@@ -342,9 +320,9 @@
             </div>
         </div>
 
-        <!-- Expo转换器配置 -->
+        <!-- Expo转换模板配置 -->
         <div class="form-section" th:if="${expoConverter != null}">
-            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>Expo转换器配置</h4>
+            <h4 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>Expo转换模板配置</h4>
 
             <div class="row">
                 <div class="col-md-6">
@@ -380,6 +358,46 @@
                 <div class="invalid-feedback" id="expoOutputArgsError"></div>
                 <div class="valid-feedback">Jinja2语法正确</div>
             </div>
+        </div>
+
+        <!-- Missing data warnings - HTTP type (仅提示缺少原始接口) -->
+        <div class="alert alert-warning d-flex justify-content-between align-items-center"
+             th:if="${tool.convertType != null and (tool.convertType == '1' or tool.convertType.toLowerCase().contains('http')) and httpTool == null}">
+            <div>
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>提示:</strong> 该MCP工具缺少关联的原始HTTP接口信息。
+            </div>
+            <a class="btn btn-sm btn-primary" href="/origin-http-tools/new"
+               th:href="@{/origin-http-tools/new(toolNum=${tool.toolNum})}">
+                <i class="fas fa-plus me-1"></i>添加原始HTTP接口
+            </a>
+        </div>
+
+        <!-- Missing data warnings - Expo type (仅提示缺少原始接口) -->
+        <div class="alert alert-warning d-flex justify-content-between align-items-center"
+             th:if="${tool.convertType != null and (tool.convertType == '2' or tool.convertType.equalsIgnoreCase('expo')) and expoTool == null}">
+            <div>
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>提示:</strong> 该MCP工具缺少关联的原始Expo接口信息。
+            </div>
+            <a class="btn btn-sm btn-primary" href="/origin-expo-tools/new"
+               th:href="@{/origin-expo-tools/new(toolNum=${tool.toolNum})}">
+                <i class="fas fa-plus me-1"></i>添加Expo接口
+            </a>
+        </div>
+
+        <!-- Missing data warnings - Code type -->
+        <div class="alert alert-info"
+             th:if="${tool.convertType != null and (tool.convertType == '3' or tool.convertType.equalsIgnoreCase('manul'))}">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>提示:</strong> 该MCP工具使用手动转换模板,直接通过代码实现,无需额外的转换器配置。
+        </div>
+
+        <!-- Missing data warnings - Unknown type or missing convertType -->
+        <div class="alert alert-warning"
+             th:if="${tool.convertType == null or (tool.convertType != '1' and tool.convertType != '2' and tool.convertType != '3' and !tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('manul'))}">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>提示:</strong> 该MCP工具的转换模板类型未设置或无效,请检查convertType字段。
         </div>
 
         <!-- 提交按钮 -->

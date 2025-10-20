@@ -10,12 +10,15 @@ import cn.com.wind.mcp.registry.dto.McpToolEditDto;
 import cn.com.wind.mcp.registry.entity.ExpoTemplateConverter;
 import cn.com.wind.mcp.registry.entity.HttpTemplateConverter;
 import cn.com.wind.mcp.registry.entity.McpTool;
+import cn.com.wind.mcp.registry.entity.OriginToolExpo;
 import cn.com.wind.mcp.registry.entity.OriginToolHttp;
 import cn.com.wind.mcp.registry.mapper.ExpoTemplateConverterMapper;
 import cn.com.wind.mcp.registry.mapper.HttpTemplateConverterMapper;
+import cn.com.wind.mcp.registry.mapper.OriginToolExpoMapper;
 import cn.com.wind.mcp.registry.mapper.OriginToolHttpMapper;
 import cn.com.wind.mcp.registry.service.McpToolService;
 import cn.com.wind.mcp.registry.util.PermissionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -51,6 +54,9 @@ public class McpToolController {
 
     @Autowired
     private OriginToolHttpMapper originToolHttpMapper;
+
+    @Autowired
+    private OriginToolExpoMapper originToolExpoMapper;
 
     @Autowired
     private HttpTemplateConverterMapper httpTemplateConverterMapper;
@@ -109,7 +115,8 @@ public class McpToolController {
 
             // 检查权限：只有工具的创建者可以编辑
             if (!PermissionUtil.hasPermission(session, tool.getProviderId())) {
-                return "redirect:/mcp-tools?error=" + URLEncoder.encode("无权限编辑此工具", StandardCharsets.UTF_8.name());
+                return "redirect:/mcp-tools?error=" + URLEncoder.encode("无权限编辑此工具",
+                    StandardCharsets.UTF_8.name());
             }
 
             // 根据convertType确定转换器类型
@@ -124,19 +131,27 @@ public class McpToolController {
                 httpTool = originToolHttpMapper.selectOne(httpWrapper);
             }
 
+            OriginToolExpo expoTool = null;
+            if (tool.getToolNum() != null) {
+                QueryWrapper<OriginToolExpo> expoWrapper = new QueryWrapper<>();
+                expoWrapper.eq("provider_tool_num", tool.getToolNum());
+                expoTool = originToolExpoMapper.selectOne(expoWrapper);
+            }
+
             // 根据convertType查询对应的转换模板信息
             HttpTemplateConverter httpConverter = null;
             ExpoTemplateConverter expoConverter = null;
 
             if (tool.getToolNum() != null) {
-                // 判断是否为HTTP类型: convertType包含"http"(不区分大小写)
-                if (convertType != null && convertType.toLowerCase().contains("http")) {
+                // 判断是否为HTTP类型: convertType='1'或包含"http"(不区分大小写)
+                if (convertType != null && ("1".equals(convertType) || convertType.toLowerCase().contains("http"))) {
                     // 查询HTTP转换模板
                     QueryWrapper<HttpTemplateConverter> converterWrapper = new QueryWrapper<>();
                     converterWrapper.eq("tool_num", tool.getToolNum());
                     httpConverter = httpTemplateConverterMapper.selectOne(converterWrapper);
                     log.info("查询HTTP转换模板: {}", httpConverter != null ? "找到" : "未找到");
-                } else if (convertType != null && "expo".equalsIgnoreCase(convertType)) {
+                } else if (convertType != null && ("2".equals(convertType) || convertType.toLowerCase().contains(
+                    "expo"))) {
                     // 查询Expo转换模板
                     QueryWrapper<ExpoTemplateConverter> converterWrapper = new QueryWrapper<>();
                     converterWrapper.eq("tool_num", tool.getToolNum());
@@ -147,6 +162,7 @@ public class McpToolController {
 
             model.addAttribute("tool", tool);
             model.addAttribute("httpTool", httpTool);
+            model.addAttribute("expoTool", expoTool);
             model.addAttribute("httpConverter", httpConverter);
             model.addAttribute("expoConverter", expoConverter);
             return "mcp-tools/form";
@@ -174,10 +190,19 @@ public class McpToolController {
 
         // 查询关联的源工具信息
         OriginToolHttp httpTool = null;
-        if (tool.getToolNum() != null) {
+        if (tool.getToolNum() != null && (StrUtil.equals("1", convertType) || convertType.toLowerCase().contains(
+            "http"))) {
             QueryWrapper<OriginToolHttp> httpWrapper = new QueryWrapper<>();
             httpWrapper.eq("provider_tool_num", tool.getToolNum());
             httpTool = originToolHttpMapper.selectOne(httpWrapper);
+        }
+
+        OriginToolExpo expoTool = null;
+        if (tool.getToolNum() != null && (StrUtil.equals("2", convertType) || convertType.toLowerCase().contains(
+            "expo"))) {
+            QueryWrapper<OriginToolExpo> expoWrapper = new QueryWrapper<>();
+            expoWrapper.eq("provider_tool_num", tool.getToolNum());
+            expoTool = originToolExpoMapper.selectOne(expoWrapper);
         }
 
         // 根据convertType查询对应的转换模板信息
@@ -185,14 +210,14 @@ public class McpToolController {
         ExpoTemplateConverter expoConverter = null;
 
         if (tool.getToolNum() != null) {
-            // 判断是否为HTTP类型: convertType包含"http"(不区分大小写)
-            if (convertType != null && convertType.toLowerCase().contains("http")) {
+            // 判断是否为HTTP类型: convertType='1'或包含"http"(不区分大小写)
+            if (convertType != null && ("1".equals(convertType) || convertType.toLowerCase().contains("http"))) {
                 // 查询HTTP转换模板
                 QueryWrapper<HttpTemplateConverter> converterWrapper = new QueryWrapper<>();
                 converterWrapper.eq("tool_num", tool.getToolNum());
                 httpConverter = httpTemplateConverterMapper.selectOne(converterWrapper);
                 log.info("查询HTTP转换模板: {}", httpConverter != null ? "找到" : "未找到");
-            } else if (convertType != null && "expo".equalsIgnoreCase(convertType)) {
+            } else if (convertType != null && ("2".equals(convertType) || convertType.toLowerCase().contains("expo"))) {
                 // 查询Expo转换模板
                 QueryWrapper<ExpoTemplateConverter> converterWrapper = new QueryWrapper<>();
                 converterWrapper.eq("tool_num", tool.getToolNum());
@@ -203,6 +228,7 @@ public class McpToolController {
 
         model.addAttribute("tool", tool);
         model.addAttribute("httpTool", httpTool);
+        model.addAttribute("expoTool", expoTool);
         model.addAttribute("httpConverter", httpConverter);
         model.addAttribute("expoConverter", expoConverter);
         return "mcp-tools/detail";

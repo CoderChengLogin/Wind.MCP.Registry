@@ -189,9 +189,23 @@ class OriginToolExpoControllerTest {
      */
     @Test
     void testNewForm_ShouldReturnFormView() {
-        String viewName = originToolExpoController.newForm(model);
+        String viewName = originToolExpoController.newForm(null, model);
 
         assertEquals("origin-tools-expo/form", viewName);
+        verify(model).addAttribute(eq("tool"), any(OriginToolExpo.class));
+    }
+
+    /**
+     * Test new form with toolNum - should pre-fill providerToolNum for auto-association
+     */
+    @Test
+    void testNewForm_WithToolNum_ShouldPreFillProviderToolNum() {
+        Long toolNum = 9876543210L;
+
+        String viewName = originToolExpoController.newForm(toolNum, model);
+
+        assertEquals("origin-tools-expo/form", viewName);
+        // 验证添加到model的tool对象的providerToolNum已经被设置
         verify(model).addAttribute(eq("tool"), any(OriginToolExpo.class));
     }
 

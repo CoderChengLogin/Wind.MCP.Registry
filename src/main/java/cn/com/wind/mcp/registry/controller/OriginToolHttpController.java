@@ -114,10 +114,22 @@ public class OriginToolHttpController {
 
     /**
      * 新增HTTP接口页面 (new路径别名)
+     *
+     * @param toolNum 关联的MCP工具编号 (可选,用于自动关联)
+     * @param model   模型
+     * @return 表单页面
      */
     @GetMapping("/new")
-    public String newForm(Model model) {
-        model.addAttribute("tool", new OriginToolHttp());
+    public String newForm(@RequestParam(required = false) Long toolNum, Model model) {
+        OriginToolHttp tool = new OriginToolHttp();
+
+        // 如果传入了toolNum,自动设置为providerToolNum,实现自动关联
+        if (toolNum != null) {
+            tool.setProviderToolNum(toolNum);
+            log.info("创建HTTP接口并关联到MCP工具: toolNum={}", toolNum);
+        }
+
+        model.addAttribute("tool", tool);
         return "origin-http-tools/form";
     }
 

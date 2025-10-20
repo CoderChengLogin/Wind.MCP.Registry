@@ -117,6 +117,49 @@
                 </div>
             </div>
 
+            <!-- 原始Expo接口信息 -->
+            <div class="card mb-4" th:if="${expoTool != null}">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-server me-2"></i>原始Expo接口信息</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">工具编号:</dt>
+                        <dd class="col-sm-9" th:text="${expoTool.providerToolNum}">工具编号</dd>
+
+                        <dt class="col-sm-3">名称:</dt>
+                        <dd class="col-sm-9" th:text="${expoTool.nameDisplay}">Expo接口名称</dd>
+
+                        <dt class="col-sm-3">功能描述:</dt>
+                        <dd class="col-sm-9" th:text="${expoTool.descDisplay}">Expo接口描述</dd>
+
+                        <dt class="col-sm-3">提供者工具名称:</dt>
+                        <dd class="col-sm-9" th:text="${expoTool.providerToolName}">提供者工具名称</dd>
+
+                        <dt class="col-sm-3">API定义(XML):</dt>
+                        <dd class="col-sm-9">
+                            <pre th:if="${expoTool.expoApiDefine != null and !#strings.isEmpty(expoTool.expoApiDefine)}"
+                                 th:text="${expoTool.expoApiDefine}">Expo API定义</pre>
+                            <span class="text-muted"
+                                  th:if="${expoTool.expoApiDefine == null or expoTool.expoApiDefine.isEmpty()}">无</span>
+                        </dd>
+
+                        <dt class="col-sm-3">服务方app:</dt>
+                        <dd class="col-sm-9" th:text="${expoTool.providerAppNum}">服务方app编号</dd>
+
+                        <dt class="col-sm-3">App Class:</dt>
+                        <dd class="col-sm-9">
+                            <code th:text="${expoTool.appClass}">App Class</code>
+                        </dd>
+
+                        <dt class="col-sm-3">Command ID:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-info" th:text="${expoTool.commandId}">Command ID</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
             <!-- MCP工具信息 -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -130,7 +173,7 @@
                         <dt class="col-sm-3">工具版本:</dt>
                         <dd class="col-sm-9" th:text="${tool.toolVersion}">工具版本</dd>
 
-                        <dt class="col-sm-3">valid:</dt>
+                        <dt class="col-sm-3">是否有效:</dt>
                         <dd class="col-sm-9">
                             <span class="badge" th:classappend="${tool.valid == '1' ? 'bg-success' : 'bg-secondary'}"
                                   th:text="${tool.valid == '1' ? '有效' : '无效'}">状态</span>
@@ -142,11 +185,21 @@
                         <dt class="col-sm-3">MCP工具描述:</dt>
                         <dd class="col-sm-9" th:text="${tool.toolDescription}">工具描述</dd>
 
-                        <dt class="col-sm-3">多语言名称:</dt>
-                        <dd class="col-sm-9" th:text="${tool.nameDisplay}">显示名称</dd>
+                        <dt class="col-sm-3">多语言名称 (英文):</dt>
+                        <dd class="col-sm-9" id="nameDisplayEn">-</dd>
 
-                        <dt class="col-sm-3">多语言描述:</dt>
-                        <dd class="col-sm-9" th:text="${tool.descriptionDisplay}">显示描述</dd>
+                        <dt class="col-sm-3">多语言名称 (中文):</dt>
+                        <dd class="col-sm-9" id="nameDisplayZh">-</dd>
+
+                        <dt class="col-sm-3">多语言描述 (英文):</dt>
+                        <dd class="col-sm-9" id="descriptionDisplayEn">-</dd>
+
+                        <dt class="col-sm-3">多语言描述 (中文):</dt>
+                        <dd class="col-sm-9" id="descriptionDisplayZh">-</dd>
+
+                        <!-- Hidden fields for JavaScript to read -->
+                        <input id="nameDisplayJson" th:value="${tool.nameDisplay}" type="hidden">
+                        <input id="descriptionDisplayJson" th:value="${tool.descriptionDisplay}" type="hidden">
 
                         <dt class="col-sm-3">input_json_schema:</dt>
                         <dd class="col-sm-9">
@@ -186,15 +239,19 @@
                         <dt class="col-sm-3">转换模板类型:</dt>
                         <dd class="col-sm-9">
                             <span class="badge bg-success"
-                                  th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http')}">
+                                  th:if="${tool.convertType != null and (tool.convertType == '1' or tool.convertType.toLowerCase().contains('http'))}">
                                 <i class="fas fa-globe me-1"></i>HTTP转换模板
                             </span>
                             <span class="badge bg-primary"
-                                  th:if="${tool.convertType != null and tool.convertType.equalsIgnoreCase('expo')}">
+                                  th:if="${tool.convertType != null and (tool.convertType == '2' or tool.convertType.equalsIgnoreCase('expo'))}">
                                 <i class="fas fa-server me-1"></i>Expo转换模板
                             </span>
+                            <span class="badge bg-warning"
+                                  th:if="${tool.convertType != null and (tool.convertType == '3' or tool.convertType.equalsIgnoreCase('manul'))}">
+                                <i class="fas fa-code me-1"></i>手动转换模板
+                            </span>
                             <span class="badge bg-secondary"
-                                  th:if="${tool.convertType == null or (!tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo'))}">
+                                  th:if="${tool.convertType == null or (tool.convertType != '1' and tool.convertType != '2' and tool.convertType != '3' and !tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('manul'))}">
                                 未知
                             </span>
                         </dd>
@@ -306,33 +363,50 @@
                 </div>
             </div>
 
-            <!-- 缺失数据提示 - HTTP类型 -->
+            <!-- Missing data warnings - HTTP type -->
             <div class="alert alert-warning"
-                 th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http') and httpTool == null and httpConverter == null}">
+                 th:if="${tool.convertType != null and (tool.convertType == '1' or tool.convertType.toLowerCase().contains('http')) and httpTool == null and httpConverter == null}">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>提示:</strong> 该MCP工具缺少关联的原始HTTP接口和HTTP转换模板信息。
             </div>
             <div class="alert alert-warning"
-                 th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http') and httpTool == null and httpConverter != null}">
+                 th:if="${tool.convertType != null and (tool.convertType == '1' or tool.convertType.toLowerCase().contains('http')) and httpTool == null and httpConverter != null}">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>提示:</strong> 该MCP工具缺少关联的原始HTTP接口信息。
             </div>
             <div class="alert alert-warning"
-                 th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http') and httpTool != null and httpConverter == null}">
+                 th:if="${tool.convertType != null and (tool.convertType == '1' or tool.convertType.toLowerCase().contains('http')) and httpTool != null and httpConverter == null}">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>提示:</strong> 该MCP工具缺少关联的HTTP转换模板信息。
             </div>
 
-            <!-- 缺失数据提示 - Expo类型 -->
+            <!-- Missing data warnings - Expo type -->
             <div class="alert alert-warning"
-                 th:if="${tool.convertType != null and tool.convertType.equalsIgnoreCase('expo') and expoConverter == null}">
+                 th:if="${tool.convertType != null and (tool.convertType == '2' or tool.convertType.equalsIgnoreCase('expo')) and expoTool == null and expoConverter == null}">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>提示:</strong> 该MCP工具缺少关联的原始Expo接口和Expo转换模板信息。
+            </div>
+            <div class="alert alert-warning"
+                 th:if="${tool.convertType != null and (tool.convertType == '2' or tool.convertType.equalsIgnoreCase('expo')) and expoTool == null and expoConverter != null}">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>提示:</strong> 该MCP工具缺少关联的原始Expo接口信息。
+            </div>
+            <div class="alert alert-warning"
+                 th:if="${tool.convertType != null and (tool.convertType == '2' or tool.convertType.equalsIgnoreCase('expo')) and expoTool != null and expoConverter == null}">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>提示:</strong> 该MCP工具缺少关联的Expo转换模板信息。
             </div>
 
-            <!-- 缺失数据提示 - 未知类型或无convertType -->
+            <!-- Missing data warnings - Code type -->
+            <div class="alert alert-info"
+                 th:if="${tool.convertType != null and (tool.convertType == '3' or tool.convertType.equalsIgnoreCase('manul'))}">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>提示:</strong> 该MCP工具使用手动转换模板,直接通过代码实现,无需额外的转换器配置。
+            </div>
+
+            <!-- Missing data warnings - Unknown type or missing convertType -->
             <div class="alert alert-warning"
-                 th:if="${tool.convertType == null or (!tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo'))}">
+                 th:if="${tool.convertType == null or (tool.convertType != '1' and tool.convertType != '2' and tool.convertType != '3' and !tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('manul'))}">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>提示:</strong> 该MCP工具的转换模板类型未设置或无效,请检查convertType字段。
             </div>
@@ -389,6 +463,9 @@
                                 type="button">
                             <i class="fas fa-trash me-1"></i>删除工具
                         </button>
+                        <button class="btn btn-success" onclick="testTool([[${tool.id}]])" type="button">
+                            <i class="fas fa-vial me-1"></i>测试工具
+                        </button>
                         <a class="btn btn-outline-secondary" th:href="@{/mcp-tools}">
                             <i class="fas fa-list me-1"></i>返回列表
                         </a>
@@ -414,6 +491,31 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
                 <button class="btn btn-danger" id="confirmDeleteBtn" type="button">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 测试结果模态框 -->
+<div class="modal fade" id="testResultModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-vial me-2"></i>工具测试结果</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div id="testResultContent">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">测试中...</span>
+                        </div>
+                        <p class="mt-3">正在执行测试,请稍候...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">关闭</button>
             </div>
         </div>
     </div>
@@ -526,6 +628,42 @@
     let currentToolId = null;
 
     /**
+     * 解析多语言JSON字段并显示
+     */
+    function parseMultilingualFields() {
+        // 解析nameDisplay
+        const nameDisplayJson = document.getElementById('nameDisplayJson');
+        if (nameDisplayJson && nameDisplayJson.value) {
+            try {
+                const nameData = JSON.parse(nameDisplayJson.value);
+                document.getElementById('nameDisplayEn').textContent = nameData.en || '-';
+                document.getElementById('nameDisplayZh').textContent = nameData.zh || '-';
+            } catch (e) {
+                console.error('Failed to parse nameDisplay JSON:', e);
+                document.getElementById('nameDisplayEn').textContent = nameDisplayJson.value;
+                document.getElementById('nameDisplayZh').textContent = '-';
+            }
+        }
+
+        // 解析descriptionDisplay
+        const descriptionDisplayJson = document.getElementById('descriptionDisplayJson');
+        if (descriptionDisplayJson && descriptionDisplayJson.value) {
+            try {
+                const descData = JSON.parse(descriptionDisplayJson.value);
+                document.getElementById('descriptionDisplayEn').textContent = descData.en || '-';
+                document.getElementById('descriptionDisplayZh').textContent = descData.zh || '-';
+            } catch (e) {
+                console.error('Failed to parse descriptionDisplay JSON:', e);
+                document.getElementById('descriptionDisplayEn').textContent = descriptionDisplayJson.value;
+                document.getElementById('descriptionDisplayZh').textContent = '-';
+            }
+        }
+    }
+
+    // 页面加载时执行
+    document.addEventListener('DOMContentLoaded', parseMultilingualFields);
+
+    /**
      * 切换Schema内容的展开/收起状态
      * @param {string} schemaType - Schema类型 ('inputSchema' 或 'outputSchema')
      * @param {HTMLElement} headerElement - 被点击的header元素
@@ -600,6 +738,98 @@
     });
 
     function copyConfig() {
+
+        /**
+         * 测试工具函数
+         * @param {number} toolId - 工具ID
+         */
+        function testTool(toolId) {
+            if (!toolId) {
+                alert('工具ID不能为空');
+                return;
+            }
+
+            // 显示测试结果模态框
+            const testModal = new bootstrap.Modal(document.getElementById('testResultModal'));
+            testModal.show();
+
+            // 重置测试结果内容为加载状态
+            document.getElementById('testResultContent').innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">测试中...</span>
+                </div>
+                <p class="mt-3">正在执行测试,请稍候...</p>
+            </div>
+        `;
+
+            // 发送测试请求
+            fetch(`/api/tools/${toolId}/test`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 显示测试结果
+                    displayTestResult(data);
+                })
+                .catch(error => {
+                    console.error('测试失败:', error);
+                    document.getElementById('testResultContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading"><i class="fas fa-exclamation-circle me-2"></i>测试失败</h5>
+                        <p class="mb-0">错误信息: ${error.message}</p>
+                    </div>
+                `;
+                });
+        }
+
+        /**
+         * 显示测试结果
+         * @param {Object} data - 测试结果数据
+         */
+        function displayTestResult(data) {
+            const content = document.getElementById('testResultContent');
+            const success = data.success || data.status === 'success';
+
+            let html = '';
+
+            if (success) {
+                html = `
+                <div class="alert alert-success">
+                    <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>测试成功</h5>
+                    <p class="mb-0">${data.message || '工具测试通过'}</p>
+                </div>
+            `;
+            } else {
+                html = `
+                <div class="alert alert-danger">
+                    <h5 class="alert-heading"><i class="fas fa-times-circle me-2"></i>测试失败</h5>
+                    <p class="mb-0">${data.message || data.error || '工具测试未通过'}</p>
+                </div>
+            `;
+            }
+
+            // 如果有详细数据,显示JSON格式
+            if (data.data) {
+                html += `
+                <div class="mt-3">
+                    <h6>详细结果:</h6>
+                    <pre class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;"><code>${JSON.stringify(data.data, null, 2)}</code></pre>
+                </div>
+            `;
+            }
+
+            content.innerHTML = html;
+        }
         const configElement = document.getElementById('toolConfig');
         const text = configElement.textContent;
 

@@ -29,8 +29,9 @@ public class McpToolMapperTest {
     @Test
     void testInsertMcpTool() {
         McpTool tool = new McpTool();
-        tool.setToolNum(12345L);
-        tool.setToolName("test_tool");
+        // 使用时间戳生成唯一的tool_num，避免uk_tool_num_valid_version约束冲突
+        tool.setToolNum(System.currentTimeMillis());
+        tool.setToolName("test_tool_" + System.currentTimeMillis());
         tool.setToolDescription("This is a test tool");
         tool.setToolType("1");
         tool.setToolVersion(1L);
@@ -55,12 +56,13 @@ public class McpToolMapperTest {
     void testSelectById() {
         // 先插入一个工具
         McpTool tool = new McpTool();
-        tool.setToolNum(54321L);
-        tool.setToolName("test_select");
+        tool.setToolNum(System.currentTimeMillis());
+        tool.setToolName("test_select_" + System.currentTimeMillis());
         tool.setToolDescription("Test select tool");
         tool.setToolType("1");
         tool.setToolVersion(1L);
         tool.setValid("1");
+        tool.setConvertType("1");
         tool.setCreateTime(LocalDateTime.now());
         tool.setCreateBy("system");
         tool.setUpdateTime(LocalDateTime.now());
@@ -72,7 +74,7 @@ public class McpToolMapperTest {
         // 查询
         McpTool selected = mcpToolMapper.selectById(id);
         assertNotNull(selected);
-        assertEquals("test_select", selected.getToolName());
+        assertEquals(tool.getToolName(), selected.getToolName());
         assertEquals("Test select tool", selected.getToolDescription());
         assertEquals("1", selected.getToolType());
         assertEquals(1L, selected.getToolVersion());
@@ -83,12 +85,13 @@ public class McpToolMapperTest {
     void testUpdateById() {
         // 先插入一个工具
         McpTool tool = new McpTool();
-        tool.setToolNum(98765L);
-        tool.setToolName("test_update");
+        tool.setToolNum(System.currentTimeMillis());
+        tool.setToolName("test_update_" + System.currentTimeMillis());
         tool.setToolDescription("Test update tool");
         tool.setToolType("1");
         tool.setToolVersion(1L);
         tool.setValid("1");
+        tool.setConvertType("1");
         tool.setCreateTime(LocalDateTime.now());
         tool.setCreateBy("system");
         tool.setUpdateTime(LocalDateTime.now());
@@ -117,12 +120,13 @@ public class McpToolMapperTest {
     void testDeleteById() {
         // 先插入一个工具
         McpTool tool = new McpTool();
-        tool.setToolNum(11111L);
-        tool.setToolName("test_delete");
+        tool.setToolNum(System.currentTimeMillis());
+        tool.setToolName("test_delete_" + System.currentTimeMillis());
         tool.setToolDescription("Test delete tool");
         tool.setToolType("1");
         tool.setToolVersion(1L);
         tool.setValid("1");
+        tool.setConvertType("1");
         tool.setCreateTime(LocalDateTime.now());
         tool.setCreateBy("system");
         tool.setUpdateTime(LocalDateTime.now());

@@ -36,14 +36,16 @@ class McpToolServiceTest {
 
     /**
      * 测试前的数据准备
+     * 使用时间戳生成唯一的tool_num，避免唯一约束冲突
      */
     @BeforeEach
     void setUp() {
         testTool = new McpTool();
-        testTool.setToolNum(1001L);
+        // 使用时间戳生成唯一的tool_num，避免uk_tool_num_valid_version约束冲突
+        testTool.setToolNum(System.currentTimeMillis());
         testTool.setToolVersion(1L);
         testTool.setValid("1");
-        testTool.setToolName("test_tool");
+        testTool.setToolName("test_tool_" + System.currentTimeMillis());
         testTool.setToolDescription("测试工具描述");
         testTool.setNameDisplay("{\"zh\": \"测试工具\", \"en\": \"Test Tool\"}");
         testTool.setDescriptionDisplay("{\"zh\": \"这是一个测试工具\"}");

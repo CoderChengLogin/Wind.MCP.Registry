@@ -61,7 +61,7 @@
                         <option value="">全部</option>
                         <option value="http">HTTP转换模板</option>
                         <option value="expo">Expo转换模板</option>
-                        <option value="manual">手动转换模板</option>
+                        <option value="code">代码转换模板</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -130,19 +130,19 @@
 
                         <!-- 转换模板类型徽章 -->
                         <span class="badge bg-success"
-                              th:if="${tool.convertType != null and tool.convertType.toLowerCase().contains('http')}">
+                              th:if="${tool.convertType != null and (tool.convertType == '1' or tool.convertType.toLowerCase().contains('http'))}">
                             <i class="fas fa-globe me-1"></i>HTTP转换模板
                         </span>
                         <span class="badge bg-primary"
-                              th:if="${tool.convertType != null and tool.convertType.equalsIgnoreCase('expo')}">
+                              th:if="${tool.convertType != null and (tool.convertType == '2' or tool.convertType.equalsIgnoreCase('expo'))}">
                             <i class="fas fa-server me-1"></i>Expo转换模板
                         </span>
                         <span class="badge bg-warning"
-                              th:if="${tool.convertType != null and tool.convertType.equalsIgnoreCase('manual')}">
-                            <i class="fas fa-hand-paper me-1"></i>手动转换模板
+                              th:if="${tool.convertType != null and (tool.convertType == '3' or tool.convertType.equalsIgnoreCase('code'))}">
+                            <i class="fas fa-code me-1"></i>代码转换模板
                         </span>
                         <span class="badge bg-secondary"
-                              th:if="${tool.convertType == null or (!tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('manual'))}">
+                              th:if="${tool.convertType == null or (tool.convertType != '1' and tool.convertType != '2' and tool.convertType != '3' and !tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('code'))}">
                             <i class="fas fa-question me-1"></i>未知模板
                         </span>
                     </div>
