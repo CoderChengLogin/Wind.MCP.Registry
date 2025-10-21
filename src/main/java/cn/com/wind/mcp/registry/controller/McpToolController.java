@@ -190,16 +190,14 @@ public class McpToolController {
 
         // 查询关联的源工具信息
         OriginToolHttp httpTool = null;
-        if (tool.getToolNum() != null && (StrUtil.equals("1", convertType) || convertType.toLowerCase().contains(
-            "http"))) {
+        if (tool.getToolNum() != null && StrUtil.equals("1", convertType)) {
             QueryWrapper<OriginToolHttp> httpWrapper = new QueryWrapper<>();
             httpWrapper.eq("provider_tool_num", tool.getToolNum());
             httpTool = originToolHttpMapper.selectOne(httpWrapper);
         }
 
         OriginToolExpo expoTool = null;
-        if (tool.getToolNum() != null && (StrUtil.equals("2", convertType) || convertType.toLowerCase().contains(
-            "expo"))) {
+        if (tool.getToolNum() != null && StrUtil.equals("2", convertType)) {
             QueryWrapper<OriginToolExpo> expoWrapper = new QueryWrapper<>();
             expoWrapper.eq("provider_tool_num", tool.getToolNum());
             expoTool = originToolExpoMapper.selectOne(expoWrapper);

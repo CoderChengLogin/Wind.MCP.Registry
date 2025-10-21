@@ -9,6 +9,7 @@ import cn.com.wind.mcp.registry.entity.OriginToolHttp;
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.mapper.ExpoTemplateConverterMapper;
 import cn.com.wind.mcp.registry.mapper.HttpTemplateConverterMapper;
+import cn.com.wind.mcp.registry.mapper.OriginToolExpoMapper;
 import cn.com.wind.mcp.registry.mapper.OriginToolHttpMapper;
 import cn.com.wind.mcp.registry.service.McpToolService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -52,6 +53,9 @@ class McpToolControllerTest {
 
     @Mock
     private OriginToolHttpMapper originToolHttpMapper;
+
+    @Mock
+    private OriginToolExpoMapper originToolExpoMapper;
 
     @Mock
     private HttpTemplateConverterMapper httpTemplateConverterMapper;

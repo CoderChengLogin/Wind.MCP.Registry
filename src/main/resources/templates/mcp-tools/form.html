@@ -390,16 +390,16 @@
             </a>
         </div>
 
-        <!-- Missing data warnings - Code type -->
+        <!-- Missing data warnings - Manual/Code type -->
         <div class="alert alert-info"
-             th:if="${tool.convertType != null and (tool.convertType == '3' or tool.convertType.equalsIgnoreCase('manul'))}">
+             th:if="${tool.convertType != null and (tool.convertType == '3' or tool.convertType.equalsIgnoreCase('manual') or tool.convertType.equalsIgnoreCase('code'))}">
             <i class="fas fa-info-circle me-2"></i>
             <strong>提示:</strong> 该MCP工具使用手动转换模板,直接通过代码实现,无需额外的转换器配置。
         </div>
 
         <!-- Missing data warnings - Unknown type or missing convertType -->
         <div class="alert alert-warning"
-             th:if="${tool.convertType == null or (tool.convertType != '1' and tool.convertType != '2' and tool.convertType != '3' and !tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('manul'))}">
+             th:if="${tool.convertType == null or (tool.convertType != '1' and tool.convertType != '2' and tool.convertType != '3' and !tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('manual') and !tool.convertType.equalsIgnoreCase('code'))}">
             <i class="fas fa-exclamation-triangle me-2"></i>
             <strong>提示:</strong> 该MCP工具的转换模板类型未设置或无效,请检查convertType字段。
         </div>

@@ -62,6 +62,8 @@
     <!-- 工具表单 -->
     <form id="toolForm" method="post" th:action="@{/origin-http-tools/save}">
         <input th:field="${tool.id}" type="hidden">
+        <!-- 隐藏字段:保存providerToolNum用于关联MCP工具 -->
+        <input th:field="${tool.providerToolNum}" type="hidden">
         <!-- 隐藏字段:保存当前应用名称用于编辑时回显 -->
         <input id="currentAppName" th:value="${providerApp != null ? providerApp.appName : ''}" type="hidden">
 

@@ -5,6 +5,10 @@
 // 全局变量:当前测试的工具ID
 let testToolId = null;
 
+// 全局变量:当前测试参数和结果(用于保存记录)
+let currentTestParameters = null;
+let currentTestResult = null;
+
 /**
  * 测试工具函数 - 显示参数输入模态框
  * @param {number} toolId - 工具ID
@@ -50,6 +54,8 @@ function executeTest() {
 
     try {
         params = JSON.parse(paramsJsonStr);
+        // 保存测试参数
+        currentTestParameters = params;
     } catch (e) {
         alert('参数JSON格式错误,请检查并修正: ' + e.message);
         return;
@@ -107,6 +113,9 @@ function displayTestResult(data) {
     const content = document.getElementById('testResultOutput');
     const success = data.success || data.status === 'success';
 
+    // 保存测试结果
+    currentTestResult = data.data;
+
     let html = '';
 
     if (success) {
@@ -135,5 +144,89 @@ function displayTestResult(data) {
         `;
     }
 
+    // 添加"确认测试成功"按钮
+    if (success) {
+        html += `
+            <div class="mt-3 text-center">
+                <button type="button" class="btn btn-success" id="confirmTestSuccessBtn" onclick="confirmTestSuccess()">
+                    <i class="fas fa-save me-1"></i>确认测试成功并保存记录
+                </button>
+            </div>
+        `;
+    } else {
+        // 测试失败时显示禁用的按钮
+        html += `
+            <div class="mt-3 text-center">
+                <button type="button" class="btn btn-secondary" disabled>
+                    <i class="fas fa-save me-1"></i>确认测试成功并保存记录
+                </button>
+                <div class="text-muted mt-2" style="font-size: 0.85rem;">
+                    <i class="fas fa-info-circle me-1"></i>只有测试成功后才能保存记录
+                </div>
+            </div>
+        `;
+    }
+
     content.innerHTML = html;
+}
+
+/**
+ * 确认测试成功并保存记录
+ */
+function confirmTestSuccess() {
+    if (!testToolId || !currentTestParameters || !currentTestResult) {
+        alert('缺少必要的测试信息');
+        return;
+    }
+
+    // 禁用按钮,防止重复点击
+    const btn = document.getElementById('confirmTestSuccessBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>保存中...';
+    }
+
+    console.log('[保存测试记录] 开始保存, 工具ID:', testToolId);
+
+    // 发送保存请求
+    fetch(`/api/tools/${testToolId}/test/save`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            testParameters: currentTestParameters,
+            testResult: currentTestResult
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('[保存测试记录] 成功:', data);
+            if (data.success) {
+                alert('测试记录保存成功!');
+                // 恢复按钮并标记为已保存
+                if (btn) {
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-success');
+                    btn.innerHTML = '<i class="fas fa-check me-1"></i>记录已保存';
+                }
+            } else {
+                throw new Error(data.message || '保存失败');
+            }
+        })
+        .catch(error => {
+            console.error('[保存测试记录] 失败:', error);
+            alert('保存测试记录失败: ' + error.message);
+            // 恢复按钮
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-1"></i>确认测试成功并保存记录';
+            }
+        });
 }

@@ -169,9 +169,32 @@ CREATE INDEX IF NOT EXISTS idx_origin_provider_config_provider_id ON origin_prov
 CREATE INDEX IF NOT EXISTS idx_origin_provider_config_status ON origin_provider_config(status);
 CREATE INDEX IF NOT EXISTS idx_origin_provider_config_is_enabled ON origin_provider_config(is_enabled);
 
+-- 8. MCP Test Success Records表(MCP测试成功记录)
+CREATE TABLE IF NOT EXISTS mcp_test_success_records (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '记录ID',
+    tool_id BIGINT NOT NULL COMMENT 'MCP工具ID',
+    tool_num VARCHAR(50) NOT NULL COMMENT '工具编号',
+    tool_name VARCHAR(255) NOT NULL COMMENT 'MCP工具名称',
+    tool_version VARCHAR(20) NOT NULL COMMENT '工具版本',
+    tool_snapshot TEXT NOT NULL COMMENT 'MCP工具完整信息快照(JSON格式)',
+    test_parameters TEXT NOT NULL COMMENT '测试参数详情(JSON格式)',
+    test_result TEXT NOT NULL COMMENT '测试结果详细数据(JSON格式)',
+    test_result_summary TEXT COMMENT '测试结果摘要',
+    test_timestamp TIMESTAMP NOT NULL COMMENT '测试时间戳',
+    operator_id BIGINT COMMENT '操作者ID(关联provider表)',
+    operator_username VARCHAR(100) COMMENT '操作者用户名',
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
+    create_by VARCHAR(100) DEFAULT 'system' COMMENT '记录创建者'
+);
+
+CREATE INDEX IF NOT EXISTS idx_test_record_tool_id ON mcp_test_success_records(tool_id);
+CREATE INDEX IF NOT EXISTS idx_test_record_tool_num ON mcp_test_success_records(tool_num);
+CREATE INDEX IF NOT EXISTS idx_test_record_operator_id ON mcp_test_success_records(operator_id);
+
 -- ==================================================================
 -- 注意事项:
 -- 1. provider_app, virtual_server, vserver_items 在V8迁移中已废弃
 -- 2. 统一使用 origin_provider_config 管理应用服务节点配置
 -- 3. 使用H2数据库MySQL兼容模式
+-- 4. mcp_test_success_records 用于存储测试成功记录,支持数据回溯
 -- ==================================================================

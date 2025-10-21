@@ -1,0 +1,63 @@
+{
+  "mcp_tool_error_code": 0,
+  "mcp_tool_error_msg": "",
+  "mcp_tool_data_schema": {
+    "title": {
+      "en": "Trading Days Calculation Result",
+      "zh": "交易日计算结果"
+    },
+    "type": "object",
+    "properties": {
+      "result": {
+        "type": "boolean",
+        "description": {
+          "en": "Indicates whether the calculation was successful",
+          "zh": "表示计算是否成功"
+        }
+      },
+      "errorCode": {
+        "type": "string",
+        "description": {
+          "en": "Error code if any error occurred",
+          "zh": "如果发生错误，返回的错误代码"
+        }
+      },
+      "errorMessage": {
+        "type": "string",
+        "description": {
+          "en": "Error message if any error occurred",
+          "zh": "如果发生错误，返回的错误信息"
+        }
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "CountDays": {
+            "type": "number",
+            "description": {
+              "en": "Number of trading days in the calculation result",
+              "zh": "计算结果中的交易日天数"
+            }
+          }
+        },
+        "description": {
+          "en": "Calculation result data",
+          "zh": "计算结果数据"
+        }
+      }
+    },
+    "description": {
+      "en": "Result of trading days calculation, including success status and the number of trading days",
+      "zh": "交易日计算的结果，包括计算成功状态和交易日天数"
+    },
+    "LLMdescription": "交易日计算的结果，包含计算状态和交易日数量"
+  },
+  "mcp_tool_data": {
+    "Data": {
+      "CountDays": 6.0
+    },
+    "errorCode": "",
+    "errorMessage": "",
+    "result": true
+  }
+}
