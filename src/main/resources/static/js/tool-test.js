@@ -25,6 +25,9 @@ function testTool(toolId) {
     // 初始化参数JSON编辑器
     document.getElementById('testParamsJson').value = '{}';
 
+    // 初始化wind.sessionid输入框
+    document.getElementById('windSessionId').value = '';
+
     // 重置测试结果输出框
     document.getElementById('testResultOutput').innerHTML = `
         <div class="text-muted text-center py-5">
@@ -61,6 +64,9 @@ function executeTest() {
         return;
     }
 
+    // 获取wind.sessionid输入值
+    const windSessionId = document.getElementById('windSessionId').value.trim();
+
     // 显示加载状态在输出参数框中
     document.getElementById('testResultOutput').innerHTML = `
         <div class="text-center py-4">
@@ -71,15 +77,23 @@ function executeTest() {
         </div>
     `;
 
-    console.log('[测试工具] 发送测试请求, 工具ID:', testToolId, '参数:', params);
+    console.log('[测试工具] 发送测试请求, 工具ID:', testToolId, '参数:', params, 'wind.sessionid:', windSessionId);
+
+    // 构建请求头
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+
+    // 如果用户填写了wind.sessionid,添加到请求头
+    if (windSessionId) {
+        headers['wind.sessionid'] = windSessionId;
+    }
 
     // 发送测试请求
     fetch(`/api/tools/${testToolId}/test`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers: headers,
         body: JSON.stringify(params)
     })
         .then(response => {

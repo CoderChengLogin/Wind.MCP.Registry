@@ -169,15 +169,15 @@
 
                         <!-- 判断用户是否有删除权限 -->
                         <button class="btn btn-outline-danger btn-sm delete-btn"
-                                th:data-tool-name="${tool.toolName}"
                                 th:data-tool-id="${tool.id}"
+                                th:data-tool-name="${tool.toolName}"
                                 th:if="${currentProviderId != null and (tool.providerId == currentProviderId)}"
                                 type="button">
                             <i class="fas fa-trash me-1"></i>删除
                         </button>
                         <button class="btn btn-outline-danger btn-sm permission-denied-delete-btn"
-                                th:if="${currentProviderId == null or (tool.providerId != currentProviderId)}"
                                 th:data-tool-name="${tool.toolName}"
+                                th:if="${currentProviderId == null or (tool.providerId != currentProviderId)}"
                                 type="button">
                             <i class="fas fa-trash me-1"></i>删除
                         </button>

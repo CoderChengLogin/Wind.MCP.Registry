@@ -30,6 +30,8 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
 
     @Autowired
     private ToolValidationService toolValidationService;
+    @Autowired
+    private McpToolMapper mcpToolMapper;
 
     @Override
     public List<McpTool> searchTools(String keyword) {
@@ -103,9 +105,6 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
     public long countByProviderId(Long providerId) {
         return count(new QueryWrapper<McpTool>().eq("provider_id", providerId));
     }
-
-    @Autowired
-    private McpToolMapper mcpToolMapper;
 
     @Override
     public McpToolDTO getMcpToolById(Long id) {

@@ -68,7 +68,7 @@ public class VserverItemsServiceImpl extends ServiceImpl<VserverItemsMapper, Vse
                 throw new RuntimeException("创建vserver_items记录失败");
             }
         } else {
-            log.info("vserver_items记录已存在: id={}", existing.getId());
+            log.info("vserver_items记录已存在: id={}", existing.getMcpItemNum());
         }
     }
 }

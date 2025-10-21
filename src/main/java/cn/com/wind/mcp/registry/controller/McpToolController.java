@@ -1,6 +1,7 @@
 package cn.com.wind.mcp.registry.controller;
 
 import cn.com.wind.mcp.registry.dto.McpToolEditDto;
+import cn.com.wind.mcp.registry.dto.McpToolExportDto;
 import cn.com.wind.mcp.registry.entity.*;
 import cn.com.wind.mcp.registry.mapper.ExpoTemplateConverterMapper;
 import cn.com.wind.mcp.registry.mapper.HttpTemplateConverterMapper;
@@ -15,6 +16,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -496,6 +499,91 @@ public class McpToolController {
             }
         } catch (Exception e) {
             log.error("查找MCP工具失败", e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * 导出工具信息为JSON
+     * 包含MCP工具信息、原始接口信息(HTTP/Expo)和转换模板信息
+     *
+     * @param id 工具ID
+     * @return McpToolExportDto的JSON数据
+     */
+    @GetMapping("/api/export/{id}")
+    @ResponseBody
+    public ResponseEntity<McpToolExportDto> exportTool(@PathVariable Long id) {
+        log.info("导出MCP工具: id={}", id);
+
+        try {
+            // 1. 查询MCP工具基本信息
+            McpTool tool = mcpToolService.getById(id);
+            if (tool == null) {
+                log.warn("工具不存在: id={}", id);
+                return ResponseEntity.notFound().build();
+            }
+
+            // 2. 创建导出DTO
+            McpToolExportDto exportDto = new McpToolExportDto();
+            exportDto.setMcpTool(tool);
+
+            // 3. 根据convertType查询对应的原始接口和转换模板
+            String convertType = tool.getConvertType();
+            Long toolNum = tool.getToolNum();
+
+            if (toolNum != null && convertType != null) {
+                // HTTP类型: convertType='1'或包含"http"
+                if ("1".equals(convertType) || convertType.toLowerCase().contains("http")) {
+                    // 查询原始HTTP接口
+                    QueryWrapper<OriginToolHttp> httpWrapper = new QueryWrapper<>();
+                    httpWrapper.eq("provider_tool_num", toolNum);
+                    OriginToolHttp httpTool = originToolHttpMapper.selectOne(httpWrapper);
+                    exportDto.setOriginToolHttp(httpTool);
+
+                    // 查询HTTP转换模板
+                    QueryWrapper<HttpTemplateConverter> httpConverterWrapper = new QueryWrapper<>();
+                    httpConverterWrapper.eq("tool_num", toolNum);
+                    HttpTemplateConverter httpConverter = httpTemplateConverterMapper.selectOne(httpConverterWrapper);
+                    exportDto.setHttpTemplateConverter(httpConverter);
+
+                    log.info("导出HTTP工具: httpTool={}, httpConverter={}",
+                            httpTool != null ? "有" : "无",
+                            httpConverter != null ? "有" : "无");
+                }
+                // Expo类型: convertType='2'或包含"expo"
+                else if ("2".equals(convertType) || convertType.toLowerCase().contains("expo")) {
+                    // 查询原始Expo接口
+                    QueryWrapper<OriginToolExpo> expoWrapper = new QueryWrapper<>();
+                    expoWrapper.eq("provider_tool_num", toolNum);
+                    OriginToolExpo expoTool = originToolExpoMapper.selectOne(expoWrapper);
+                    exportDto.setOriginToolExpo(expoTool);
+
+                    // 查询Expo转换模板
+                    QueryWrapper<ExpoTemplateConverter> expoConverterWrapper = new QueryWrapper<>();
+                    expoConverterWrapper.eq("tool_num", toolNum);
+                    ExpoTemplateConverter expoConverter = expoTemplateConverterMapper.selectOne(expoConverterWrapper);
+                    exportDto.setExpoTemplateConverter(expoConverter);
+
+                    log.info("导出Expo工具: expoTool={}, expoConverter={}",
+                            expoTool != null ? "有" : "无",
+                            expoConverter != null ? "有" : "无");
+                }
+            }
+
+            log.info("工具导出成功: id={}, toolName={}", id, tool.getToolName());
+
+            // 4. 设置响应头,提示浏览器下载文件
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            String fileName = "mcp-tool-" + tool.getToolName() + ".json";
+            headers.setContentDispositionFormData("attachment", fileName);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(exportDto);
+
+        } catch (Exception e) {
+            log.error("导出MCP工具失败: id=" + id, e);
             return ResponseEntity.status(500).build();
         }
     }

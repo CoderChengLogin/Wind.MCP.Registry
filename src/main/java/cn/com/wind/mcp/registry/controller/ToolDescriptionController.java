@@ -39,6 +39,11 @@ public class ToolDescriptionController {
         try {
             log.info("测试工具请求体: {}", requestBody);
 
+            // DEBUG: 打印所有请求头
+            log.info("请求头 wind.sessionid: {}", request.getHeader("wind.sessionid"));
+            log.info("请求头 windsessionid: {}", request.getHeader("windsessionid"));
+            log.info("请求头 X-Session-Id: {}", request.getHeader("X-Session-Id"));
+
             // 确保vserver_items记录存在
             McpTool mcpTool = mcpToolService.getById(id);
             if (mcpTool != null) {
