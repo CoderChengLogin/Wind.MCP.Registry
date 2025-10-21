@@ -1,9 +1,12 @@
 package cn.com.wind.mcp.registry.controller;
 
 import cn.com.wind.mcp.registry.dto.common.Result;
+import cn.com.wind.mcp.registry.entity.McpTool;
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.McpClientService;
 import cn.com.wind.mcp.registry.service.McpTestSuccessRecordService;
+import cn.com.wind.mcp.registry.service.McpToolService;
+import cn.com.wind.mcp.registry.service.VserverItemsService;
 import cn.hutool.json.JSONUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +27,8 @@ import java.util.Map;
 public class ToolDescriptionController {
     private final McpClientService mcpClientService;
     private final McpTestSuccessRecordService mcpTestSuccessRecordService;
+    private final McpToolService mcpToolService;
+    private final VserverItemsService vserverItemsService;
 
     @PostMapping("/tools/{id}/test")
     public Result<Map<String, Object>> testTool(
@@ -33,6 +38,23 @@ public class ToolDescriptionController {
 
         try {
             log.info("测试工具请求体: {}", requestBody);
+
+            // 确保vserver_items记录存在
+            McpTool mcpTool = mcpToolService.getById(id);
+            if (mcpTool != null) {
+                try {
+                    vserverItemsService.ensureVserverItemExists(
+                            "vserver_test",
+                            mcpTool.getToolNum(),
+                            mcpTool.getToolType(),
+                            "system"
+                    );
+                    log.info("已确保vserver_items记录存在: toolNum={}", mcpTool.getToolNum());
+                } catch (Exception e) {
+                    log.error("确保vserver_items记录时出错", e);
+                    // 不影响主流程,继续执行
+                }
+            }
             if (true) {
                 // 读取 mock.json 文件并返回
                 ClassPathResource resource = new ClassPathResource("config/mock.json");

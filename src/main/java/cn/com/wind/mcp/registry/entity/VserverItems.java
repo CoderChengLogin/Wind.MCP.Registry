@@ -5,19 +5,25 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
- * 虚拟服务器关联条目
+ * 虚拟服务器项目实体类
  *
- * @TableName vserver_items
+ * @author system
+ * @date 2025-01-21
  */
-@TableName(value = "vserver_items")
 @Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@TableName("vserver_items")
 public class VserverItems extends Model<VserverItems> {
+
     /**
-     * 主键
+     * 主键ID
      */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -25,7 +31,7 @@ public class VserverItems extends Model<VserverItems> {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 创建人
@@ -35,7 +41,7 @@ public class VserverItems extends Model<VserverItems> {
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 更新人
@@ -43,27 +49,27 @@ public class VserverItems extends Model<VserverItems> {
     private String updateBy;
 
     /**
-     * 虚拟服务器id
+     * 虚拟服务器ID
      */
     private String vserverId;
 
     /**
-     * mcp项目编号
+     * MCP项目编号
      */
     private Long mcpItemNum;
 
     /**
-     * MCP类型(1:tool, 2:prompt, 3:resource)
+     * MCP项目类型(1:tool,2:agent)
      */
     private String mcpItemType;
 
     /**
-     * 状态: 1 已发布
+     * 状态(1:启用,0:禁用)
      */
     private String status;
 
     /**
-     * 排序
+     * 排序号
      */
     private Integer orderNum;
 }

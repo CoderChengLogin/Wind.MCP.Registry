@@ -9,20 +9,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
- * 虚拟服务器
+ * 虚拟服务器实体类
  *
- * @TableName virtual_server
+ * @author system
+ * @date 2025-01-21
  */
 @Data
-@TableName(value = "virtual_server")
+@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@TableName("virtual_server")
 public class VirtualServer extends Model<VirtualServer> {
+
     /**
-     * 主键
+     * 主键ID
      */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -30,7 +32,7 @@ public class VirtualServer extends Model<VirtualServer> {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 创建人
@@ -40,7 +42,7 @@ public class VirtualServer extends Model<VirtualServer> {
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 更新人
@@ -48,17 +50,17 @@ public class VirtualServer extends Model<VirtualServer> {
     private String updateBy;
 
     /**
-     * 虚拟服务器id
+     * 虚拟服务器ID
      */
     private String vserverId;
 
     /**
-     * 用户id
+     * 用户ID
      */
     private String userid;
 
     /**
-     * 名称
+     * 虚拟服务器名称
      */
     private String name;
 
@@ -69,15 +71,12 @@ public class VirtualServer extends Model<VirtualServer> {
     private String desc;
 
     /**
-     * url
+     * URL地址
      */
     private String url;
 
     /**
-     * 状态: 1 已发布
+     * 状态(1:启用,0:禁用)
      */
     private String status;
 }
-
-
-
