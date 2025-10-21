@@ -1,9 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.OriginToolExpo;
 import cn.com.wind.mcp.registry.entity.OriginToolHttp;
@@ -17,13 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 提供者应用服务节点控制器
@@ -54,7 +48,7 @@ public class ProviderAppController {
      */
     @GetMapping("/list")
     public String listPage(HttpSession session, Model model) {
-        Provider provider = (Provider)session.getAttribute("currentProvider");
+        Provider provider = (Provider) session.getAttribute("currentProvider");
         if (provider == null) {
             return "redirect:/provider/login";
         }
@@ -71,10 +65,10 @@ public class ProviderAppController {
 
             // 提取app_name列表并按字母排序
             List<String> loadBalancerNames = configs.stream()
-                .map(OriginProviderConfig::getAppName)
-                .distinct()
-                .sorted()
-                .collect(java.util.stream.Collectors.toList());
+                    .map(OriginProviderConfig::getAppName)
+                    .distinct()
+                    .sorted()
+                    .collect(java.util.stream.Collectors.toList());
 
             // 为每个负载均衡器计算统计信息
             List<Map<String, Object>> loadBalancers = new java.util.ArrayList<>();
@@ -91,17 +85,17 @@ public class ProviderAppController {
 
                 // 统计节点数和健康节点数
                 long healthyCount = nodes.stream()
-                    .filter(n -> n.getIsEnabled() != null && n.getIsEnabled())
-                    .count();
+                        .filter(n -> n.getIsEnabled() != null && n.getIsEnabled())
+                        .count();
                 loadInfo.put("totalNodes", nodes.size());
                 loadInfo.put("healthyNodes", healthyCount);
 
                 // 统计站点类型数量
                 long siteTypeCount = nodes.stream()
-                    .map(OriginProviderConfig::getSiteType)
-                    .filter(st -> st != null && !st.isEmpty())
-                    .distinct()
-                    .count();
+                        .map(OriginProviderConfig::getSiteType)
+                        .filter(st -> st != null && !st.isEmpty())
+                        .distinct()
+                        .count();
                 loadInfo.put("siteTypeCount", siteTypeCount);
 
                 loadBalancers.add(loadInfo);
@@ -132,15 +126,15 @@ public class ProviderAppController {
     @GetMapping("/page")
     @ResponseBody
     public Map<String, Object> page(@RequestParam(defaultValue = "1") Integer pageNum,
-        @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(required = false) String appName,
-        @RequestParam(required = false) String siteType,
-        @RequestParam(required = false) Boolean isEnabled,
-        HttpSession session) {
+                                    @RequestParam(defaultValue = "10") Integer pageSize,
+                                    @RequestParam(required = false) String appName,
+                                    @RequestParam(required = false) String siteType,
+                                    @RequestParam(required = false) Boolean isEnabled,
+                                    HttpSession session) {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider provider = (Provider)session.getAttribute("currentProvider");
+            Provider provider = (Provider) session.getAttribute("currentProvider");
             if (provider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");
@@ -199,7 +193,7 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider provider = (Provider)session.getAttribute("currentProvider");
+            Provider provider = (Provider) session.getAttribute("currentProvider");
             if (provider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");
@@ -216,11 +210,11 @@ public class ProviderAppController {
 
             // 按站点类型分组
             Map<String, List<OriginProviderConfig>> nodesBySite = nodes.stream()
-                .collect(java.util.stream.Collectors.groupingBy(
-                    node -> node.getSiteType() != null && !node.getSiteType().isEmpty()
-                        ? node.getSiteType()
-                        : "未分类"
-                ));
+                    .collect(java.util.stream.Collectors.groupingBy(
+                            node -> node.getSiteType() != null && !node.getSiteType().isEmpty()
+                                    ? node.getSiteType()
+                                    : "未分类"
+                    ));
 
             result.put("success", true);
             result.put("nodesBySite", nodesBySite);
@@ -279,7 +273,7 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider provider = (Provider)session.getAttribute("currentProvider");
+            Provider provider = (Provider) session.getAttribute("currentProvider");
             if (provider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");
@@ -321,7 +315,7 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider provider = (Provider)session.getAttribute("currentProvider");
+            Provider provider = (Provider) session.getAttribute("currentProvider");
             if (provider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");
@@ -362,8 +356,8 @@ public class ProviderAppController {
 
         try {
             boolean success = isEnabled
-                ? originProviderConfigService.enableConfig(id)
-                : originProviderConfigService.disableConfig(id);
+                    ? originProviderConfigService.enableConfig(id)
+                    : originProviderConfigService.disableConfig(id);
             if (success) {
                 result.put("success", true);
                 result.put("message", isEnabled ? "启用成功" : "禁用成功");
@@ -493,7 +487,7 @@ public class ProviderAppController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider provider = (Provider)session.getAttribute("currentProvider");
+            Provider provider = (Provider) session.getAttribute("currentProvider");
             if (provider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");

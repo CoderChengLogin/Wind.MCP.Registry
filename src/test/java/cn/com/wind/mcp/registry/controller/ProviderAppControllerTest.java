@@ -1,10 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.OriginToolExpo;
 import cn.com.wind.mcp.registry.entity.OriginToolHttp;
@@ -20,20 +15,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.ui.Model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * ProviderAppController unit test
@@ -94,9 +83,9 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.list(any(QueryWrapper.class)))
-            .thenReturn(Arrays.asList(config1, config2))
-            .thenReturn(createNodeList(2, true))
-            .thenReturn(createNodeList(3, false));
+                .thenReturn(Arrays.asList(config1, config2))
+                .thenReturn(createNodeList(2, true))
+                .thenReturn(createNodeList(3, false));
 
         String viewName = providerAppController.listPage(session, model);
 
@@ -115,7 +104,7 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.list(any(QueryWrapper.class)))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         String viewName = providerAppController.listPage(session, model);
 
@@ -135,7 +124,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.page(1, 10, null, null, null, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
     }
 
@@ -157,11 +146,11 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.page(any(Page.class), any(QueryWrapper.class)))
-            .thenReturn(mockPage);
+                .thenReturn(mockPage);
 
         Map<String, Object> result = providerAppController.page(1, 10, null, null, null, session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals(10L, result.get("total"));
         assertEquals(2L, result.get("pages"));
         assertNotNull(result.get("records"));
@@ -185,12 +174,12 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.page(any(Page.class), any(QueryWrapper.class)))
-            .thenReturn(mockPage);
+                .thenReturn(mockPage);
 
         Map<String, Object> result = providerAppController.page(1, 10, "app-service",
-            "production", true, session);
+                "production", true, session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals(2L, result.get("total"));
     }
 
@@ -204,11 +193,11 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.page(any(Page.class), any(QueryWrapper.class)))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.page(1, 10, null, null, null, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("查询失败"));
     }
 
@@ -223,7 +212,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.listByAppName("app-service", session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
     }
 
@@ -242,7 +231,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.listByAppName("app-service", session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertNotNull(result.get("nodesBySite"));
         assertEquals(3, result.get("totalCount"));
     }
@@ -257,11 +246,11 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.list(any(QueryWrapper.class)))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.listByAppName("app-service", session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("查询失败"));
     }
 
@@ -281,7 +270,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.detail(1L);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertNotNull(result.get("data"));
     }
 
@@ -294,7 +283,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.detail(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("应用节点不存在", result.get("message"));
     }
 
@@ -311,7 +300,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.detail(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("应用节点不存在", result.get("message"));
     }
 
@@ -321,11 +310,11 @@ class ProviderAppControllerTest {
     @Test
     void testDetail_ExceptionHandling() {
         when(originProviderConfigService.getById(1L))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.detail(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("获取失败"));
     }
 
@@ -343,7 +332,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.create(config, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
     }
 
@@ -364,7 +353,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.create(config, session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("创建成功", result.get("message"));
         assertEquals(1L, config.getProviderId());
         assertEquals("testuser", config.getCreateBy());
@@ -387,7 +376,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.create(config, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("创建失败"));
     }
 
@@ -404,11 +393,11 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.createConfig(any(OriginProviderConfig.class)))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.create(config, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("创建失败"));
     }
 
@@ -426,7 +415,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.update(config, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
     }
 
@@ -448,7 +437,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.update(config, session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("更新成功", result.get("message"));
         assertEquals("testuser", config.getUpdateBy());
     }
@@ -470,7 +459,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.update(config, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("更新失败"));
     }
 
@@ -488,11 +477,11 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.updateConfig(any(OriginProviderConfig.class)))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.update(config, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("更新失败"));
     }
 
@@ -507,7 +496,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.toggleEnable(1L, true);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("启用成功", result.get("message"));
         verify(originProviderConfigService).enableConfig(1L);
     }
@@ -521,7 +510,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.toggleEnable(1L, false);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("禁用成功", result.get("message"));
         verify(originProviderConfigService).disableConfig(1L);
     }
@@ -535,7 +524,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.toggleEnable(1L, true);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("操作失败", result.get("message"));
     }
 
@@ -545,11 +534,11 @@ class ProviderAppControllerTest {
     @Test
     void testToggleEnable_ExceptionHandling() {
         when(originProviderConfigService.enableConfig(1L))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.toggleEnable(1L, true);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("操作失败"));
     }
 
@@ -564,7 +553,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.delete(1L);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("删除成功", result.get("message"));
     }
 
@@ -577,7 +566,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.delete(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("删除失败", result.get("message"));
     }
 
@@ -587,11 +576,11 @@ class ProviderAppControllerTest {
     @Test
     void testDelete_ExceptionHandling() {
         when(originProviderConfigService.deleteConfig(1L))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.delete(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("删除失败"));
     }
 
@@ -608,7 +597,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.batchDelete(ids);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("批量删除成功", result.get("message"));
         verify(originProviderConfigService, times(3)).deleteConfig(anyLong());
     }
@@ -625,7 +614,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.batchDelete(ids);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("批量删除失败", result.get("message"));
     }
 
@@ -637,11 +626,11 @@ class ProviderAppControllerTest {
         List<Long> ids = Arrays.asList(1L, 2L);
 
         when(originProviderConfigService.deleteConfig(anyLong()))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.batchDelete(ids);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("批量删除失败"));
     }
 
@@ -660,7 +649,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.checkHealth(1L);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertNotNull(result.get("healthStatus"));
     }
 
@@ -677,7 +666,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.checkHealth(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("未配置健康检查URL"));
     }
 
@@ -690,7 +679,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.checkHealth(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
     }
 
     /**
@@ -699,11 +688,11 @@ class ProviderAppControllerTest {
     @Test
     void testCheckHealth_ExceptionHandling() {
         when(originProviderConfigService.getById(1L))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.checkHealth(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("检查失败"));
     }
 
@@ -718,7 +707,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.listEnabled(session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
     }
 
@@ -737,7 +726,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.listEnabled(session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertNotNull(result.get("apps"));
     }
 
@@ -806,18 +795,18 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.listEnabled(session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         @SuppressWarnings("unchecked")
-        List<OriginProviderConfig> apps = (List<OriginProviderConfig>)result.get("apps");
+        List<OriginProviderConfig> apps = (List<OriginProviderConfig>) result.get("apps");
 
         // 验证去重后只有2个应用
         assertEquals(2, apps.size());
 
         // 验证MyApp选择了负载因子最高的节点(河西站,ID=2)
         OriginProviderConfig myApp = apps.stream()
-            .filter(app -> "MyApp".equals(app.getAppName()))
-            .findFirst()
-            .orElse(null);
+                .filter(app -> "MyApp".equals(app.getAppName()))
+                .findFirst()
+                .orElse(null);
         assertNotNull(myApp);
         assertEquals(2L, myApp.getId());
         assertEquals("河西", myApp.getSiteType());
@@ -825,9 +814,9 @@ class ProviderAppControllerTest {
 
         // 验证AnotherApp存在
         OriginProviderConfig anotherApp = apps.stream()
-            .filter(app -> "AnotherApp".equals(app.getAppName()))
-            .findFirst()
-            .orElse(null);
+                .filter(app -> "AnotherApp".equals(app.getAppName()))
+                .findFirst()
+                .orElse(null);
         assertNotNull(anotherApp);
         assertEquals(4L, anotherApp.getId());
     }
@@ -842,11 +831,11 @@ class ProviderAppControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originProviderConfigService.list(any(QueryWrapper.class)))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.listEnabled(session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("获取失败"));
     }
 
@@ -863,7 +852,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.getRelatedHttpTools(1L);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals(2, result.get("count"));
         assertNotNull(result.get("tools"));
     }
@@ -874,11 +863,11 @@ class ProviderAppControllerTest {
     @Test
     void testGetRelatedHttpTools_ExceptionHandling() {
         when(originProviderConfigService.getRelatedHttpTools(1L))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.getRelatedHttpTools(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("查询失败"));
     }
 
@@ -893,7 +882,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.getRelatedExpoTools(1L);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals(3, result.get("count"));
         assertNotNull(result.get("tools"));
     }
@@ -904,11 +893,11 @@ class ProviderAppControllerTest {
     @Test
     void testGetRelatedExpoTools_ExceptionHandling() {
         when(originProviderConfigService.getRelatedExpoTools(1L))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.getRelatedExpoTools(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("查询失败"));
     }
 
@@ -925,7 +914,7 @@ class ProviderAppControllerTest {
 
         Map<String, Object> result = providerAppController.getRelatedTools(1L);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals(2, result.get("httpCount"));
         assertEquals(3, result.get("expoCount"));
         assertEquals(5, result.get("totalCount"));
@@ -939,11 +928,11 @@ class ProviderAppControllerTest {
     @Test
     void testGetRelatedTools_ExceptionHandling() {
         when(originProviderConfigService.getRelatedHttpTools(1L))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerAppController.getRelatedTools(1L);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertTrue(result.get("message").toString().contains("查询失败"));
     }
 
@@ -956,7 +945,7 @@ class ProviderAppControllerTest {
         List<OriginProviderConfig> nodes = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             OriginProviderConfig config = new OriginProviderConfig();
-            config.setId((long)i);
+            config.setId((long) i);
             config.setAppName("app-service-" + i);
             config.setAppIp("192.168.1." + i);
             config.setAppPort(8080 + i);
@@ -1003,7 +992,7 @@ class ProviderAppControllerTest {
         List<OriginToolHttp> tools = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             OriginToolHttp tool = new OriginToolHttp();
-            tool.setId((long)i);
+            tool.setId((long) i);
             tool.setNameDisplay("http-tool-" + i);
             tools.add(tool);
         }
@@ -1017,7 +1006,7 @@ class ProviderAppControllerTest {
         List<OriginToolExpo> tools = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             OriginToolExpo tool = new OriginToolExpo();
-            tool.setId((long)i);
+            tool.setId((long) i);
             tool.setNameDisplay("expo-tool-" + i);
             tools.add(tool);
         }

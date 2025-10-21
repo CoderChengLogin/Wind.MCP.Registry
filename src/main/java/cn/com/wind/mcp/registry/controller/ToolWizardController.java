@@ -1,7 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.time.LocalDateTime;
-
 import cn.com.wind.mcp.registry.dto.UnifiedToolAddDto;
 import cn.com.wind.mcp.registry.entity.ExpoTemplateConverter;
 import cn.com.wind.mcp.registry.entity.HttpTemplateConverter;
@@ -21,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.time.LocalDateTime;
 
 /**
  * 工具录入向导Controller
@@ -86,8 +86,8 @@ public class ToolWizardController {
 
             // 场景判断: 如果selectedToolType不为空,说明用户选择了原始工具类型(完整流程)
             boolean hasOriginTool = dto.getSelectedToolType() != null &&
-                !dto.getSelectedToolType().trim().isEmpty() &&
-                !"skip".equals(dto.getSelectedToolType());
+                    !dto.getSelectedToolType().trim().isEmpty() &&
+                    !"skip".equals(dto.getSelectedToolType());
 
             // 1. 如果有原始工具,则保存原始工具(步骤1-2)
             if (hasOriginTool) {
@@ -106,7 +106,7 @@ public class ToolWizardController {
                     httpTool.setInputSchema(dto.getInputSchema());
                     httpTool.setOutputSchema(dto.getOutputSchema());
                     httpTool.setProviderAppNum(
-                        dto.getProviderAppNum() != null ? Long.valueOf(dto.getProviderAppNum()) : null);
+                            dto.getProviderAppNum() != null ? Long.valueOf(dto.getProviderAppNum()) : null);
                     httpTool.setCreateTime(LocalDateTime.now());
                     httpTool.setCreateBy("system");
                     httpTool.setUpdateTime(LocalDateTime.now());
@@ -231,8 +231,8 @@ public class ToolWizardController {
     private String determineConverterType(UnifiedToolAddDto dto) {
         // 场景1: 完整流程 - 选择了原始工具类型
         if (dto.getSelectedToolType() != null &&
-            !dto.getSelectedToolType().trim().isEmpty() &&
-            !"skip".equals(dto.getSelectedToolType())) {
+                !dto.getSelectedToolType().trim().isEmpty() &&
+                !"skip".equals(dto.getSelectedToolType())) {
             log.info("完整流程: 使用原始工具类型 {}", dto.getSelectedToolType());
             return dto.getSelectedToolType();
         }

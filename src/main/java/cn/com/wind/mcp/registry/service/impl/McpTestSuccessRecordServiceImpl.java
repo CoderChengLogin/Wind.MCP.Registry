@@ -1,28 +1,18 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
-import cn.com.wind.mcp.registry.entity.ExpoTemplateConverter;
-import cn.com.wind.mcp.registry.entity.HttpTemplateConverter;
-import cn.com.wind.mcp.registry.entity.McpTestSuccessRecord;
-import cn.com.wind.mcp.registry.entity.McpTool;
-import cn.com.wind.mcp.registry.entity.OriginToolExpo;
-import cn.com.wind.mcp.registry.entity.OriginToolHttp;
+import cn.com.wind.mcp.registry.entity.*;
 import cn.com.wind.mcp.registry.mapper.McpTestSuccessRecordMapper;
-import cn.com.wind.mcp.registry.service.ExpoTemplateConverterService;
-import cn.com.wind.mcp.registry.service.HttpTemplateConverterService;
-import cn.com.wind.mcp.registry.service.McpTestSuccessRecordService;
-import cn.com.wind.mcp.registry.service.McpToolService;
-import cn.com.wind.mcp.registry.service.OriginToolExpoService;
-import cn.com.wind.mcp.registry.service.OriginToolHttpService;
+import cn.com.wind.mcp.registry.service.*;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * MCP工具测试成功记录Service实现类
@@ -34,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class McpTestSuccessRecordServiceImpl
-    extends ServiceImpl<McpTestSuccessRecordMapper, McpTestSuccessRecord>
-    implements McpTestSuccessRecordService {
+        extends ServiceImpl<McpTestSuccessRecordMapper, McpTestSuccessRecord>
+        implements McpTestSuccessRecordService {
 
     private final McpToolService mcpToolService;
     private final HttpTemplateConverterService httpTemplateConverterService;
@@ -57,10 +47,10 @@ public class McpTestSuccessRecordServiceImpl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean saveTestRecord(Long toolId, String testParameters, String testResult,
-        Long operatorId, String operatorUsername) {
+                                  Long operatorId, String operatorUsername) {
         try {
             log.info("开始保存测试成功记录: toolId={}, operatorId={}, operatorUsername={}",
-                toolId, operatorId, operatorUsername);
+                    toolId, operatorId, operatorUsername);
 
             // 1. 获取MCP工具信息
             McpTool mcpTool = mcpToolService.getById(toolId);
@@ -77,26 +67,26 @@ public class McpTestSuccessRecordServiceImpl
 
             // 4. 创建测试记录
             McpTestSuccessRecord record = new McpTestSuccessRecord()
-                .setToolId(toolId)
-                .setToolNum(String.valueOf(mcpTool.getToolNum()))
-                .setToolName(mcpTool.getToolName())
-                .setToolVersion(String.valueOf(mcpTool.getToolVersion()))
-                .setToolSnapshot(JSONUtil.toJsonStr(toolSnapshot))
-                .setTestParameters(testParameters)
-                .setTestResult(testResult)
-                .setTestResultSummary(resultSummary)
-                .setTestTimestamp(LocalDateTime.now())
-                .setOperatorId(operatorId)
-                .setOperatorUsername(operatorUsername)
-                .setCreateTime(LocalDateTime.now())
-                .setCreateBy(operatorUsername);
+                    .setToolId(toolId)
+                    .setToolNum(String.valueOf(mcpTool.getToolNum()))
+                    .setToolName(mcpTool.getToolName())
+                    .setToolVersion(String.valueOf(mcpTool.getToolVersion()))
+                    .setToolSnapshot(JSONUtil.toJsonStr(toolSnapshot))
+                    .setTestParameters(testParameters)
+                    .setTestResult(testResult)
+                    .setTestResultSummary(resultSummary)
+                    .setTestTimestamp(LocalDateTime.now())
+                    .setOperatorId(operatorId)
+                    .setOperatorUsername(operatorUsername)
+                    .setCreateTime(LocalDateTime.now())
+                    .setCreateBy(operatorUsername);
 
             // 5. 保存记录
             boolean success = save(record);
 
             if (success) {
                 log.info("测试成功记录保存完成: recordId={}, toolId={}, operatorUsername={}",
-                    record.getId(), toolId, operatorUsername);
+                        record.getId(), toolId, operatorUsername);
             } else {
                 log.error("测试成功记录保存失败: toolId={}", toolId);
             }
@@ -129,9 +119,9 @@ public class McpTestSuccessRecordServiceImpl
             // HTTP转换模板 (convertType = '1' 或 'http')
             if ("1".equals(convertType) || convertType.contains("http")) {
                 HttpTemplateConverter httpConverter = httpTemplateConverterService.lambdaQuery()
-                    .eq(HttpTemplateConverter::getToolNum, mcpTool.getToolNum())
-                    .eq(HttpTemplateConverter::getToolVersion, mcpTool.getToolVersion())
-                    .one();
+                        .eq(HttpTemplateConverter::getToolNum, mcpTool.getToolNum())
+                        .eq(HttpTemplateConverter::getToolVersion, mcpTool.getToolVersion())
+                        .one();
                 if (httpConverter != null) {
                     snapshot.put("httpConverter", httpConverter);
                     log.debug("添加HTTP转换模板快照: toolNum={}", mcpTool.getToolNum());
@@ -139,8 +129,8 @@ public class McpTestSuccessRecordServiceImpl
                     // 原始HTTP工具信息
                     if (httpConverter.getProviderToolNum() != null) {
                         OriginToolHttp originHttp = originToolHttpService.lambdaQuery()
-                            .eq(OriginToolHttp::getProviderToolNum, httpConverter.getProviderToolNum())
-                            .one();
+                                .eq(OriginToolHttp::getProviderToolNum, httpConverter.getProviderToolNum())
+                                .one();
                         if (originHttp != null) {
                             snapshot.put("originHttp", originHttp);
                             log.debug("添加原始HTTP工具快照: providerToolNum={}", httpConverter.getProviderToolNum());
@@ -151,9 +141,9 @@ public class McpTestSuccessRecordServiceImpl
             // Expo转换模板 (convertType = '2' 或 'expo')
             else if ("2".equals(convertType) || "expo".equals(convertType)) {
                 ExpoTemplateConverter expoConverter = expoTemplateConverterService.lambdaQuery()
-                    .eq(ExpoTemplateConverter::getToolNum, mcpTool.getToolNum())
-                    .eq(ExpoTemplateConverter::getToolVersion, mcpTool.getToolVersion())
-                    .one();
+                        .eq(ExpoTemplateConverter::getToolNum, mcpTool.getToolNum())
+                        .eq(ExpoTemplateConverter::getToolVersion, mcpTool.getToolVersion())
+                        .one();
                 if (expoConverter != null) {
                     snapshot.put("expoConverter", expoConverter);
                     log.debug("添加Expo转换模板快照: toolNum={}", mcpTool.getToolNum());
@@ -161,8 +151,8 @@ public class McpTestSuccessRecordServiceImpl
                     // 原始Expo工具信息
                     if (expoConverter.getProviderToolNum() != null) {
                         OriginToolExpo originExpo = originToolExpoService.lambdaQuery()
-                            .eq(OriginToolExpo::getProviderToolNum, expoConverter.getProviderToolNum())
-                            .one();
+                                .eq(OriginToolExpo::getProviderToolNum, expoConverter.getProviderToolNum())
+                                .one();
                         if (originExpo != null) {
                             snapshot.put("originExpo", originExpo);
                             log.debug("添加原始Expo工具快照: providerToolNum={}", expoConverter.getProviderToolNum());
@@ -190,8 +180,8 @@ public class McpTestSuccessRecordServiceImpl
             Map<String, Object> resultMap = JSONUtil.toBean(testResult, Map.class);
 
             // 从结果中提取关键信息
-            Integer errorCode = (Integer)resultMap.get("mcp_tool_error_code");
-            String errorMsg = (String)resultMap.get("mcp_tool_error_msg");
+            Integer errorCode = (Integer) resultMap.get("mcp_tool_error_code");
+            String errorMsg = (String) resultMap.get("mcp_tool_error_msg");
 
             if (errorCode != null && errorCode == 0) {
                 return "测试成功";

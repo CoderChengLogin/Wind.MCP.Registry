@@ -23,5 +23,5 @@ public interface McpTestSuccessRecordService extends IService<McpTestSuccessReco
      * @return 保存是否成功
      */
     boolean saveTestRecord(Long toolId, String testParameters, String testResult,
-        Long operatorId, String operatorUsername);
+                           Long operatorId, String operatorUsername);
 }

@@ -18,6 +18,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ExpoTemplateConverterServiceImpl extends ServiceImpl<ExpoTemplateConverterMapper, ExpoTemplateConverter>
-    implements ExpoTemplateConverterService {
+        implements ExpoTemplateConverterService {
 
 }

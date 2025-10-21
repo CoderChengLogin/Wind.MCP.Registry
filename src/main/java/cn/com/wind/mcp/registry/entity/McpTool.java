@@ -1,7 +1,5 @@
 package cn.com.wind.mcp.registry.entity;
 
-import java.time.LocalDateTime;
-
 import cn.com.wind.mcp.registry.handler.ConvertTypeHandler;
 import cn.com.wind.mcp.registry.handler.ToolTypeHandler;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -12,6 +10,8 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
 
 /**
  * <p>

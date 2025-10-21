@@ -21,21 +21,21 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-        throws Exception {
+            throws Exception {
         String requestURI = request.getRequestURI();
 
         // 允许访问的公开路径
         String[] allowedPaths = {
-            "/api/tools/",     // API工具接口
-            "/provider/login",     // 登录页面
-            "/provider/register",  // 注册页面
-            "/legal/",            // 法律文档页面（服务协议、隐私政策）
-            "/css/",              // CSS静态资源
-            "/js/",               // JS静态资源
-            "/vendor/",           // 第三方库资源
-            "/webfonts/",         // 字体资源
-            "/images/",           // 图片资源
-            "/favicon.ico"        // 网站图标
+                "/api/tools/",     // API工具接口
+                "/provider/login",     // 登录页面
+                "/provider/register",  // 注册页面
+                "/legal/",            // 法律文档页面（服务协议、隐私政策）
+                "/css/",              // CSS静态资源
+                "/js/",               // JS静态资源
+                "/vendor/",           // 第三方库资源
+                "/webfonts/",         // 字体资源
+                "/images/",           // 图片资源
+                "/favicon.ico"        // 网站图标
         };
 
         // 检查是否为允许访问的路径
@@ -48,7 +48,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         // 检查用户是否已登录
         HttpSession session = request.getSession(false);
         if (session != null) {
-            Provider provider = (Provider)session.getAttribute("currentProvider");
+            Provider provider = (Provider) session.getAttribute("currentProvider");
             if (provider != null) {
                 log.debug("用户已登录: {}, 访问路径: {}", provider.getUsername(), requestURI);
                 return true;
@@ -72,14 +72,14 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-        ModelAndView modelAndView) throws Exception {
+                           ModelAndView modelAndView) throws Exception {
         // 为所有视图添加currentPath属性,用于导航栏高亮
         if (modelAndView != null && !modelAndView.hasView()) {
             return;
         }
 
         if (modelAndView != null && modelAndView.getViewName() != null
-            && !modelAndView.getViewName().startsWith("redirect:")) {
+                && !modelAndView.getViewName().startsWith("redirect:")) {
             String currentPath = request.getRequestURI();
             modelAndView.addObject("currentPath", currentPath);
             log.debug("添加currentPath到ModelAndView: {}", currentPath);
@@ -95,7 +95,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         String accept = request.getHeader("Accept");
 
         return "XMLHttpRequest".equals(xRequestedWith)
-            || (contentType != null && contentType.contains("application/json"))
-            || (accept != null && accept.contains("application/json"));
+                || (contentType != null && contentType.contains("application/json"))
+                || (accept != null && accept.contains("application/json"));
     }
 }

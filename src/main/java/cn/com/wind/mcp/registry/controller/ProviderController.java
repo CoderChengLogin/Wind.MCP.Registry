@@ -1,8 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.ProviderService;
 import cn.hutool.core.util.StrUtil;
@@ -10,11 +7,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -53,7 +49,7 @@ public class ProviderController {
      */
     @GetMapping("/profile")
     public String profilePage(HttpSession session) {
-        Provider provider = (Provider)session.getAttribute("currentProvider");
+        Provider provider = (Provider) session.getAttribute("currentProvider");
         if (provider == null) {
             return "redirect:/provider/login";
         }
@@ -66,11 +62,11 @@ public class ProviderController {
     @PostMapping("/register")
     @ResponseBody
     public Map<String, Object> register(@RequestParam String username,
-        @RequestParam String password,
-        @RequestParam String confirmPassword,
-        @RequestParam(required = false) String email,
-        @RequestParam(required = false) String phoneNumber,
-        @RequestParam(required = false) String companyName) {
+                                        @RequestParam String password,
+                                        @RequestParam String confirmPassword,
+                                        @RequestParam(required = false) String email,
+                                        @RequestParam(required = false) String phoneNumber,
+                                        @RequestParam(required = false) String companyName) {
         Map<String, Object> result = new HashMap<>();
 
         try {
@@ -123,8 +119,8 @@ public class ProviderController {
     @PostMapping("/login")
     @ResponseBody
     public Map<String, Object> login(@RequestParam String username,
-        @RequestParam String password,
-        HttpSession session) {
+                                     @RequestParam String password,
+                                     HttpSession session) {
         Map<String, Object> result = new HashMap<>();
 
         try {
@@ -170,7 +166,7 @@ public class ProviderController {
     public Map<String, Object> getCurrentProvider(HttpSession session) {
         Map<String, Object> result = new HashMap<>();
 
-        Provider provider = (Provider)session.getAttribute("currentProvider");
+        Provider provider = (Provider) session.getAttribute("currentProvider");
         if (provider != null) {
             result.put("success", true);
 
@@ -219,14 +215,14 @@ public class ProviderController {
     @PostMapping("/updateProfile")
     @ResponseBody
     public Map<String, Object> updateProfile(@RequestParam(required = false) String email,
-        @RequestParam(required = false) String phoneNumber,
-        @RequestParam(required = false) String companyName,
-        @RequestParam(required = false) String contactPerson,
-        HttpSession session) {
+                                             @RequestParam(required = false) String phoneNumber,
+                                             @RequestParam(required = false) String companyName,
+                                             @RequestParam(required = false) String contactPerson,
+                                             HttpSession session) {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+            Provider currentProvider = (Provider) session.getAttribute("currentProvider");
             if (currentProvider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");
@@ -235,7 +231,7 @@ public class ProviderController {
 
             // 更新用户信息
             boolean success = providerService.updateProfile(currentProvider.getId(), email, phoneNumber, companyName,
-                contactPerson);
+                    contactPerson);
             if (success) {
                 // 更新session中的用户信息
                 Provider updatedProvider = providerService.getById(currentProvider.getId());
@@ -265,7 +261,7 @@ public class ProviderController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+            Provider currentProvider = (Provider) session.getAttribute("currentProvider");
             if (currentProvider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");

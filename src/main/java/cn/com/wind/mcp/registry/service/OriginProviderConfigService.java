@@ -1,11 +1,11 @@
 package cn.com.wind.mcp.registry.service;
 
-import java.util.List;
-
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.OriginToolExpo;
 import cn.com.wind.mcp.registry.entity.OriginToolHttp;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * 提供商应用配置服务接口

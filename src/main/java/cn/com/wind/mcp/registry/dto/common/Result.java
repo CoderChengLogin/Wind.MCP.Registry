@@ -26,9 +26,9 @@ public class Result<T> {
      */
     public static <T> Result<T> success(T data) {
         return Result.<T>builder()
-            .success(true)
-            .data(data)
-            .build();
+                .success(true)
+                .data(data)
+                .build();
     }
 
     /**
@@ -40,10 +40,10 @@ public class Result<T> {
      */
     public static <T> Result<T> success(String message, T data) {
         return Result.<T>builder()
-            .success(true)
-            .message(message)
-            .data(data)
-            .build();
+                .success(true)
+                .message(message)
+                .data(data)
+                .build();
     }
 
     /**
@@ -54,9 +54,9 @@ public class Result<T> {
      */
     public static <T> Result<T> fail(String error) {
         return Result.<T>builder()
-            .success(false)
-            .error(error)
-            .build();
+                .success(false)
+                .error(error)
+                .build();
     }
 
     /**
@@ -68,9 +68,9 @@ public class Result<T> {
      */
     public static <T> Result<T> fail(String message, String error) {
         return Result.<T>builder()
-            .success(false)
-            .message(message)
-            .error(error)
-            .build();
+                .success(false)
+                .message(message)
+                .error(error)
+                .build();
     }
 }

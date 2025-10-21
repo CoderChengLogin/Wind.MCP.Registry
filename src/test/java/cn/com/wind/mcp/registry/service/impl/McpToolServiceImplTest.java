@@ -1,8 +1,5 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.util.Arrays;
-import java.util.List;
-
 import cn.com.wind.mcp.registry.entity.McpTool;
 import cn.com.wind.mcp.registry.service.ToolValidationService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,16 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * McpToolServiceImpl的单元测试类
@@ -90,7 +83,7 @@ class McpToolServiceImplTest {
         tool.setToolName("invalid_tool");
 
         ToolValidationService.ValidationResult failResult =
-            new ToolValidationService.ValidationResult(false, "工具名称无效", null);
+                new ToolValidationService.ValidationResult(false, "工具名称无效", null);
         when(toolValidationService.validateMcpTool(any(McpTool.class))).thenReturn(failResult);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -109,7 +102,7 @@ class McpToolServiceImplTest {
         tool.setToolName("valid_tool");
 
         ToolValidationService.ValidationResult successResult =
-            new ToolValidationService.ValidationResult(true, "验证通过", null);
+                new ToolValidationService.ValidationResult(true, "验证通过", null);
         when(toolValidationService.validateMcpTool(any(McpTool.class))).thenReturn(successResult);
         doReturn(true).when(service).saveOrUpdate(any(McpTool.class));
 
@@ -127,7 +120,7 @@ class McpToolServiceImplTest {
         tool.setInputSchema(null);
 
         ToolValidationService.ValidationResult successResult =
-            new ToolValidationService.ValidationResult(true, "验证通过", "UNIQUE123");
+                new ToolValidationService.ValidationResult(true, "验证通过", "UNIQUE123");
         when(toolValidationService.validateMcpTool(any(McpTool.class))).thenReturn(successResult);
         doReturn(true).when(service).saveOrUpdate(any(McpTool.class));
 
@@ -147,7 +140,7 @@ class McpToolServiceImplTest {
         tool.setInputSchema("{\"type\":\"object\"}");
 
         ToolValidationService.ValidationResult successResult =
-            new ToolValidationService.ValidationResult(true, "验证通过", "UNIQUE456");
+                new ToolValidationService.ValidationResult(true, "验证通过", "UNIQUE456");
         when(toolValidationService.validateMcpTool(any(McpTool.class))).thenReturn(successResult);
         doReturn(true).when(service).saveOrUpdate(any(McpTool.class));
 
@@ -166,7 +159,7 @@ class McpToolServiceImplTest {
         tool.setInputSchema("{\"uniqueId\":\"OLD123\"}");
 
         ToolValidationService.ValidationResult successResult =
-            new ToolValidationService.ValidationResult(true, "验证通过", "NEW456");
+                new ToolValidationService.ValidationResult(true, "验证通过", "NEW456");
         when(toolValidationService.validateMcpTool(any(McpTool.class))).thenReturn(successResult);
         doReturn(true).when(service).saveOrUpdate(any(McpTool.class));
 

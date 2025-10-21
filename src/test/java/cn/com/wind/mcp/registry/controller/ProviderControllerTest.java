@@ -1,7 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.ProviderService;
 import jakarta.servlet.http.HttpSession;
@@ -11,17 +9,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * ProviderController unit test
@@ -100,12 +92,12 @@ class ProviderControllerTest {
     @Test
     void testRegister_Success() {
         when(providerService.register(eq("testuser"), eq("password123"), eq("test@example.com"), eq("1234567890")))
-            .thenReturn(true);
+                .thenReturn(true);
 
         Map<String, Object> result = providerController.register("testuser", "password123", "password123",
-            "test@example.com", "1234567890", null);
+                "test@example.com", "1234567890", null);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("注册成功", result.get("message"));
         verify(providerService).register("testuser", "password123", "test@example.com", "1234567890");
     }
@@ -117,7 +109,7 @@ class ProviderControllerTest {
     void testRegister_BlankUsernameOrPassword() {
         Map<String, Object> result = providerController.register("", "password", "password", null, null, null);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户名和密码不能为空", result.get("message"));
         verify(providerService, never()).register(anyString(), anyString(), anyString(), anyString());
     }
@@ -128,9 +120,9 @@ class ProviderControllerTest {
     @Test
     void testRegister_PasswordsDoNotMatch() {
         Map<String, Object> result = providerController.register("testuser", "password123", "password456",
-            null, null, null);
+                null, null, null);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("两次输入的密码不一致", result.get("message"));
         verify(providerService, never()).register(anyString(), anyString(), anyString(), anyString());
     }
@@ -141,9 +133,9 @@ class ProviderControllerTest {
     @Test
     void testRegister_UsernameTooShort() {
         Map<String, Object> result = providerController.register("ab", "password123", "password123",
-            null, null, null);
+                null, null, null);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户名长度应在3-20个字符之间", result.get("message"));
     }
 
@@ -154,9 +146,9 @@ class ProviderControllerTest {
     void testRegister_UsernameTooLong() {
         String longUsername = "a".repeat(21);
         Map<String, Object> result = providerController.register(longUsername, "password123", "password123",
-            null, null, null);
+                null, null, null);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户名长度应在3-20个字符之间", result.get("message"));
     }
 
@@ -166,9 +158,9 @@ class ProviderControllerTest {
     @Test
     void testRegister_PasswordTooShort() {
         Map<String, Object> result = providerController.register("testuser", "12345", "12345",
-            null, null, null);
+                null, null, null);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("密码长度不能少于6个字符", result.get("message"));
     }
 
@@ -180,9 +172,9 @@ class ProviderControllerTest {
         when(providerService.register(anyString(), anyString(), anyString(), anyString())).thenReturn(false);
 
         Map<String, Object> result = providerController.register("testuser", "password123", "password123",
-            null, null, null);
+                null, null, null);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户名或邮箱已存在", result.get("message"));
     }
 
@@ -192,12 +184,12 @@ class ProviderControllerTest {
     @Test
     void testRegister_ExceptionHandling() {
         when(providerService.register(eq("testuser"), eq("password123"), anyString(), anyString()))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerController.register("testuser", "password123", "password123",
-            "test@example.com", "1234567890", null);
+                "test@example.com", "1234567890", null);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("注册失败，请稍后重试", result.get("message"));
     }
 
@@ -217,12 +209,12 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.login("testuser", "password123", session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("登录成功", result.get("message"));
         verify(session).setAttribute("currentProvider", provider);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> providerInfo = (Map<String, Object>)result.get("provider");
+        Map<String, Object> providerInfo = (Map<String, Object>) result.get("provider");
         assertEquals(1L, providerInfo.get("id"));
         assertEquals("testuser", providerInfo.get("username"));
     }
@@ -234,7 +226,7 @@ class ProviderControllerTest {
     void testLogin_BlankCredentials() {
         Map<String, Object> result = providerController.login("", "password", session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户名和密码不能为空", result.get("message"));
         verify(providerService, never()).login(anyString(), anyString());
     }
@@ -248,7 +240,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.login("testuser", "wrongpassword", session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户名或密码错误", result.get("message"));
         verify(session, never()).setAttribute(anyString(), any());
     }
@@ -262,7 +254,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.login("testuser", "password", session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("登录失败，请稍后重试", result.get("message"));
     }
 
@@ -283,10 +275,10 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.getCurrentProvider(session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> providerInfo = (Map<String, Object>)result.get("provider");
+        Map<String, Object> providerInfo = (Map<String, Object>) result.get("provider");
         assertEquals(1L, providerInfo.get("id"));
         assertEquals("testuser", providerInfo.get("username"));
         assertEquals("test-api-key", providerInfo.get("apiKey"));
@@ -301,7 +293,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.getCurrentProvider(session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
     }
 
@@ -314,7 +306,7 @@ class ProviderControllerTest {
     void testLogout_Success() {
         Map<String, Object> result = providerController.logout(session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("退出登录成功", result.get("message"));
         verify(session).removeAttribute("currentProvider");
         verify(session).invalidate();
@@ -329,7 +321,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.logout(session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("退出登录失败", result.get("message"));
     }
 
@@ -351,13 +343,13 @@ class ProviderControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(currentProvider);
         when(providerService.updateProfile(eq(1L), eq("newemail@example.com"), eq("1234567890"),
-            eq("NewCompany"), eq("John Doe"))).thenReturn(true);
+                eq("NewCompany"), eq("John Doe"))).thenReturn(true);
         when(providerService.getById(1L)).thenReturn(updatedProvider);
 
         Map<String, Object> result = providerController.updateProfile("newemail@example.com",
-            "1234567890", "NewCompany", "John Doe", session);
+                "1234567890", "NewCompany", "John Doe", session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("个人信息更新成功", result.get("message"));
         verify(session).setAttribute("currentProvider", updatedProvider);
     }
@@ -370,9 +362,9 @@ class ProviderControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(null);
 
         Map<String, Object> result = providerController.updateProfile("email@test.com",
-            null, null, null, session);
+                null, null, null, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
         verify(providerService, never()).updateProfile(anyLong(), anyString(), anyString(), anyString(), anyString());
     }
@@ -387,12 +379,12 @@ class ProviderControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(providerService.updateProfile(anyLong(), anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(false);
+                .thenReturn(false);
 
         Map<String, Object> result = providerController.updateProfile("email@test.com",
-            null, null, null, session);
+                null, null, null, session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("更新失败", result.get("message"));
     }
 
@@ -406,12 +398,12 @@ class ProviderControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(providerService.updateProfile(eq(1L), eq("email@test.com"), anyString(), anyString(), anyString()))
-            .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new RuntimeException("Database error"));
 
         Map<String, Object> result = providerController.updateProfile("email@test.com",
-            "123456", "Company", "Person", session);
+                "123456", "Company", "Person", session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("更新失败，请稍后重试", result.get("message"));
     }
 
@@ -435,7 +427,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.regenerateApiKey(session);
 
-        assertTrue((Boolean)result.get("success"));
+        assertTrue((Boolean) result.get("success"));
         assertEquals("API密钥重新生成成功", result.get("message"));
         assertEquals("new-api-key-12345", result.get("apiKey"));
         verify(session).setAttribute("currentProvider", updatedProvider);
@@ -450,7 +442,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.regenerateApiKey(session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("用户未登录", result.get("message"));
         verify(providerService, never()).regenerateApiKey(anyLong());
     }
@@ -468,7 +460,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.regenerateApiKey(session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("生成失败", result.get("message"));
     }
 
@@ -485,7 +477,7 @@ class ProviderControllerTest {
 
         Map<String, Object> result = providerController.regenerateApiKey(session);
 
-        assertFalse((Boolean)result.get("success"));
+        assertFalse((Boolean) result.get("success"));
         assertEquals("生成失败，请稍后重试", result.get("message"));
     }
 }

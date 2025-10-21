@@ -1,12 +1,12 @@
 package cn.com.wind.mcp.registry.entity;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 虚拟服务器关联条目

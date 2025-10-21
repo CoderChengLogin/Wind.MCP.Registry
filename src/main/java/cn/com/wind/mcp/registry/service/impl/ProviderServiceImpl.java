@@ -1,7 +1,5 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.time.LocalDateTime;
-
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.mapper.ProviderMapper;
 import cn.com.wind.mcp.registry.service.ProviderService;
@@ -12,6 +10,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -134,7 +134,7 @@ public class ProviderServiceImpl extends ServiceImpl<ProviderMapper, Provider> i
 
     @Override
     public boolean updateProfile(Long providerId, String email, String phoneNumber, String companyName,
-        String contactPerson) {
+                                 String contactPerson) {
         try {
             Provider provider = getById(providerId);
             if (provider == null) {

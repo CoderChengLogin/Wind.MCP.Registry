@@ -4,9 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -124,7 +122,7 @@ class SessionDataUtilTest {
     @Test
     void testGetIpAddress_FromForwardedFor_MultipleIps() {
         when(mockRequest.getHeader("HTTP_X_FORWARDED_FOR"))
-            .thenReturn("10.0.0.1,203.0.113.195,192.168.1.1");
+                .thenReturn("10.0.0.1,203.0.113.195,192.168.1.1");
 
         String ip = SessionDataUtil.getIpAddress(mockRequest);
 
@@ -138,7 +136,7 @@ class SessionDataUtilTest {
     @Test
     void testGetIpAddress_FromForwardedFor_MixedSeparators() {
         when(mockRequest.getHeader("HTTP_X_FORWARDED_FOR"))
-            .thenReturn("10.0.0.1,203.0.113.195;192.168.1.1");
+                .thenReturn("10.0.0.1,203.0.113.195;192.168.1.1");
 
         String ip = SessionDataUtil.getIpAddress(mockRequest);
 
@@ -152,7 +150,7 @@ class SessionDataUtilTest {
     @Test
     void testGetIpAddress_FromForwardedFor_WithQuotes() {
         when(mockRequest.getHeader("HTTP_X_FORWARDED_FOR"))
-            .thenReturn("'10.0.0.1','203.0.113.195'");
+                .thenReturn("'10.0.0.1','203.0.113.195'");
 
         String ip = SessionDataUtil.getIpAddress(mockRequest);
 
@@ -165,7 +163,7 @@ class SessionDataUtilTest {
     @Test
     void testGetIpAddress_FromForwardedFor_OnlyPrivateIps() {
         when(mockRequest.getHeader("HTTP_X_FORWARDED_FOR"))
-            .thenReturn("10.0.0.1,192.168.1.1,172.16.0.1");
+                .thenReturn("10.0.0.1,192.168.1.1,172.16.0.1");
         when(mockRequest.getRemoteAddr()).thenReturn("203.0.113.195");
 
         String ip = SessionDataUtil.getIpAddress(mockRequest);
@@ -361,17 +359,17 @@ class SessionDataUtilTest {
     void testGetIpAddress_FilterPrivateIps() {
         // 测试10.x.x.x被过滤
         when(mockRequest.getHeader("HTTP_X_FORWARDED_FOR"))
-            .thenReturn("10.1.2.3,203.0.113.195");
+                .thenReturn("10.1.2.3,203.0.113.195");
         assertEquals("203.0.113.195", SessionDataUtil.getIpAddress(mockRequest));
 
         // 测试192.168.x.x被过滤
         when(mockRequest.getHeader("HTTP_X_FORWARDED_FOR"))
-            .thenReturn("192.168.0.1,203.0.113.195");
+                .thenReturn("192.168.0.1,203.0.113.195");
         assertEquals("203.0.113.195", SessionDataUtil.getIpAddress(mockRequest));
 
         // 测试172.16.x.x被过滤
         when(mockRequest.getHeader("HTTP_X_FORWARDED_FOR"))
-            .thenReturn("172.16.0.1,203.0.113.195");
+                .thenReturn("172.16.0.1,203.0.113.195");
         assertEquals("203.0.113.195", SessionDataUtil.getIpAddress(mockRequest));
     }
 

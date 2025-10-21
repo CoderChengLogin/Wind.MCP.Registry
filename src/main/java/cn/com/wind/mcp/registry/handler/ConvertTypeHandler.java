@@ -1,19 +1,19 @@
 package cn.com.wind.mcp.registry.handler;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * ConvertType字段类型处理器
  * 负责在数据库CHAR(1)值和业务逻辑String值之间转换
- *
+ * <p>
  * 数据库存储: '1', '2', '3'
  * 业务逻辑: "http", "expo", "code"
  *
@@ -35,7 +35,7 @@ public class ConvertTypeHandler extends BaseTypeHandler<String> {
      */
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType)
-        throws SQLException {
+            throws SQLException {
         // 业务值 → 数据库值
         String dbValue = convertToDbValue(parameter);
         ps.setString(i, dbValue);

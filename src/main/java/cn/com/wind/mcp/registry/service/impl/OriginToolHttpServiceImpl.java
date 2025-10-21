@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OriginToolHttpServiceImpl extends ServiceImpl<OriginToolHttpMapper, OriginToolHttp>
-    implements OriginToolHttpService {
+        implements OriginToolHttpService {
 
     /**
      * 统计指定用户创建的接口数量
@@ -27,7 +27,7 @@ public class OriginToolHttpServiceImpl extends ServiceImpl<OriginToolHttpMapper,
     @Override
     public long countByCreateBy(String createBy) {
         return count(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<OriginToolHttp>().eq("create_by",
-            createBy));
+                createBy));
     }
 
     /**
@@ -39,6 +39,6 @@ public class OriginToolHttpServiceImpl extends ServiceImpl<OriginToolHttpMapper,
     @Override
     public long countByProviderId(Long providerId) {
         return count(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<OriginToolHttp>().eq("provider_id",
-            providerId));
+                providerId));
     }
 }

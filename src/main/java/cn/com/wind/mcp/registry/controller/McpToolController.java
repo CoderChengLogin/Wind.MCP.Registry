@@ -1,17 +1,7 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import cn.com.wind.mcp.registry.dto.McpToolEditDto;
-import cn.com.wind.mcp.registry.entity.ExpoTemplateConverter;
-import cn.com.wind.mcp.registry.entity.HttpTemplateConverter;
-import cn.com.wind.mcp.registry.entity.McpTool;
-import cn.com.wind.mcp.registry.entity.OriginToolExpo;
-import cn.com.wind.mcp.registry.entity.OriginToolHttp;
+import cn.com.wind.mcp.registry.entity.*;
 import cn.com.wind.mcp.registry.mapper.ExpoTemplateConverterMapper;
 import cn.com.wind.mcp.registry.mapper.HttpTemplateConverterMapper;
 import cn.com.wind.mcp.registry.mapper.OriginToolExpoMapper;
@@ -28,13 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -69,10 +59,10 @@ public class McpToolController {
      */
     @GetMapping
     public String list(Model model,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "all") String view,
-        HttpSession session) {
+                       @RequestParam(defaultValue = "1") int page,
+                       @RequestParam(defaultValue = "10") int size,
+                       @RequestParam(defaultValue = "all") String view,
+                       HttpSession session) {
         log.info("查询MCP工具列表: page={}, size={}, view={}", page, size, view);
 
         Page<McpTool> toolPage = new Page<>(page, size);
@@ -116,7 +106,7 @@ public class McpToolController {
             // 检查权限：只有工具的创建者可以编辑
             if (!PermissionUtil.hasPermission(session, tool.getProviderId())) {
                 return "redirect:/mcp-tools?error=" + URLEncoder.encode("无权限编辑此工具",
-                    StandardCharsets.UTF_8.name());
+                        StandardCharsets.UTF_8.name());
             }
 
             // 根据convertType确定转换器类型
@@ -151,7 +141,7 @@ public class McpToolController {
                     httpConverter = httpTemplateConverterMapper.selectOne(converterWrapper);
                     log.info("查询HTTP转换模板: {}", httpConverter != null ? "找到" : "未找到");
                 } else if (convertType != null && ("2".equals(convertType) || convertType.toLowerCase().contains(
-                    "expo"))) {
+                        "expo"))) {
                     // 查询Expo转换模板
                     QueryWrapper<ExpoTemplateConverter> converterWrapper = new QueryWrapper<>();
                     converterWrapper.eq("tool_num", tool.getToolNum());
@@ -352,7 +342,7 @@ public class McpToolController {
      * 更新转换器信息
      */
     private void updateConverter(HttpTemplateConverter converterData, McpTool mcpTool, Long providerId,
-        HttpSession session) {
+                                 HttpSession session) {
         // 查询已存在的转换器
         QueryWrapper<HttpTemplateConverter> wrapper = new QueryWrapper<>();
         wrapper.eq("tool_num", mcpTool.getToolNum());
@@ -388,8 +378,8 @@ public class McpToolController {
     @GetMapping("/api/list")
     @ResponseBody
     public ResponseEntity<List<McpTool>> listApi(@RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size,
-        HttpSession session) {
+                                                 @RequestParam(defaultValue = "10") int size,
+                                                 HttpSession session) {
         log.info("API查询MCP工具列表: page={}, size={}", page, size);
 
         try {
@@ -422,7 +412,7 @@ public class McpToolController {
         if (tool == null) {
             try {
                 return "redirect:/mcp-tools?error=" + URLEncoder.encode("工具不存在",
-                    StandardCharsets.UTF_8.toString());
+                        StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException e) {
                 log.error("URL编码失败", e);
                 return "redirect:/mcp-tools";
@@ -433,7 +423,7 @@ public class McpToolController {
         if (!PermissionUtil.hasPermission(session, tool.getProviderId())) {
             try {
                 return "redirect:/mcp-tools?error=" + URLEncoder.encode("无权限删除此工具",
-                    StandardCharsets.UTF_8.toString());
+                        StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException e) {
                 log.error("URL编码失败", e);
                 return "redirect:/mcp-tools";
@@ -443,7 +433,7 @@ public class McpToolController {
         mcpToolService.removeById(id);
         try {
             return "redirect:/mcp-tools?success=" + URLEncoder.encode("工具删除成功",
-                StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8.toString());
         } catch (UnsupportedEncodingException e) {
             log.error("URL编码失败", e);
             return "redirect:/mcp-tools";
@@ -455,9 +445,9 @@ public class McpToolController {
      */
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size,
-        HttpSession session) {
+                         @RequestParam(defaultValue = "1") int page,
+                         @RequestParam(defaultValue = "10") int size,
+                         HttpSession session) {
         log.info("搜索MCP工具: keyword={}", keyword);
 
         // 获取当前登录用户ID
@@ -467,11 +457,11 @@ public class McpToolController {
         if (currentProviderId != null) {
             // 只搜索当前用户的工具
             queryWrapper.eq("provider_id", currentProviderId)
-                .and(wrapper -> wrapper
-                    .like("tool_name", keyword)
-                    .or()
-                    .like("tool_description", keyword)
-                );
+                    .and(wrapper -> wrapper
+                            .like("tool_name", keyword)
+                            .or()
+                            .like("tool_description", keyword)
+                    );
         } else {
             // 用户未登录，返回空结果
             queryWrapper.eq("1", "0");

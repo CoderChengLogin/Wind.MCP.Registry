@@ -1,15 +1,6 @@
 package cn.com.wind.mcp.registry.service;
 
-import java.util.List;
-import java.util.Map;
-
-import cn.com.wind.mcp.registry.entity.ExpoTemplateConverter;
-import cn.com.wind.mcp.registry.entity.HttpTemplateConverter;
-import cn.com.wind.mcp.registry.entity.McpTestSuccessRecord;
-import cn.com.wind.mcp.registry.entity.McpTool;
-import cn.com.wind.mcp.registry.entity.OriginToolExpo;
-import cn.com.wind.mcp.registry.entity.OriginToolHttp;
-import cn.com.wind.mcp.registry.entity.Provider;
+import cn.com.wind.mcp.registry.entity.*;
 import cn.hutool.json.JSONUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,10 +11,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * McpTestSuccessRecordService集成测试类
@@ -126,7 +117,7 @@ class McpTestSuccessRecordServiceTest {
         // 准备测试参数和结果
         testParameters = "{\"name\": \"test\"}";
         testResult
-            = "{\"mcp_tool_error_code\": 0, \"mcp_tool_error_msg\": \"success\", \"data\": {\"result\": \"ok\"}}";
+                = "{\"mcp_tool_error_code\": 0, \"mcp_tool_error_msg\": \"success\", \"data\": {\"result\": \"ok\"}}";
     }
 
     /**
@@ -137,11 +128,11 @@ class McpTestSuccessRecordServiceTest {
     void testSaveTestRecord() {
         // When: 保存测试记录
         boolean saved = mcpTestSuccessRecordService.saveTestRecord(
-            testToolId,
-            testParameters,
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                testToolId,
+                testParameters,
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         // Then: 验证结果
@@ -149,8 +140,8 @@ class McpTestSuccessRecordServiceTest {
 
         // 验证记录是否真的保存到数据库
         List<McpTestSuccessRecord> records = mcpTestSuccessRecordService.lambdaQuery()
-            .eq(McpTestSuccessRecord::getToolId, testToolId)
-            .list();
+                .eq(McpTestSuccessRecord::getToolId, testToolId)
+                .list();
 
         assertNotNull(records, "查询结果不应为null");
         assertEquals(1, records.size(), "应该有一条测试记录");
@@ -174,11 +165,11 @@ class McpTestSuccessRecordServiceTest {
     void testSaveTestRecordWithNonExistentTool() {
         // When: 尝试为不存在的工具保存测试记录
         boolean saved = mcpTestSuccessRecordService.saveTestRecord(
-            99999L, // 不存在的工具ID
-            testParameters,
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                99999L, // 不存在的工具ID
+                testParameters,
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         // Then: 验证结果
@@ -193,17 +184,17 @@ class McpTestSuccessRecordServiceTest {
     void testQueryRecordsByToolId() {
         // Given: 保存测试记录
         mcpTestSuccessRecordService.saveTestRecord(
-            testToolId,
-            testParameters,
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                testToolId,
+                testParameters,
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         // When: 按工具ID查询
         List<McpTestSuccessRecord> records = mcpTestSuccessRecordService.lambdaQuery()
-            .eq(McpTestSuccessRecord::getToolId, testToolId)
-            .list();
+                .eq(McpTestSuccessRecord::getToolId, testToolId)
+                .list();
 
         // Then: 验证结果
         assertNotNull(records, "查询结果不应为null");
@@ -218,17 +209,17 @@ class McpTestSuccessRecordServiceTest {
     void testQueryRecordsByOperatorId() {
         // Given: 保存测试记录
         mcpTestSuccessRecordService.saveTestRecord(
-            testToolId,
-            testParameters,
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                testToolId,
+                testParameters,
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         // When: 按操作者ID查询
         List<McpTestSuccessRecord> records = mcpTestSuccessRecordService.lambdaQuery()
-            .eq(McpTestSuccessRecord::getOperatorId, testProvider.getId())
-            .list();
+                .eq(McpTestSuccessRecord::getOperatorId, testProvider.getId())
+                .list();
 
         // Then: 验证结果
         assertNotNull(records, "查询结果不应为null");
@@ -243,19 +234,19 @@ class McpTestSuccessRecordServiceTest {
     void testSaveMultipleTestRecords() {
         // When: 保存多条测试记录
         boolean saved1 = mcpTestSuccessRecordService.saveTestRecord(
-            testToolId,
-            "{\"name\": \"test1\"}",
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                testToolId,
+                "{\"name\": \"test1\"}",
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         boolean saved2 = mcpTestSuccessRecordService.saveTestRecord(
-            testToolId,
-            "{\"name\": \"test2\"}",
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                testToolId,
+                "{\"name\": \"test2\"}",
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         // Then: 验证结果
@@ -264,8 +255,8 @@ class McpTestSuccessRecordServiceTest {
 
         // 验证数据库中有两条记录
         List<McpTestSuccessRecord> records = mcpTestSuccessRecordService.lambdaQuery()
-            .eq(McpTestSuccessRecord::getToolId, testToolId)
-            .list();
+                .eq(McpTestSuccessRecord::getToolId, testToolId)
+                .list();
 
         assertEquals(2, records.size(), "应该有两条测试记录");
     }
@@ -278,19 +269,19 @@ class McpTestSuccessRecordServiceTest {
     void testSnapshotContainsHttpConverterInfo() {
         // When: 保存测试记录 (testTool的convertType='http')
         boolean saved = mcpTestSuccessRecordService.saveTestRecord(
-            testToolId,
-            testParameters,
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                testToolId,
+                testParameters,
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         assertTrue(saved, "测试记录应该保存成功");
 
         // Then: 验证快照内容
         List<McpTestSuccessRecord> records = mcpTestSuccessRecordService.lambdaQuery()
-            .eq(McpTestSuccessRecord::getToolId, testToolId)
-            .list();
+                .eq(McpTestSuccessRecord::getToolId, testToolId)
+                .list();
 
         assertEquals(1, records.size(), "应该有一条测试记录");
 
@@ -306,9 +297,9 @@ class McpTestSuccessRecordServiceTest {
 
         // 验证包含HTTP转换器信息 (关键验证点)
         assertTrue(snapshot.containsKey("httpConverter"),
-            "HTTP工具快照应包含httpConverter信息");
+                "HTTP工具快照应包含httpConverter信息");
 
-        Map<String, Object> httpConverter = (Map<String, Object>)snapshot.get("httpConverter");
+        Map<String, Object> httpConverter = (Map<String, Object>) snapshot.get("httpConverter");
         assertNotNull(httpConverter, "httpConverter不应为null");
         assertTrue(httpConverter.containsKey("reqUrl"), "httpConverter应包含reqUrl");
         assertTrue(httpConverter.containsKey("reqMethod"), "httpConverter应包含reqMethod");
@@ -316,7 +307,7 @@ class McpTestSuccessRecordServiceTest {
 
         // 验证包含原始HTTP工具信息
         assertTrue(snapshot.containsKey("originHttp"),
-            "HTTP工具快照应包含originHttp信息");
+                "HTTP工具快照应包含originHttp信息");
 
         System.out.println("=== HTTP工具快照验证成功 ===");
         System.out.println("快照包含的键: " + snapshot.keySet());
@@ -361,19 +352,19 @@ class McpTestSuccessRecordServiceTest {
 
         // When: 保存测试记录
         boolean saved = mcpTestSuccessRecordService.saveTestRecord(
-            expoTool.getId(),
-            testParameters,
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                expoTool.getId(),
+                testParameters,
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         assertTrue(saved, "测试记录应该保存成功");
 
         // Then: 验证快照内容
         List<McpTestSuccessRecord> records = mcpTestSuccessRecordService.lambdaQuery()
-            .eq(McpTestSuccessRecord::getToolId, expoTool.getId())
-            .list();
+                .eq(McpTestSuccessRecord::getToolId, expoTool.getId())
+                .list();
 
         assertEquals(1, records.size(), "应该有一条测试记录");
 
@@ -389,14 +380,14 @@ class McpTestSuccessRecordServiceTest {
 
         // 验证包含Expo转换器信息 (关键验证点)
         assertTrue(snapshot.containsKey("expoConverter"),
-            "Expo工具快照应包含expoConverter信息");
+                "Expo工具快照应包含expoConverter信息");
 
-        Map<String, Object> expoConv = (Map<String, Object>)snapshot.get("expoConverter");
+        Map<String, Object> expoConv = (Map<String, Object>) snapshot.get("expoConverter");
         assertNotNull(expoConv, "expoConverter不应为null");
 
         // 验证包含原始Expo工具信息
         assertTrue(snapshot.containsKey("originExpo"),
-            "Expo工具快照应包含originExpo信息");
+                "Expo工具快照应包含originExpo信息");
 
         System.out.println("=== Expo工具快照验证成功 ===");
         System.out.println("快照包含的键: " + snapshot.keySet());
@@ -424,19 +415,19 @@ class McpTestSuccessRecordServiceTest {
 
         // When: 保存测试记录
         boolean saved = mcpTestSuccessRecordService.saveTestRecord(
-            manualTool.getId(),
-            testParameters,
-            testResult,
-            testProvider.getId(),
-            testProvider.getUsername()
+                manualTool.getId(),
+                testParameters,
+                testResult,
+                testProvider.getId(),
+                testProvider.getUsername()
         );
 
         assertTrue(saved, "测试记录应该保存成功");
 
         // Then: 验证快照内容
         List<McpTestSuccessRecord> records = mcpTestSuccessRecordService.lambdaQuery()
-            .eq(McpTestSuccessRecord::getToolId, manualTool.getId())
-            .list();
+                .eq(McpTestSuccessRecord::getToolId, manualTool.getId())
+                .list();
 
         assertEquals(1, records.size(), "应该有一条测试记录");
 
@@ -452,9 +443,9 @@ class McpTestSuccessRecordServiceTest {
 
         // 验证不包含转换器信息 (Manual类型不需要转换器)
         assertFalse(snapshot.containsKey("httpConverter"),
-            "Manual工具快照不应包含httpConverter");
+                "Manual工具快照不应包含httpConverter");
         assertFalse(snapshot.containsKey("expoConverter"),
-            "Manual工具快照不应包含expoConverter");
+                "Manual工具快照不应包含expoConverter");
 
         System.out.println("=== Manual工具快照验证成功 ===");
         System.out.println("快照包含的键: " + snapshot.keySet());

@@ -1,11 +1,11 @@
 package cn.com.wind.mcp.registry.mapper;
 
-import java.util.List;
-
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 提供商应用配置Mapper接口

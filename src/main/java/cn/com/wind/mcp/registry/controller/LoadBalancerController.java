@@ -1,9 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.service.OriginProviderConfigService;
 import cn.com.wind.mcp.registry.service.ProviderService;
@@ -11,13 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 负载均衡器控制器
@@ -72,8 +66,8 @@ public class LoadBalancerController {
 
                     // 统计健康节点数(is_enabled=true且status=1)
                     long healthyCount = nodes.stream()
-                        .filter(n -> n.getIsEnabled() != null && n.getIsEnabled() && n.getStatus() == 1)
-                        .count();
+                            .filter(n -> n.getIsEnabled() != null && n.getIsEnabled() && n.getStatus() == 1)
+                            .count();
 
                     Map<String, Object> loadInfo = new HashMap<>();
                     loadInfo.put("loadName", loadName);
@@ -119,7 +113,7 @@ public class LoadBalancerController {
 
             // 按站点类型分组查询节点
             Map<String, List<OriginProviderConfig>> nodesBySite =
-                originProviderConfigService.getNodesGroupBySiteType(loadName);
+                    originProviderConfigService.getNodesGroupBySiteType(loadName);
 
             result.put("success", true);
             result.put("data", nodesBySite);
@@ -182,7 +176,7 @@ public class LoadBalancerController {
         Map<String, Object> result = new HashMap<>();
         try {
             log.info("创建新服务节点: loadName={}, siteType={}, ip={}",
-                config.getAppName(), config.getSiteType(), config.getAppIp());
+                    config.getAppName(), config.getSiteType(), config.getAppIp());
 
             boolean success = originProviderConfigService.createConfig(config);
 
@@ -265,8 +259,8 @@ public class LoadBalancerController {
             log.info("切换服务节点状态: id={}, enabled={}", id, enabled);
 
             boolean success = enabled ?
-                originProviderConfigService.enableConfig(id) :
-                originProviderConfigService.disableConfig(id);
+                    originProviderConfigService.enableConfig(id) :
+                    originProviderConfigService.disableConfig(id);
 
             result.put("success", success);
             result.put("message", success ? "操作成功" : "操作失败");

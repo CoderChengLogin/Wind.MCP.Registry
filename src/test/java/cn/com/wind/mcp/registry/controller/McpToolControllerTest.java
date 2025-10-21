@@ -1,7 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.util.Collections;
-
 import cn.com.wind.mcp.registry.dto.McpToolEditDto;
 import cn.com.wind.mcp.registry.entity.HttpTemplateConverter;
 import cn.com.wind.mcp.registry.entity.McpTool;
@@ -24,17 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * McpToolController unit test
@@ -331,7 +323,7 @@ class McpToolControllerTest {
 
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         doThrow(new RuntimeException("Validation error")).when(mcpToolService)
-            .saveOrUpdateWithValidation(any(McpTool.class));
+                .saveOrUpdateWithValidation(any(McpTool.class));
 
         McpToolEditDto dto = new McpToolEditDto();
         dto.setToolName("Test Tool");

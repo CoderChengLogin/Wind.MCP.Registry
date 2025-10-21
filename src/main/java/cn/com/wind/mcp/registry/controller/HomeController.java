@@ -40,7 +40,7 @@ public class HomeController {
         log.info("访问首页");
 
         // 检查用户是否登录
-        Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+        Provider currentProvider = (Provider) session.getAttribute("currentProvider");
         if (currentProvider == null) {
             // 未登录，重定向到登录页
             log.info("用户未登录，重定向到登录页");

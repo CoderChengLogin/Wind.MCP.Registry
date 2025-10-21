@@ -1,21 +1,21 @@
 package cn.com.wind.mcp.registry.util;
 
-import java.io.UnsupportedEncodingException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import cn.com.wind.mcp.registry.dto.mcptool.SessionUserInfoV3;
 import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Slf4j
 public class SessionDataUtil {
 
     private static final Pattern VALID_IP_PATTERN = Pattern.compile(
-        "^(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,"
-            + "2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$");
+            "^(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,"
+                    + "2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$");
 
     @Value("${spring.profiles.active}")
     private static String env;
@@ -45,9 +45,9 @@ public class SessionDataUtil {
                 String[] array = text.split("[,|;]");
                 for (String s : array) {
                     if (isValidIp(s) &&
-                        !s.startsWith("10.") &&
-                        !s.startsWith("192.168") &&
-                        !s.startsWith("172.16.")) {
+                            !s.startsWith("10.") &&
+                            !s.startsWith("192.168") &&
+                            !s.startsWith("172.16.")) {
                         return s;
                     }
                 }
@@ -96,8 +96,8 @@ public class SessionDataUtil {
         try {
             String wftSessionId = WindSessionIdUtils.getWindSessionId(request);
             //log.info("wftSessionId:" + wftSessionId);
-            SessionUserInfoV3 userInfoV3 = ((SessionUserInfoV3)request.getSession().getAttribute(
-                "__user__" + wftSessionId));
+            SessionUserInfoV3 userInfoV3 = ((SessionUserInfoV3) request.getSession().getAttribute(
+                    "__user__" + wftSessionId));
             if (userInfoV3 == null) {
                 return 0;
             } else {
@@ -126,7 +126,7 @@ public class SessionDataUtil {
             lan = request.getParameter("lan");
         }
         return StrUtil.isBlank(lan) ? "cn" :
-            ("cn".equals(lan) || "zh-CN".equals(lan)) || "zh".equals(lan) ? "cn" : "en";
+                ("cn".equals(lan) || "zh-CN".equals(lan)) || "zh".equals(lan) ? "cn" : "en";
     }
 
 }

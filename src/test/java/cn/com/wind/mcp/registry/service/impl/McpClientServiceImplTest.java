@@ -1,11 +1,5 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.config.McpClientConfig;
 import cn.com.wind.mcp.registry.dto.mcptool.McpToolDTO;
 import cn.com.wind.mcp.registry.service.McpToolService;
@@ -23,11 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -87,7 +79,7 @@ class McpClientServiceImplTest {
     void testTestToolWithSessionId_NullSessionId() {
         Map<String, Object> result = mcpClientService.testToolWithSessionId(1L, new HashMap<>(), null);
 
-        assertTrue((Boolean)result.get("isError"));
+        assertTrue((Boolean) result.get("isError"));
         assertEquals("sessionId 不能为空", result.get("error"));
     }
 
@@ -98,7 +90,7 @@ class McpClientServiceImplTest {
     void testTestToolWithSessionId_EmptySessionId() {
         Map<String, Object> result = mcpClientService.testToolWithSessionId(1L, new HashMap<>(), "   ");
 
-        assertTrue((Boolean)result.get("isError"));
+        assertTrue((Boolean) result.get("isError"));
         assertEquals("sessionId 不能为空", result.get("error"));
     }
 
@@ -113,8 +105,8 @@ class McpClientServiceImplTest {
 
         Map<String, Object> result = mcpClientService.testToolWithSessionId(999L, new HashMap<>(), "test-session");
 
-        assertTrue((Boolean)result.get("isError"));
-        assertTrue(((String)result.get("error")).contains("工具不存在"));
+        assertTrue((Boolean) result.get("isError"));
+        assertTrue(((String) result.get("error")).contains("工具不存在"));
     }
 
     /**
@@ -143,13 +135,13 @@ class McpClientServiceImplTest {
     void testCreateErrorResponse() throws Exception {
         // 使用反射调用私有方法
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("createErrorResponse",
-            String.class);
+                String.class);
         method.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> result = (Map<String, Object>)method.invoke(mcpClientService, "测试错误");
+        Map<String, Object> result = (Map<String, Object>) method.invoke(mcpClientService, "测试错误");
 
-        assertTrue((Boolean)result.get("isError"));
+        assertTrue((Boolean) result.get("isError"));
         assertEquals("测试错误", result.get("error"));
     }
 
@@ -181,7 +173,7 @@ class McpClientServiceImplTest {
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("getCurrentSessionId");
         method.setAccessible(true);
 
-        String result = (String)method.invoke(mcpClientService);
+        String result = (String) method.invoke(mcpClientService);
 
         assertNull(result);
     }
@@ -199,7 +191,7 @@ class McpClientServiceImplTest {
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("getCurrentSessionId");
         method.setAccessible(true);
 
-        String result = (String)method.invoke(mcpClientService);
+        String result = (String) method.invoke(mcpClientService);
 
         assertEquals("session-from-header", result);
 
@@ -213,8 +205,8 @@ class McpClientServiceImplTest {
     @Test
     void testParseSseResponse_Success() throws Exception {
         String sseResponse
-            = "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"mcp_tool_error_code\\\":0,"
-            + "\\\"mcp_tool_data\\\":{\\\"result\\\":\\\"success\\\"}}\"}]}}";
+                = "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"mcp_tool_error_code\\\":0,"
+                + "\\\"mcp_tool_data\\\":{\\\"result\\\":\\\"success\\\"}}\"}]}}";
 
         Map<String, Object> mcpResponse = new HashMap<>();
         Map<String, Object> result = new HashMap<>();
@@ -235,19 +227,19 @@ class McpClientServiceImplTest {
         parsedContent.put("mcp_tool_data", toolData);
 
         when(objectMapper.readValue(eq("{\"mcp_tool_error_code\":0,\"mcp_tool_data\":{\"result\":\"success\"}}"),
-            eq(Map.class)))
-            .thenReturn(parsedContent);
+                eq(Map.class)))
+                .thenReturn(parsedContent);
 
         // 使用反射调用私有方法
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("parseSseResponse",
-            String.class);
+                String.class);
         method.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> response = (Map<String, Object>)method.invoke(mcpClientService, sseResponse);
+        Map<String, Object> response = (Map<String, Object>) method.invoke(mcpClientService, sseResponse);
 
         assertNotNull(response);
-        assertFalse((Boolean)response.getOrDefault("isError", true));
+        assertFalse((Boolean) response.getOrDefault("isError", true));
     }
 
     /**
@@ -267,15 +259,15 @@ class McpClientServiceImplTest {
 
         // 使用反射调用私有方法
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("parseSseResponse",
-            String.class);
+                String.class);
         method.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> response = (Map<String, Object>)method.invoke(mcpClientService, sseResponse);
+        Map<String, Object> response = (Map<String, Object>) method.invoke(mcpClientService, sseResponse);
 
         assertNotNull(response);
-        assertTrue((Boolean)response.get("isError"));
-        assertTrue(((String)response.get("error")).contains("MCP错误"));
+        assertTrue((Boolean) response.get("isError"));
+        assertTrue(((String) response.get("error")).contains("MCP错误"));
     }
 
     /**
@@ -284,8 +276,8 @@ class McpClientServiceImplTest {
     @Test
     void testParseSseResponse_TimeString() throws Exception {
         String sseResponse
-            = "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"mcp_tool_error_code\\\":0,"
-            + "\\\"mcp_tool_data\\\":\\\"2025-10-17 15:30:00\\\"}\"}]}}";
+                = "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"mcp_tool_error_code\\\":0,"
+                + "\\\"mcp_tool_data\\\":\\\"2025-10-17 15:30:00\\\"}\"}]}}";
 
         Map<String, Object> mcpResponse = new HashMap<>();
         Map<String, Object> result = new HashMap<>();
@@ -304,23 +296,23 @@ class McpClientServiceImplTest {
         parsedContent.put("mcp_tool_data", "2025-10-17 15:30:00");
 
         when(objectMapper.readValue(eq("{\"mcp_tool_error_code\":0,\"mcp_tool_data\":\"2025-10-17 15:30:00\"}"),
-            eq(Map.class)))
-            .thenReturn(parsedContent);
+                eq(Map.class)))
+                .thenReturn(parsedContent);
 
         // 使用反射调用私有方法
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("parseSseResponse",
-            String.class);
+                String.class);
         method.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> response = (Map<String, Object>)method.invoke(mcpClientService, sseResponse);
+        Map<String, Object> response = (Map<String, Object>) method.invoke(mcpClientService, sseResponse);
 
         assertNotNull(response);
-        assertFalse((Boolean)response.getOrDefault("isError", true));
+        assertFalse((Boolean) response.getOrDefault("isError", true));
 
         // 验证时间字符串被正确处理
         @SuppressWarnings("unchecked")
-        Map<String, Object> businessData = (Map<String, Object>)response.get("businessData");
+        Map<String, Object> businessData = (Map<String, Object>) response.get("businessData");
         if (businessData != null) {
             assertEquals("2025-10-17 15:30:00", businessData.get("currentTime"));
         }
@@ -332,8 +324,8 @@ class McpClientServiceImplTest {
     @Test
     void testParseSseResponse_ToolExecutionError() throws Exception {
         String sseResponse
-            = "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"mcp_tool_error_code\\\":500,"
-            + "\\\"mcp_tool_error_msg\\\":\\\"Internal error\\\"}\"}]}}";
+                = "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"mcp_tool_error_code\\\":500,"
+                + "\\\"mcp_tool_error_msg\\\":\\\"Internal error\\\"}\"}]}}";
 
         Map<String, Object> mcpResponse = new HashMap<>();
         Map<String, Object> result = new HashMap<>();
@@ -352,19 +344,19 @@ class McpClientServiceImplTest {
         parsedContent.put("mcp_tool_error_msg", "Internal error");
 
         when(objectMapper.readValue(eq("{\"mcp_tool_error_code\":500,\"mcp_tool_error_msg\":\"Internal error\"}"),
-            eq(Map.class)))
-            .thenReturn(parsedContent);
+                eq(Map.class)))
+                .thenReturn(parsedContent);
 
         // 使用反射调用私有方法
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("parseSseResponse",
-            String.class);
+                String.class);
         method.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> response = (Map<String, Object>)method.invoke(mcpClientService, sseResponse);
+        Map<String, Object> response = (Map<String, Object>) method.invoke(mcpClientService, sseResponse);
 
         assertNotNull(response);
-        assertTrue((Boolean)response.get("isError"));
+        assertTrue((Boolean) response.get("isError"));
         assertEquals(500, response.get("errorCode"));
         assertEquals("Internal error", response.get("errorMessage"));
     }
@@ -377,19 +369,19 @@ class McpClientServiceImplTest {
         String invalidJson = "invalid json";
 
         when(objectMapper.readValue(eq(invalidJson), eq(Map.class)))
-            .thenThrow(new com.fasterxml.jackson.core.JsonParseException(null, "Invalid JSON"));
+                .thenThrow(new com.fasterxml.jackson.core.JsonParseException(null, "Invalid JSON"));
 
         // 使用反射调用私有方法
         java.lang.reflect.Method method = McpClientServiceImpl.class.getDeclaredMethod("parseSseResponse",
-            String.class);
+                String.class);
         method.setAccessible(true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> response = (Map<String, Object>)method.invoke(mcpClientService, invalidJson);
+        Map<String, Object> response = (Map<String, Object>) method.invoke(mcpClientService, invalidJson);
 
         assertNotNull(response);
-        assertTrue((Boolean)response.get("isError"));
-        assertTrue(((String)response.get("error")).contains("解析MCP响应失败"));
+        assertTrue((Boolean) response.get("isError"));
+        assertTrue(((String) response.get("error")).contains("解析MCP响应失败"));
     }
 
     /**
@@ -422,7 +414,7 @@ class McpClientServiceImplTest {
 
         Map<String, Object> result = mcpClientService.testToolWithSessionId(-1L, new HashMap<>(), "test-session");
 
-        assertTrue((Boolean)result.get("isError"));
+        assertTrue((Boolean) result.get("isError"));
     }
 
     /**
@@ -436,6 +428,6 @@ class McpClientServiceImplTest {
 
         Map<String, Object> result = mcpClientService.testToolWithSessionId(0L, new HashMap<>(), "test-session");
 
-        assertTrue((Boolean)result.get("isError"));
+        assertTrue((Boolean) result.get("isError"));
     }
 }

@@ -1,7 +1,5 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.util.regex.Pattern;
-
 import cn.com.wind.mcp.registry.entity.McpTool;
 import cn.com.wind.mcp.registry.entity.OriginToolHttp;
 import cn.com.wind.mcp.registry.mapper.McpToolMapper;
@@ -13,6 +11,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -71,7 +71,7 @@ public class ToolValidationServiceImpl implements ToolValidationService {
         // 检查唯一性 (toolName + toolVersion)
         QueryWrapper<McpTool> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("tool_name", tool.getToolName())
-            .eq("tool_version", tool.getToolVersion());
+                .eq("tool_version", tool.getToolVersion());
         if (tool.getId() != null) {
             queryWrapper.ne("id", tool.getId());
         }
@@ -131,8 +131,8 @@ public class ToolValidationServiceImpl implements ToolValidationService {
         // 检查唯一性 (name + method + url)
         QueryWrapper<OriginToolHttp> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", tool.getName())
-            .eq("method", tool.getMethod())
-            .eq("url", tool.getUrl());
+                .eq("method", tool.getMethod())
+                .eq("url", tool.getUrl());
         if (tool.getId() != null) {
             queryWrapper.ne("id", tool.getId());
         }

@@ -1,15 +1,5 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-
 import cn.com.wind.mcp.registry.config.McpClientConfig;
 import cn.com.wind.mcp.registry.dto.mcptool.McpToolDTO;
 import cn.com.wind.mcp.registry.service.McpClientService;
@@ -24,6 +14,16 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -80,10 +80,10 @@ public class McpClientServiceImpl implements McpClientService {
                 try {
                     List<McpToolDTO> allTools = mcpToolService.getAllMcpTools();
                     log.info("当前数据库中的所有工具: {}",
-                        allTools.stream()
-                            .map(t -> String.format("ID:%d, ToolNum:%d, Name:%s",
-                                t.getId(), t.getToolNum(), t.getToolName()))
-                            .collect(java.util.stream.Collectors.toList()));
+                            allTools.stream()
+                                    .map(t -> String.format("ID:%d, ToolNum:%d, Name:%s",
+                                            t.getId(), t.getToolNum(), t.getToolName()))
+                                    .collect(java.util.stream.Collectors.toList()));
                 } catch (Exception e) {
                     log.error("查询所有工具失败", e);
                 }
@@ -92,7 +92,7 @@ public class McpClientServiceImpl implements McpClientService {
             }
 
             log.info("找到工具: ID={}, ToolNum={}, Name={}",
-                tool.getId(), tool.getToolNum(), tool.getToolName());
+                    tool.getId(), tool.getToolNum(), tool.getToolName());
 
             // 构造MCP调用请求
             Map<String, Object> mcpRequest = new HashMap<>();
@@ -132,7 +132,7 @@ public class McpClientServiceImpl implements McpClientService {
             String mcpUrl = mcpProperties.getServer().getUrl();
 
             // 使用正确的Accept头检查连接
-            HttpURLConnection connection = (HttpURLConnection)new URL(mcpUrl).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(mcpUrl).openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json, text/event-stream");
             connection.setRequestProperty("Cache-Control", "no-cache");
@@ -168,7 +168,7 @@ public class McpClientServiceImpl implements McpClientService {
         try {
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
             if (requestAttributes != null) {
-                HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
+                HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
                 // 1. 优先从请求头获取 windsessionid
                 String sessionId = request.getHeader("windsessionid");
                 if (sessionId != null) {
@@ -243,7 +243,7 @@ public class McpClientServiceImpl implements McpClientService {
      */
     private String sendSseRequest(String url, Map<String, Object> requestData, String sessionId) {
         try {
-            HttpURLConnection connection = (HttpURLConnection)new URL(url).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json, text/event-stream");
@@ -291,7 +291,7 @@ public class McpClientServiceImpl implements McpClientService {
                 log.info("响应Content-Type: {}", contentType);
 
                 try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
 
                     String line;
                     if (contentType != null && contentType.contains("text/event-stream")) {
@@ -324,7 +324,7 @@ public class McpClientServiceImpl implements McpClientService {
             } else {
                 // 读取错误响应
                 try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                        new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
                     StringBuilder error = new StringBuilder();
                     String line;
                     while ((line = reader.readLine()) != null) {
@@ -351,14 +351,14 @@ public class McpClientServiceImpl implements McpClientService {
             log.info("解析MCP响应: {}", mcpResponse);
 
             if (mcpResponse.containsKey("result")) {
-                Map<String, Object> mcpResult = (Map<String, Object>)mcpResponse.get("result");
+                Map<String, Object> mcpResult = (Map<String, Object>) mcpResponse.get("result");
 
                 if (mcpResult.containsKey("content")) {
                     java.util.List<Map<String, Object>> content =
-                        (java.util.List<Map<String, Object>>)mcpResult.get("content");
+                            (java.util.List<Map<String, Object>>) mcpResult.get("content");
 
                     if (content != null && !content.isEmpty() && "text".equals(content.get(0).get("type"))) {
-                        String textContent = (String)content.get(0).get("text");
+                        String textContent = (String) content.get(0).get("text");
                         log.info("提取的文本内容: {}", textContent);
 
                         if (textContent != null && !textContent.trim().isEmpty()) {
@@ -374,13 +374,13 @@ public class McpClientServiceImpl implements McpClientService {
                                 if (parsedContent.containsKey("mcp_tool_error_code")) {
                                     Object errorCode = parsedContent.get("mcp_tool_error_code");
                                     if (errorCode != null && !errorCode.equals(0)) {
-                                        String errorMsg = (String)parsedContent.get("mcp_tool_error_msg");
+                                        String errorMsg = (String) parsedContent.get("mcp_tool_error_msg");
 
                                         // 错误情况：返回原始MCP格式
                                         result.put("content", content);
                                         result.put("isError", true);
                                         result.put("error",
-                                            "工具执行失败: " + errorMsg + " (错误代码: " + errorCode + ")");
+                                                "工具执行失败: " + errorMsg + " (错误代码: " + errorCode + ")");
                                         result.put("errorCode", errorCode);
                                         result.put("errorMessage", errorMsg);
                                         return result;
@@ -394,12 +394,12 @@ public class McpClientServiceImpl implements McpClientService {
 
                                 // 2. 解析后的业务数据（用于"测试结果"显示）
                                 if (parsedContent.containsKey("mcp_tool_data") && parsedContent.get("mcp_tool_data")
-                                    != null) {
+                                        != null) {
                                     Object toolData = parsedContent.get("mcp_tool_data");
 
                                     if (toolData instanceof String) {
                                         // 如果是字符串，尝试解析为JSON
-                                        String toolDataStr = (String)toolData;
+                                        String toolDataStr = (String) toolData;
 
                                         // 检查是否是简单的时间字符串（不是JSON）
                                         if (toolDataStr.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
@@ -413,7 +413,7 @@ public class McpClientServiceImpl implements McpClientService {
                                         if (!toolDataStr.trim().isEmpty()) {
                                             try {
                                                 Map<String, Object> actualData = objectMapper.readValue(toolDataStr,
-                                                    Map.class);
+                                                        Map.class);
                                                 // 将业务数据添加到结果中
                                                 result.put("businessData", actualData);
                                                 log.info("成功解析 tool_data: {}", actualData);
@@ -425,7 +425,7 @@ public class McpClientServiceImpl implements McpClientService {
                                     } else if (toolData instanceof Map) {
                                         // 如果已经是Map对象，直接使用
                                         @SuppressWarnings("unchecked")
-                                        Map<String, Object> actualData = (Map<String, Object>)toolData;
+                                        Map<String, Object> actualData = (Map<String, Object>) toolData;
                                         result.put("businessData", actualData);
                                         log.info("直接使用Map格式的tool_data: {}", actualData);
                                     }
@@ -458,7 +458,7 @@ public class McpClientServiceImpl implements McpClientService {
             }
 
             if (mcpResponse.containsKey("error")) {
-                Map<String, Object> error = (Map<String, Object>)mcpResponse.get("error");
+                Map<String, Object> error = (Map<String, Object>) mcpResponse.get("error");
 
                 // 错误情况返回MCP格式
                 Map<String, Object> result = new HashMap<>();
@@ -520,10 +520,10 @@ public class McpClientServiceImpl implements McpClientService {
                 try {
                     List<McpToolDTO> allTools = mcpToolService.getAllMcpTools();
                     log.info("当前数据库中的所有工具: {}",
-                        allTools.stream()
-                            .map(t -> String.format("ID:%d, ToolNum:%d, Name:%s",
-                                t.getId(), t.getToolNum(), t.getToolName()))
-                            .collect(java.util.stream.Collectors.toList()));
+                            allTools.stream()
+                                    .map(t -> String.format("ID:%d, ToolNum:%d, Name:%s",
+                                            t.getId(), t.getToolNum(), t.getToolName()))
+                                    .collect(java.util.stream.Collectors.toList()));
                 } catch (Exception e) {
                     log.error("查询所有工具失败", e);
                 }
@@ -532,7 +532,7 @@ public class McpClientServiceImpl implements McpClientService {
             }
 
             log.info("找到工具: ID={}, ToolNum={}, Name={}",
-                tool.getId(), tool.getToolNum(), tool.getToolName());
+                    tool.getId(), tool.getToolNum(), tool.getToolName());
 
             // 构造MCP调用请求
             Map<String, Object> mcpRequest = new HashMap<>();
@@ -548,7 +548,7 @@ public class McpClientServiceImpl implements McpClientService {
             // 使用SSE方式发送请求，传入 sessionId
             String mcpUrl = mcpProperties.getServer().getUrl();
             log.info("准备调用MCP服务器: {}, 工具: {}, 参数: {}, sessionId: {}",
-                mcpUrl, tool.getToolName(), arguments, sessionId);
+                    mcpUrl, tool.getToolName(), arguments, sessionId);
             String response = sendSseRequest(mcpUrl, mcpRequest, sessionId);
 
             if (response != null && !response.trim().isEmpty()) {

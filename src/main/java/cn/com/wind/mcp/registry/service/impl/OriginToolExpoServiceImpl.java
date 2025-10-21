@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OriginToolExpoServiceImpl extends ServiceImpl<OriginToolExpoMapper, OriginToolExpo>
-    implements OriginToolExpoService {
+        implements OriginToolExpoService {
 
     /**
      * 统计指定用户创建的接口数量

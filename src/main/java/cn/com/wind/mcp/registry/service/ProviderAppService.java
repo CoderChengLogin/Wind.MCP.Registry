@@ -1,9 +1,9 @@
 package cn.com.wind.mcp.registry.service;
 
-import java.util.List;
-
 import cn.com.wind.mcp.registry.entity.ProviderApp;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * 提供者应用服务节点服务接口

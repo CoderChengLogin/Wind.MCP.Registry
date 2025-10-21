@@ -18,7 +18,7 @@ public class PermissionUtil {
         if (session == null) {
             return null;
         }
-        return (Provider)session.getAttribute("currentProvider");
+        return (Provider) session.getAttribute("currentProvider");
     }
 
     /**

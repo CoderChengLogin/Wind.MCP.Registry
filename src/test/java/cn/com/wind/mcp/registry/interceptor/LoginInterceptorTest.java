@@ -1,8 +1,5 @@
 package cn.com.wind.mcp.registry.interceptor;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import cn.com.wind.mcp.registry.entity.Provider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,15 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * LoginInterceptor 单元测试
@@ -297,7 +290,7 @@ class LoginInterceptorTest {
     @Test
     void testPostHandle_NullModelAndView() throws Exception {
         assertDoesNotThrow(() ->
-            interceptor.postHandle(mockRequest, mockResponse, new Object(), null)
+                interceptor.postHandle(mockRequest, mockResponse, new Object(), null)
         );
     }
 
@@ -309,7 +302,7 @@ class LoginInterceptorTest {
         ModelAndView modelAndView = new ModelAndView();
 
         assertDoesNotThrow(() ->
-            interceptor.postHandle(mockRequest, mockResponse, new Object(), modelAndView)
+                interceptor.postHandle(mockRequest, mockResponse, new Object(), modelAndView)
         );
     }
 
@@ -348,7 +341,7 @@ class LoginInterceptorTest {
         modelAndView.clear();
 
         assertDoesNotThrow(() ->
-            interceptor.postHandle(mockRequest, mockResponse, new Object(), modelAndView)
+                interceptor.postHandle(mockRequest, mockResponse, new Object(), modelAndView)
         );
     }
 

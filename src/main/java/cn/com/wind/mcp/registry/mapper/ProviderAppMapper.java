@@ -1,11 +1,11 @@
 package cn.com.wind.mcp.registry.mapper;
 
-import java.util.List;
-
 import cn.com.wind.mcp.registry.entity.ProviderApp;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 提供者应用服务节点Mapper接口
@@ -35,7 +35,7 @@ public interface ProviderAppMapper extends BaseMapper<ProviderApp> {
      * @return 应用节点列表
      */
     List<ProviderApp> selectByProviderIdAndAppName(@Param("providerId") Long providerId,
-        @Param("appName") String appName);
+                                                   @Param("appName") String appName);
 
     /**
      * 查询已启用的应用节点

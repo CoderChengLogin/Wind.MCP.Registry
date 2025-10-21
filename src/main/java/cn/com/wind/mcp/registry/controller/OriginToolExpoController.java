@@ -1,9 +1,6 @@
 package cn.com.wind.mcp.registry.controller;
 // Force recompile
 
-import java.net.URLEncoder;
-import java.time.LocalDateTime;
-
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.OriginToolExpo;
 import cn.com.wind.mcp.registry.service.OriginProviderConfigService;
@@ -17,12 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URLEncoder;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -54,9 +49,9 @@ public class OriginToolExpoController {
      */
     @GetMapping
     public String list(Model model,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size,
-        HttpSession session) {
+                       @RequestParam(defaultValue = "1") int page,
+                       @RequestParam(defaultValue = "10") int size,
+                       HttpSession session) {
         log.info("查询原始Expo接口列表: page={}, size={}", page, size);
 
         Page<OriginToolExpo> toolPage = new Page<OriginToolExpo>(page, size);
@@ -278,9 +273,9 @@ public class OriginToolExpoController {
      */
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size,
-        HttpSession session) {
+                         @RequestParam(defaultValue = "1") int page,
+                         @RequestParam(defaultValue = "10") int size,
+                         HttpSession session) {
         log.info("搜索原始Expo接口: keyword={}", keyword);
 
         // 获取当前登录用户ID
@@ -290,11 +285,11 @@ public class OriginToolExpoController {
         if (currentProviderId != null) {
             // 只搜索当前用户的工具
             queryWrapper.eq("provider_id", currentProviderId)
-                .and(wrapper -> wrapper
-                    .like("name_display", keyword)
-                    .or()
-                    .like("desc_display", keyword)
-                );
+                    .and(wrapper -> wrapper
+                            .like("name_display", keyword)
+                            .or()
+                            .like("desc_display", keyword)
+                    );
         } else {
             // 用户未登录，返回空结果
             queryWrapper.eq("1", "0");

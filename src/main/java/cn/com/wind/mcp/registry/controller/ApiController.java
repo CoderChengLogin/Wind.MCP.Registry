@@ -1,8 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.entity.McpTool;
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.McpToolService;
@@ -12,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * API控制器
@@ -35,7 +35,7 @@ public class ApiController {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+            Provider currentProvider = (Provider) session.getAttribute("currentProvider");
             if (currentProvider == null) {
                 result.put("success", false);
                 result.put("message", "用户未登录");
@@ -44,8 +44,8 @@ public class ApiController {
 
             // 查询用户的MCP工具数量
             long mcpToolCount = mcpToolService.count(
-                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<McpTool>()
-                    .eq("provider_id", currentProvider.getId()));
+                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<McpTool>()
+                            .eq("provider_id", currentProvider.getId()));
 
             // 查询用户的HTTP接口数量 - 需要导入OriginToolHttpService
             long httpToolCount = 0; // 暂时保持为0，后续实现

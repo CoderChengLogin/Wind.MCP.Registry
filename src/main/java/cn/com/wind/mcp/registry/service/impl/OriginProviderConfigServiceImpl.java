@@ -1,8 +1,5 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import cn.com.wind.mcp.registry.entity.OriginProviderConfig;
 import cn.com.wind.mcp.registry.entity.OriginToolExpo;
 import cn.com.wind.mcp.registry.entity.OriginToolHttp;
@@ -19,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * 提供商应用配置服务实现类
  * <p>
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 public class OriginProviderConfigServiceImpl extends ServiceImpl<OriginProviderConfigMapper, OriginProviderConfig>
-    implements OriginProviderConfigService {
+        implements OriginProviderConfigService {
 
     @Autowired
     private OriginToolHttpMapper originToolHttpMapper;
@@ -288,10 +288,10 @@ public class OriginProviderConfigServiceImpl extends ServiceImpl<OriginProviderC
 
         List<OriginProviderConfig> configs = list(wrapper);
         List<String> loadNames = configs.stream()
-            .map(OriginProviderConfig::getAppName)
-            .distinct()
-            .sorted()
-            .collect(java.util.stream.Collectors.toList());
+                .map(OriginProviderConfig::getAppName)
+                .distinct()
+                .sorted()
+                .collect(java.util.stream.Collectors.toList());
 
         log.info("找到 {} 个负载均衡器", loadNames.size());
         return loadNames;
@@ -336,9 +336,9 @@ public class OriginProviderConfigServiceImpl extends ServiceImpl<OriginProviderC
 
         // 使用Stream API按site_type分组
         java.util.Map<String, List<OriginProviderConfig>> groupedNodes = nodes.stream()
-            .collect(java.util.stream.Collectors.groupingBy(
-                node -> node.getSiteType() != null ? node.getSiteType() : "未分类"
-            ));
+                .collect(java.util.stream.Collectors.groupingBy(
+                        node -> node.getSiteType() != null ? node.getSiteType() : "未分类"
+                ));
 
         log.info("负载 {} 共有 {} 个站点类型", loadName, groupedNodes.size());
         return groupedNodes;

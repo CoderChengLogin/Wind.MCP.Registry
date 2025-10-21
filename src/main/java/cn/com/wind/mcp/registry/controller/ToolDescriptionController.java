@@ -1,9 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
 import cn.com.wind.mcp.registry.dto.common.Result;
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.McpClientService;
@@ -15,11 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -31,9 +27,9 @@ public class ToolDescriptionController {
 
     @PostMapping("/tools/{id}/test")
     public Result<Map<String, Object>> testTool(
-        @PathVariable Long id,
-        @RequestBody Map<String, Object> requestBody,
-        HttpServletRequest request) {
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> requestBody,
+            HttpServletRequest request) {
 
         try {
             log.info("测试工具请求体: {}", requestBody);
@@ -56,7 +52,7 @@ public class ToolDescriptionController {
 
             // 1. 从请求体获取
             if (requestBody.containsKey("sessionId")) {
-                sessionId = (String)requestBody.remove("sessionId");
+                sessionId = (String) requestBody.remove("sessionId");
             }
 
             // 2. 从请求头获取
@@ -101,15 +97,15 @@ public class ToolDescriptionController {
      */
     @PostMapping("/tools/{id}/test/save")
     public Result<String> saveTestRecord(
-        @PathVariable Long id,
-        @RequestBody Map<String, Object> requestBody,
-        HttpSession session) {
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> requestBody,
+            HttpSession session) {
 
         try {
             log.info("保存测试成功记录: toolId={}, requestBody={}", id, requestBody);
 
             // 获取当前登录用户
-            Provider currentProvider = (Provider)session.getAttribute("currentProvider");
+            Provider currentProvider = (Provider) session.getAttribute("currentProvider");
             if (currentProvider == null) {
                 return Result.fail("用户未登录");
             }
@@ -120,11 +116,11 @@ public class ToolDescriptionController {
 
             // 保存测试记录
             boolean success = mcpTestSuccessRecordService.saveTestRecord(
-                id,
-                testParameters,
-                testResult,
-                currentProvider.getId(),
-                currentProvider.getUsername()
+                    id,
+                    testParameters,
+                    testResult,
+                    currentProvider.getId(),
+                    currentProvider.getUsername()
             );
 
             if (success) {

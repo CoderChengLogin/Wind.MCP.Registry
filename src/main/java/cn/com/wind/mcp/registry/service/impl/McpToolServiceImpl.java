@@ -1,8 +1,5 @@
 package cn.com.wind.mcp.registry.service.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import cn.com.wind.mcp.registry.dto.mcptool.McpToolDTO;
 import cn.com.wind.mcp.registry.entity.McpTool;
 import cn.com.wind.mcp.registry.mapper.McpToolMapper;
@@ -15,6 +12,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -37,10 +37,10 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
 
         if (StringUtils.hasText(keyword)) {
             queryWrapper.like("tool_name", keyword)
-                .or()
-                .like("tool_description", keyword)
-                .or()
-                .like("name_display", keyword);
+                    .or()
+                    .like("tool_description", keyword)
+                    .or()
+                    .like("name_display", keyword);
         }
 
         return list(queryWrapper);
@@ -119,9 +119,9 @@ public class McpToolServiceImpl extends ServiceImpl<McpToolMapper, McpTool> impl
     @Override
     public List<McpToolDTO> getMcpToolsByNumValid(Long toolNum, String valid) {
         List<McpTool> entities = mcpToolMapper.selectList(
-            new QueryWrapper<McpTool>()
-                .eq("tool_num", toolNum)
-                .eq("valid", valid)
+                new QueryWrapper<McpTool>()
+                        .eq("tool_num", toolNum)
+                        .eq("valid", valid)
         );
         return entities.stream().map(this::convertToDTO).collect(Collectors.toList());
     }

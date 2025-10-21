@@ -16,5 +16,5 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class HttpTemplateConverterServiceImpl extends ServiceImpl<HttpTemplateConverterMapper, HttpTemplateConverter>
-    implements HttpTemplateConverterService {
+        implements HttpTemplateConverterService {
 }

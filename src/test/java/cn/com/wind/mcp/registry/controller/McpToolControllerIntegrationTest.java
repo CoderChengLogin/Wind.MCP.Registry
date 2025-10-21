@@ -1,7 +1,5 @@
 package cn.com.wind.mcp.registry.controller;
 
-import java.time.LocalDateTime;
-
 import cn.com.wind.mcp.registry.entity.McpTool;
 import cn.com.wind.mcp.registry.entity.Provider;
 import cn.com.wind.mcp.registry.service.McpToolService;
@@ -18,16 +16,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * McpToolController集成测试 - 验证convert_type显示问题
- *
+ * <p>
  * 测试说明:
  * 验证convert_type='3'(manual/code)是否正确显示为"手动转换模板"
  *
@@ -125,11 +123,11 @@ public class McpToolControllerIntegrationTest {
     @DisplayName("RED: 详情页应显示HTTP转换模板")
     void testDetailPage_HttpTool_ShouldShowHttpBadge() throws Exception {
         mockMvc.perform(get("/mcp-tools/" + httpTool.getId())
-                .session(session))
-            .andExpect(status().isOk())
-            .andExpect(view().name("mcp-tools/detail"))
-            .andExpect(content().string(containsString("HTTP转换模板")))
-            .andExpect(content().string(not(containsString("未知"))));
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("mcp-tools/detail"))
+                .andExpect(content().string(containsString("HTTP转换模板")))
+                .andExpect(content().string(not(containsString("未知"))));
     }
 
     /**
@@ -139,11 +137,11 @@ public class McpToolControllerIntegrationTest {
     @DisplayName("RED: 详情页应显示Expo转换模板")
     void testDetailPage_ExpoTool_ShouldShowExpoBadge() throws Exception {
         mockMvc.perform(get("/mcp-tools/" + expoTool.getId())
-                .session(session))
-            .andExpect(status().isOk())
-            .andExpect(view().name("mcp-tools/detail"))
-            .andExpect(content().string(containsString("Expo转换模板")))
-            .andExpect(content().string(not(containsString("未知"))));
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("mcp-tools/detail"))
+                .andExpect(content().string(containsString("Expo转换模板")))
+                .andExpect(content().string(not(containsString("未知"))));
     }
 
     /**
@@ -153,10 +151,10 @@ public class McpToolControllerIntegrationTest {
     @DisplayName("详情页应显示手动转换模板")
     void testDetailPage_CodeTool_ShouldShowManualBadge() throws Exception {
         MvcResult result = mockMvc.perform(get("/mcp-tools/" + codeTool.getId())
-                .session(session))
-            .andExpect(status().isOk())
-            .andExpect(view().name("mcp-tools/detail"))
-            .andReturn();
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("mcp-tools/detail"))
+                .andReturn();
 
         String content = result.getResponse().getContentAsString();
 
@@ -174,9 +172,9 @@ public class McpToolControllerIntegrationTest {
 
         // 断言应该通过: 显示"手动转换模板"
         mockMvc.perform(get("/mcp-tools/" + codeTool.getId())
-                .session(session))
-            .andExpect(content().string(containsString("手动转换模板")))
-            .andExpect(content().string(not(containsString("未知"))));
+                        .session(session))
+                .andExpect(content().string(containsString("手动转换模板")))
+                .andExpect(content().string(not(containsString("未知"))));
     }
 
     /**
@@ -186,10 +184,10 @@ public class McpToolControllerIntegrationTest {
     @DisplayName("列表页应显示手动转换模板徽章")
     void testListPage_CodeTool_ShouldShowManualBadge() throws Exception {
         MvcResult result = mockMvc.perform(get("/mcp-tools")
-                .session(session))
-            .andExpect(status().isOk())
-            .andExpect(view().name("mcp-tools/list"))
-            .andReturn();
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("mcp-tools/list"))
+                .andReturn();
 
         String content = result.getResponse().getContentAsString();
 
@@ -200,15 +198,15 @@ public class McpToolControllerIntegrationTest {
         if (content.contains(codeTool.getToolName())) {
             int startIdx = content.indexOf(codeTool.getToolName());
             String snippet = content.substring(Math.max(0, startIdx - 200),
-                Math.min(startIdx + 500, content.length()));
+                    Math.min(startIdx + 500, content.length()));
             System.out.println("Card Snippet: " + snippet);
         }
 
         // 断言应该通过: 显示"手动转换模板"
         mockMvc.perform(get("/mcp-tools")
-                .session(session))
-            .andExpect(content().string(containsString("手动转换模板")))
-            .andExpect(content().string(not(containsString("未知模板"))));
+                        .session(session))
+                .andExpect(content().string(containsString("手动转换模板")))
+                .andExpect(content().string(not(containsString("未知模板"))));
     }
 
     /**
