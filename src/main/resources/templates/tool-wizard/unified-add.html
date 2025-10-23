@@ -90,7 +90,7 @@
                             <div class="row">
                                 <!-- 完整流程 - Expo -->
                                 <div class="col-md-3">
-                                    <div class="card tool-type-card" data-converter="expo" data-type="expo"
+                                    <div class="card tool-type-card" data-converter="2" data-type="expo"
                                          style="cursor: pointer; transition: all 0.3s ease;">
                                         <div class="card-body text-center">
                                             <i class="fas fa-server fa-3x text-primary mb-3"></i>
@@ -102,7 +102,7 @@
                                 </div>
                                 <!-- 完整流程 - HTTP -->
                                 <div class="col-md-3">
-                                    <div class="card tool-type-card" data-converter="http" data-type="http"
+                                    <div class="card tool-type-card" data-converter="1" data-type="http"
                                          style="cursor: pointer; transition: all 0.3s ease;">
                                         <div class="card-body text-center">
                                             <i class="fas fa-globe fa-3x text-success mb-3"></i>
@@ -114,7 +114,7 @@
                                 </div>
                                 <!-- 简化流程 - HTTP -->
                                 <div class="col-md-3">
-                                    <div class="card tool-type-card" data-converter="http" data-type="skip-http"
+                                    <div class="card tool-type-card" data-converter="1" data-type="skip-http"
                                          style="cursor: pointer; transition: all 0.3s ease;">
                                         <div class="card-body text-center">
                                             <i class="fas fa-forward fa-3x text-warning mb-3"></i>
@@ -126,7 +126,7 @@
                                 </div>
                                 <!-- 简化流程 - Expo -->
                                 <div class="col-md-3">
-                                    <div class="card tool-type-card" data-converter="expo" data-type="skip-expo"
+                                    <div class="card tool-type-card" data-converter="2" data-type="skip-expo"
                                          style="cursor: pointer; transition: all 0.3s ease;">
                                         <div class="card-body text-center">
                                             <i class="fas fa-forward fa-3x text-primary mb-3"></i>
@@ -276,7 +276,7 @@
                                 <label class="form-label required">工具名称 <span class="text-danger">*</span></label>
                                 <input class="form-control" disabled id="expoToolName" name="expoToolName"
                                        placeholder="请输入Expo工具名称"
-                                       required type="text">
+                                       type="text">
                                 <div class="form-text">工具的标识名称，用于系统识别</div>
                             </div>
                         </div>
@@ -284,7 +284,7 @@
                             <div class="mb-3">
                                 <label class="form-label required">工具版本 <span class="text-danger">*</span></label>
                                 <input class="form-control" disabled id="expoToolVersion" name="expoToolVersion"
-                                       placeholder="1.0.0" required type="text">
+                                       placeholder="1.0.0" type="text">
                                 <div class="form-text">工具的版本号</div>
                             </div>
                         </div>
@@ -315,7 +315,7 @@
                         <label class="form-label required">工具描述 <span class="text-danger">*</span></label>
                         <textarea class="form-control" disabled id="expoDescription" name="expoDescription"
                                   placeholder="请描述这个Expo工具的功能和用途"
-                                  required rows="4"></textarea>
+                                  rows="4"></textarea>
                         <div class="form-text">详细说明工具的功能和使用场景</div>
                     </div>
                 </div>
@@ -450,9 +450,9 @@
                             <label class="form-label required">转换模板类型 <span class="text-danger">*</span></label>
                             <select class="form-select" id="convertType" name="convertType" required>
                                 <option value="">请选择转换模板类型</option>
-                                <option value="http">HTTP转换模板</option>
-                                <option value="expo">Expo转换模板</option>
-                                <option value="manual">手动转换模板</option>
+                                <option value="1">HTTP转换模板</option>
+                                <option value="2">Expo转换模板</option>
+                                <option value="3">手动转换模板</option>
                             </select>
                             <div class="form-text">选择工具的转换模板类型</div>
                         </div>
@@ -638,6 +638,8 @@
 <script src="/vendor/bootstrap/bootstrap-5.1.3.bundle.min.js"></script>
 <!-- 自定义JS -->
 <script th:src="@{/js/app.js}"></script>
+<!-- 导入工具管理器 -->
+<script src="/js/import-util.js"></script>
 
 <!-- 页面专用样式 -->
 <style>
@@ -713,6 +715,27 @@
 <!-- 页面专用JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // 检查是否为导入模式
+        const urlParams = new URLSearchParams(window.location.search);
+        const isImportMode = urlParams.get('mode') === 'import';
+
+        if (isImportMode) {
+            // 从sessionStorage获取导入数据
+            const importData = ImportToolManager.getImportData();
+
+            if (importData && importData.mcpTool) {
+                // 显示导入通知
+                ImportToolManager.showNotification('已从导入文件加载数据，请检查并修改后保存', 'info');
+
+                // 预填充表单数据
+                setTimeout(() => {
+                    prefillFormFromImport(importData);
+                }, 500);
+            } else {
+                ImportToolManager.showNotification('未找到导入数据，请重新导入', 'error');
+            }
+        }
+
         // 必填字段配置
         const requiredFields = {
             section1: [], // 第一步只需要选择工具类型，通过点击事件验证
@@ -769,7 +792,7 @@
 
         /**
          * 显示对应类型的模板转换器表单
-         * @param {string} converterType - 转换器类型 ('http' 或 'expo')
+         * @param {string} converterType - 转换器类型 ('1'=HTTP 或 '2'=Expo)
          */
         function showConverterForm(converterType) {
             selectedConverterType = converterType;
@@ -779,11 +802,11 @@
             document.getElementById('expo-converter-form').style.display = 'none';
 
             // 显示对应的转换器表单
-            if (converterType === 'http') {
+            if (converterType === '1') {
                 document.getElementById('http-converter-form').style.display = 'block';
                 // 设置HTTP转换器的必填字段
                 requiredFields.section4 = ['templateReqUrl', 'templateReqMethod', 'templateReqHeaders', 'reqBody', 'respBody'];
-            } else if (converterType === 'expo') {
+            } else if (converterType === '2') {
                 document.getElementById('expo-converter-form').style.display = 'block';
                 // 设置Expo转换器的必填字段
                 requiredFields.section4 = ['templateAppClass', 'templateCommandId', 'templateInputArgs', 'templateOutputArgs'];
@@ -818,7 +841,7 @@
 
                 if (isSkipMode) {
                     // 简化流程：直接跳到步骤3
-                    const converterName = converterType === 'http' ? 'HTTP' : 'Expo';
+                    const converterName = converterType === '1' ? 'HTTP' : 'Expo';
                     modeMessage.textContent = `您选择了简化流程(${converterName})，将直接进入步骤3(MCP工具录入)。`;
                     requiredFields.section2 = []; // 第二步不需要必填字段
 
@@ -826,6 +849,10 @@
                     document.getElementById('section2').style.display = 'none';
                     document.getElementById('step-2').style.display = 'none';
                     document.querySelectorAll('.fa-arrow-right')[0].style.display = 'none';
+
+                    // 移除步骤2所有字段的required属性,防止HTML5表单验证失败
+                    const section2Inputs = document.querySelectorAll('#section2 input[required], #section2 textarea[required], #section2 select[required]');
+                    section2Inputs.forEach(input => input.removeAttribute('required'));
 
                     // 显示对应类型的第4步模板转换器表单
                     showConverterForm(converterType);
@@ -916,7 +943,7 @@
                 const nextSectionElement = document.getElementById(`section${nextSection}`);
                 const nextLockElement = document.getElementById(`section${nextSection}-lock`);
                 const nextContentElement = nextSectionElement.querySelector('.section-content-locked');
-                const nextIndicator = document.getElementById(`step${nextSection}-indicator`);
+                const nextIndicator = document.getElementById(`step-${nextSection}`);
 
                 // 移除锁定状态
                 nextSectionElement.classList.remove('section-locked');
@@ -1155,6 +1182,192 @@
                     }
                 }
             });
+        }
+
+        /**
+         * 从导入数据预填充表单
+         * @param {Object} importData - 导入的JSON数据
+         */
+        function prefillFormFromImport(importData) {
+            console.log('[导入预填充] 开始预填充表单', importData);
+
+            const mcpTool = importData.mcpTool;
+            if (!mcpTool) return;
+
+            // 1. 根据convertType和是否有原始工具数据确定流程
+            const convertType = mcpTool.convertType || '1';
+            const isHttp = convertType === '1' || convertType.toLowerCase() === 'http';
+            const isExpo = convertType === '2' || convertType.toLowerCase() === 'expo';
+
+            // 检查是否有原始工具数据(判断使用完整流程还是简化流程)
+            const hasOriginToolHttp = importData.originToolHttp && Object.keys(importData.originToolHttp).length > 0;
+            const hasOriginToolExpo = importData.originToolExpo && Object.keys(importData.originToolExpo).length > 0;
+
+            // 2. 自动选择工具类型卡片
+            let targetCard;
+            if (isHttp) {
+                // 如果有HTTP原始工具数据,选择完整流程;否则选择简化流程
+                if (hasOriginToolHttp) {
+                    targetCard = document.querySelector('.tool-type-card[data-type="http"]');
+                } else {
+                    targetCard = document.querySelector('.tool-type-card[data-type="skip-http"]');
+                }
+            } else if (isExpo) {
+                // 如果有Expo原始工具数据,选择完整流程;否则选择简化流程
+                if (hasOriginToolExpo) {
+                    targetCard = document.querySelector('.tool-type-card[data-type="expo"]');
+                } else {
+                    targetCard = document.querySelector('.tool-type-card[data-type="skip-expo"]');
+                }
+            }
+
+            if (targetCard) {
+                targetCard.click(); // 触发点击事件，自动选择对应的流程
+            }
+
+            // 2.5. 如果是完整流程且有原始工具数据,填充步骤2(原始工具信息)
+            if (hasOriginToolHttp && isHttp) {
+                setTimeout(() => {
+                    const originTool = importData.originToolHttp;
+                    if (originTool.nameDisplay) document.getElementById('nameDisplay').value = originTool.nameDisplay;
+                    if (originTool.descDisplay) document.getElementById('descDisplay').value = originTool.descDisplay;
+                    if (originTool.reqUrl) document.getElementById('reqUrl').value = originTool.reqUrl;
+                    if (originTool.reqMethod) document.getElementById('reqMethod').value = originTool.reqMethod;
+                    if (originTool.reqHeaders) document.getElementById('reqHeaders').value = originTool.reqHeaders;
+                    if (originTool.inputSchema) document.getElementById('inputSchema').value = originTool.inputSchema;
+                    if (originTool.outputSchema) document.getElementById('outputSchema').value = originTool.outputSchema;
+                    if (originTool.providerAppNum) document.getElementById('providerAppNum').value = originTool.providerAppNum;
+
+                    // 触发input事件,让表单验证生效
+                    console.log('[导入预填充] 触发步骤2的input事件以激活验证');
+                    document.querySelectorAll('#section2 input, #section2 textarea, #section2 select').forEach(field => {
+                        field.dispatchEvent(new Event('input', {bubbles: true}));
+                    });
+
+                    console.log('[导入预填充] 完整流程 - 步骤2(原始HTTP工具)数据已填充');
+
+                    // 手动检查并解锁步骤3(因为完整流程需要步骤2完成)
+                    setTimeout(() => {
+                        if (checkSectionCompletion('section2')) {
+                            console.log('[导入预填充] 步骤2验证通过,解锁步骤3');
+                            unlockNextSection(2);
+                        }
+                    }, 200);
+                }, 1000);
+            } else if (hasOriginToolExpo && isExpo) {
+                setTimeout(() => {
+                    const originTool = importData.originToolExpo;
+                    if (originTool.providerToolName) document.getElementById('expoToolName').value = originTool.providerToolName;
+                    if (originTool.nameDisplay) document.getElementById('expoToolName').value = originTool.nameDisplay;
+                    if (originTool.expoToolVersion) document.getElementById('expoToolVersion').value = originTool.expoToolVersion || '1.0.0';
+                    if (originTool.appClass) document.getElementById('expoAppClass').value = originTool.appClass;
+                    if (originTool.commandId) document.getElementById('expoCommandId').value = originTool.commandId;
+                    if (originTool.descDisplay) document.getElementById('expoDescription').value = originTool.descDisplay;
+
+                    // 触发input事件,让表单验证生效
+                    console.log('[导入预填充] 触发步骤2的input事件以激活验证');
+                    document.querySelectorAll('#section2 input, #section2 textarea, #section2 select').forEach(field => {
+                        field.dispatchEvent(new Event('input', {bubbles: true}));
+                    });
+
+                    console.log('[导入预填充] 完整流程 - 步骤2(原始Expo工具)数据已填充');
+
+                    // 手动检查并解锁步骤3
+                    setTimeout(() => {
+                        if (checkSectionCompletion('section2')) {
+                            console.log('[导入预填充] 步骤2验证通过,解锁步骤3');
+                            unlockNextSection(2);
+                        }
+                    }, 200);
+                }, 1000);
+            }
+
+            // 3. 等待表单解锁后填充第3步(MCP工具信息)
+            // 简化流程: 1000ms后填充; 完整流程: 1500ms后填充(等待步骤2解锁步骤3)
+            const step3Delay = (hasOriginToolHttp || hasOriginToolExpo) ? 1500 : 1000;
+            setTimeout(() => {
+                // 填充MCP工具基本信息
+                if (mcpTool.toolName) document.getElementById('toolName').value = mcpTool.toolName;
+                if (mcpTool.toolDescription) document.getElementById('toolDescription').value = mcpTool.toolDescription;
+
+                // 解析多语言字段
+                try {
+                    if (mcpTool.nameDisplay) {
+                        const nameDisplay = JSON.parse(mcpTool.nameDisplay);
+                        document.getElementById('mcpNameDisplayEn').value = nameDisplay.en || '';
+                        document.getElementById('mcpNameDisplayZh').value = nameDisplay.zh || '';
+                    }
+                    if (mcpTool.descriptionDisplay) {
+                        const descDisplay = JSON.parse(mcpTool.descriptionDisplay);
+                        document.getElementById('descriptionDisplayEn').value = descDisplay.en || '';
+                        document.getElementById('descriptionDisplayZh').value = descDisplay.zh || '';
+                    }
+                } catch (e) {
+                    console.warn('[导入预填充] 解析多语言字段失败', e);
+                }
+
+                // 填充JSON Schema
+                if (mcpTool.inputSchema) document.getElementById('mcpInputSchema').value = mcpTool.inputSchema;
+                if (mcpTool.outputSchema) document.getElementById('mcpOutputSchema').value = mcpTool.outputSchema;
+
+                // 填充其他字段
+                if (mcpTool.streamOutput) document.getElementById('streamOutput').value = mcpTool.streamOutput;
+                if (mcpTool.convertType) {
+                    const convertTypeField = document.getElementById('convertType');
+                    // 直接使用数字值 ('1'=HTTP, '2'=Expo, '3'=Manual)
+                    convertTypeField.value = mcpTool.convertType;
+                    // 触发change事件,让表单验证生效
+                    convertTypeField.dispatchEvent(new Event('change', {bubbles: true}));
+                    convertTypeField.dispatchEvent(new Event('input', {bubbles: true}));
+                }
+                if (mcpTool.toolType) document.getElementById('toolType').value = mcpTool.toolType;
+
+                // 触发input事件，让表单验证生效
+                console.log('[导入预填充] 触发步骤3的input事件以激活验证');
+                document.querySelectorAll('#section3 input, #section3 textarea, #section3 select').forEach(field => {
+                    field.dispatchEvent(new Event('input', {bubbles: true}));
+                });
+
+                // 手动检查并解锁步骤4
+                setTimeout(() => {
+                    if (checkSectionCompletion('section3')) {
+                        console.log('[导入预填充] 步骤3验证通过,解锁步骤4');
+                        unlockNextSection(3);
+                    }
+                }, 200);
+            }, step3Delay);
+
+            // 4. 等待第4步解锁后填充转换器信息
+            // 简化流程: 2000ms后填充; 完整流程: 2200ms后填充
+            const step4Delay = (hasOriginToolHttp || hasOriginToolExpo) ? 2200 : 2000;
+            setTimeout(() => {
+                if (isHttp && importData.httpTemplateConverter) {
+                    const converter = importData.httpTemplateConverter;
+                    if (converter.reqUrl) document.getElementById('templateReqUrl').value = converter.reqUrl;
+                    if (converter.reqMethod) document.getElementById('templateReqMethod').value = converter.reqMethod;
+                    if (converter.reqHeaders) document.getElementById('templateReqHeaders').value = converter.reqHeaders;
+                    if (converter.reqBody) document.getElementById('reqBody').value = converter.reqBody;
+                    if (converter.respBody) document.getElementById('respBody').value = converter.respBody;
+                } else if (isExpo && importData.expoTemplateConverter) {
+                    const converter = importData.expoTemplateConverter;
+                    if (converter.appClass) document.getElementById('templateAppClass').value = converter.appClass;
+                    if (converter.commandId) document.getElementById('templateCommandId').value = converter.commandId;
+                    if (converter.inputArgs) document.getElementById('templateInputArgs').value = converter.inputArgs;
+                    if (converter.outputArgs) document.getElementById('templateOutputArgs').value = converter.outputArgs;
+                }
+
+                // 触发input事件
+                console.log('[导入预填充] 触发步骤4的input事件以激活验证');
+                document.querySelectorAll('#section4 input, #section4 textarea, #section4 select').forEach(field => {
+                    field.dispatchEvent(new Event('input', {bubbles: true}));
+                });
+
+                // 最终检查保存按钮状态
+                setTimeout(() => {
+                    checkSaveButton();
+                    console.log('[导入预填充] 预填充完成,保存按钮状态已更新');
+                }, 200);
+            }, step4Delay);
         }
 
         // 表单提交处理

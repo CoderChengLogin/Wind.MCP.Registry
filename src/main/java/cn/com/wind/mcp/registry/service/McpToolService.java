@@ -1,5 +1,7 @@
 package cn.com.wind.mcp.registry.service;
 
+import cn.com.wind.mcp.registry.dto.McpToolExportDto;
+import cn.com.wind.mcp.registry.dto.McpToolImportValidationResult;
 import cn.com.wind.mcp.registry.dto.mcptool.McpToolDTO;
 import cn.com.wind.mcp.registry.entity.McpTool;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -79,5 +81,24 @@ public interface McpToolService extends IService<McpTool> {
      * @return MCP工具DTO列表
      */
     List<McpToolDTO> getAllMcpTools();
+
+    /**
+     * 验证导入的工具数据
+     *
+     * @param exportDto         导入的数据
+     * @param currentProviderId 当前登录用户的提供者ID
+     * @return 校验结果
+     */
+    McpToolImportValidationResult validateImportData(McpToolExportDto exportDto, Long currentProviderId);
+
+    /**
+     * 导入工具数据
+     *
+     * @param exportDto         导入的数据
+     * @param currentProviderId 当前登录用户的提供者ID
+     * @param username          当前登录用户的用户名
+     * @return 导入后的MCP工具
+     */
+    McpTool importTool(McpToolExportDto exportDto, Long currentProviderId, String username);
 
 }

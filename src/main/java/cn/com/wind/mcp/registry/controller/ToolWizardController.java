@@ -155,7 +155,7 @@ public class ToolWizardController {
             String converterType = determineConverterType(dto);
             log.info("确定的模板转换器类型: {}", converterType);
 
-            if ("http".equals(converterType)) {
+            if ("1".equals(converterType)) {
                 // 保存HTTP模板转换器
                 if (dto.getTemplateReqUrl() == null || dto.getTemplateReqUrl().trim().isEmpty()) {
                     log.error("HTTP模板转换器URL不能为空");
@@ -179,7 +179,7 @@ public class ToolWizardController {
                 httpTemplateConverterService.save(converter);
                 log.info("保存HTTP模板转换器成功: {}", converter.getId());
 
-            } else if ("expo".equals(converterType)) {
+            } else if ("2".equals(converterType)) {
                 // 保存Expo模板转换器
                 if (dto.getTemplateAppClass() == null) {
                     log.error("Expo模板转换器AppClass不能为空");
@@ -226,7 +226,7 @@ public class ToolWizardController {
      * 2. 如果未选择原始工具类型(简化流程),则根据MCP工具的convertType字段确定
      *
      * @param dto 统一工具录入DTO
-     * @return 模板转换器类型: "http" 或 "expo"
+     * @return 模板转换器类型: "1"(HTTP) 或 "2"(Expo) 或 "3"(Manual)
      */
     private String determineConverterType(UnifiedToolAddDto dto) {
         // 场景1: 完整流程 - 选择了原始工具类型
@@ -234,11 +234,19 @@ public class ToolWizardController {
                 !dto.getSelectedToolType().trim().isEmpty() &&
                 !"skip".equals(dto.getSelectedToolType())) {
             log.info("完整流程: 使用原始工具类型 {}", dto.getSelectedToolType());
-            return dto.getSelectedToolType();
+            // 将工具类型名称映射为数字值: http→1, expo→2
+            String selectedType = dto.getSelectedToolType();
+            if ("http".equals(selectedType)) {
+                return "1";
+            } else if ("expo".equals(selectedType)) {
+                return "2";
+            }
+            // 如果已经是数字值,直接返回
+            return selectedType;
         }
 
         // 场景2: 简化流程 - 根据MCP工具的convertType确定
-        // convertType可能的值: "http", "expo" 等
+        // convertType可能的值: "1"(HTTP), "2"(Expo), "3"(Manual)
         if (dto.getConvertType() != null && !dto.getConvertType().trim().isEmpty()) {
             log.info("简化流程: 使用MCP工具的convertType {}", dto.getConvertType());
             return dto.getConvertType();
@@ -246,6 +254,6 @@ public class ToolWizardController {
 
         // 默认使用HTTP
         log.warn("无法确定模板转换器类型,默认使用HTTP");
-        return "http";
+        return "1";
     }
 }

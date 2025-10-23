@@ -469,6 +469,12 @@
                         <button class="btn btn-info" th:onclick="|exportTool(${tool.id})|" type="button">
                             <i class="fas fa-download me-1"></i>导出工具
                         </button>
+                        <button class="btn btn-warning"
+                                th:if="${session.currentProvider != null and session.currentProvider.username == 'pczhou'}"
+                                th:onclick="|publishTool(${tool.id})|"
+                                type="button">
+                            <i class="fas fa-cloud-upload-alt me-1"></i>发布工具
+                        </button>
                         <a class="btn btn-outline-secondary" th:href="@{/mcp-tools}">
                             <i class="fas fa-list me-1"></i>返回列表
                         </a>
@@ -890,6 +896,207 @@
                 console.error('[导出工具] 失败:', error);
                 alert('导出失败: ' + error.message);
             });
+    }
+
+    /**
+     * 发布工具到目标数据库 (wind_mcp_server)
+     * @param {number} toolId - 工具ID
+     */
+    function publishTool(toolId) {
+        if (!toolId) {
+            alert('工具ID不能为空');
+            return;
+        }
+
+        // 确认发布
+        if (!confirm('确定要将此工具发布到wind_mcp_server数据库吗?')) {
+            return;
+        }
+
+        console.log('[发布工具] 开始发布, 工具ID:', toolId);
+
+        // 显示加载提示
+        const loadingToast = showToast('正在发布工具...', 'info', 0);
+
+        // 1. 先导出工具数据
+        fetch(`/mcp-tools/api/export/${toolId}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`导出失败: HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(exportData => {
+                console.log('[发布工具] 导出数据成功:', exportData);
+
+                // 2. 构建发布DTO
+                const publishDto = buildPublishDto(exportData);
+                console.log('[发布工具] 发布DTO:', publishDto);
+
+                // 3. 发送发布请求
+                return fetch('/mcp-tools/api/publish', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(publishDto)
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || `HTTP ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('[发布工具] 发布成功:', result);
+                hideToast(loadingToast);
+                showToast('工具发布成功!', 'success', 3000);
+            })
+            .catch(error => {
+                console.error('[发布工具] 失败:', error);
+                hideToast(loadingToast);
+                showToast('发布失败: ' + error.message, 'danger', 5000);
+            });
+    }
+
+    /**
+     * 构建发布DTO对象
+     * @param {object} exportData - 导出的工具数据
+     * @returns {object} 发布DTO
+     */
+    function buildPublishDto(exportData) {
+        const dto = {};
+
+        // 复制MCP工具基本信息
+        if (exportData.mcpTool) {
+            const tool = exportData.mcpTool;
+            dto.id = tool.id;
+            dto.toolNum = tool.toolNum;
+            dto.toolVersion = tool.toolVersion;
+            dto.valid = tool.valid;
+            dto.toolName = tool.toolName;
+            dto.toolDescription = tool.toolDescription;
+            dto.nameDisplay = tool.nameDisplay;
+            dto.descriptionDisplay = tool.descriptionDisplay;
+            dto.inputSchema = tool.inputSchema;
+            dto.outputSchema = tool.outputSchema;
+            dto.streamOutput = tool.streamOutput;
+            dto.convertType = tool.convertType;
+            dto.toolType = tool.toolType;
+            dto.providerId = tool.providerId;
+        }
+
+        // 复制原始HTTP工具信息
+        if (exportData.originToolHttp) {
+            const httpTool = exportData.originToolHttp;
+            dto.httpReqUrl = httpTool.reqUrl;
+            dto.httpReqMethod = httpTool.reqMethod;
+            dto.httpReqHeaders = httpTool.reqHeaders;
+            dto.httpInputSchema = typeof httpTool.inputSchema === 'string'
+                ? httpTool.inputSchema
+                : JSON.stringify(httpTool.inputSchema);
+            dto.httpOutputSchema = typeof httpTool.outputSchema === 'string'
+                ? httpTool.outputSchema
+                : JSON.stringify(httpTool.outputSchema);
+        }
+
+        // 复制原始Expo工具信息
+        if (exportData.originToolExpo) {
+            const expoTool = exportData.originToolExpo;
+            dto.expoAppClass = expoTool.appClass;
+            dto.expoCommandId = expoTool.commandId;
+            dto.expoFunctionName = expoTool.functionName;
+            dto.expoApiDefine = expoTool.expoApiDefine;
+        }
+
+        // 复制HTTP转换模板信息
+        if (exportData.httpTemplateConverter) {
+            const httpConverter = exportData.httpTemplateConverter;
+            dto.httpTemplateReqUrl = httpConverter.reqUrl;
+            dto.httpTemplateReqMethod = httpConverter.reqMethod;
+            dto.httpTemplateReqHeaders = httpConverter.reqHeaders;
+            dto.httpTemplateReqBody = httpConverter.reqBody;
+            dto.httpTemplateRespBody = httpConverter.respBody;
+        }
+
+        // 复制Expo转换模板信息
+        if (exportData.expoTemplateConverter) {
+            const expoConverter = exportData.expoTemplateConverter;
+            dto.expoTemplateAppClass = expoConverter.appClass;
+            dto.expoTemplateCommandId = expoConverter.commandId;
+            dto.expoTemplateInputArgs = expoConverter.inputArgs;
+            dto.expoTemplateOutputArgs = expoConverter.outputArgs;
+        }
+
+        return dto;
+    }
+
+    /**
+     * 显示Toast提示
+     * @param {string} message - 消息内容
+     * @param {string} type - 类型 (success/danger/warning/info)
+     * @param {number} duration - 显示时长(毫秒), 0表示不自动关闭
+     * @returns {HTMLElement} Toast元素
+     */
+    function showToast(message, type = 'info', duration = 3000) {
+        const toastContainer = getOrCreateToastContainer();
+
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `alert alert-${type} alert-dismissible fade show`;
+        toast.role = 'alert';
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        if (duration > 0) {
+            setTimeout(() => hideToast(toast), duration);
+        }
+
+        return toast;
+    }
+
+    /**
+     * 隐藏Toast
+     * @param {HTMLElement} toast - Toast元素
+     */
+    function hideToast(toast) {
+        if (toast && toast.parentNode) {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 150);
+        }
+    }
+
+    /**
+     * 获取或创建Toast容器
+     * @returns {HTMLElement} Toast容器
+     */
+    function getOrCreateToastContainer() {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 350px;';
+            document.body.appendChild(container);
+        }
+        return container;
     }
 </script>
 </body>

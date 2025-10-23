@@ -2,6 +2,7 @@ package cn.com.wind.mcp.registry.controller;
 
 import cn.com.wind.mcp.registry.dto.McpToolEditDto;
 import cn.com.wind.mcp.registry.dto.McpToolExportDto;
+import cn.com.wind.mcp.registry.dto.McpToolImportValidationResult;
 import cn.com.wind.mcp.registry.entity.*;
 import cn.com.wind.mcp.registry.mapper.ExpoTemplateConverterMapper;
 import cn.com.wind.mcp.registry.mapper.HttpTemplateConverterMapper;
@@ -57,6 +58,9 @@ public class McpToolController {
     @Autowired
     private ExpoTemplateConverterMapper expoTemplateConverterMapper;
 
+    @Autowired
+    private cn.com.wind.mcp.registry.service.McpToolPublisherService mcpToolPublisherService;
+
     /**
      * 工具列表页面
      */
@@ -77,9 +81,14 @@ public class McpToolController {
             // 用户未登录，返回空结果
             result = mcpToolService.page(toolPage, new QueryWrapper<McpTool>().eq("1", "0"));
         } else {
-            // 查询用户自己的工具（默认行为）
+            Provider currentProvider = PermissionUtil.getCurrentProvider(session);
+            String username = currentProvider.getUsername();
+
             QueryWrapper<McpTool> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("provider_id", currentProviderId);
+            // pczhou 用户可以查看全局工具,其他用户只能看自己的
+            if (!"pczhou".equals(username)) {
+                queryWrapper.eq("provider_id", currentProviderId);
+            }
             result = mcpToolService.page(toolPage, queryWrapper);
         }
 
@@ -504,6 +513,158 @@ public class McpToolController {
     }
 
     /**
+     * 导入工具信息
+     * 支持导入通过导出功能生成的JSON文件
+     *
+     * @param exportDto 导入的工具数据
+     * @param session   HTTP会话
+     * @return 导入结果(成功/失败消息)
+     */
+    @PostMapping("/api/import")
+    @ResponseBody
+    public ResponseEntity<?> importTool(@RequestBody McpToolExportDto exportDto, HttpSession session) {
+        log.info("接收到工具导入请求");
+
+        try {
+            // 1. 检查用户登录状态
+            Long currentProviderId = PermissionUtil.getCurrentProviderId(session);
+            if (currentProviderId == null) {
+                log.warn("用户未登录,无法导入工具");
+                return ResponseEntity.status(401).body("用户未登录,请先登录");
+            }
+
+            String username = PermissionUtil.getCurrentProvider(session).getUsername();
+            log.info("当前用户: providerId={}, username={}", currentProviderId, username);
+
+            // 2. 校验导入数据
+            McpToolImportValidationResult validationResult = mcpToolService.validateImportData(exportDto,
+                    currentProviderId);
+
+            if (!validationResult.isValid() || validationResult.hasErrors()) {
+                log.warn("导入数据校验失败: {}", validationResult.getErrors());
+                return ResponseEntity.status(400).body(validationResult);
+            }
+
+            // 3. 执行导入
+            McpTool importedTool = mcpToolService.importTool(exportDto, currentProviderId, username);
+
+            log.info("工具导入成功: id={}, toolName={}", importedTool.getId(), importedTool.getToolName());
+
+            // 4. 返回成功响应(包含警告信息,如果有)
+            return ResponseEntity.ok(new ImportSuccessResponse(
+                    true,
+                    "工具导入成功",
+                    importedTool.getId(),
+                    importedTool.getToolName(),
+                    validationResult.getWarnings()
+            ));
+
+        } catch (Exception e) {
+            log.error("导入工具失败", e);
+            return ResponseEntity.status(500).body(new ImportErrorResponse(
+                    false,
+                    "导入失败: " + e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 发布工具到目标数据库 (wind_mcp_server)
+     * 将工具数据从mcp_registry发布到wind_mcp_server数据库
+     *
+     * @param publishDto 发布数据传输对象 (包含完整的工具信息)
+     * @param session    HTTP会话
+     * @return 发布结果 (成功/失败消息)
+     */
+    @PostMapping("/api/publish")
+    @ResponseBody
+    public ResponseEntity<?> publishTool(@RequestBody cn.com.wind.mcp.registry.dto.McpToolPublishDto publishDto,
+                                         HttpSession session) {
+        log.info("接收到工具发布请求: toolName={}, toolNum={}", publishDto.getToolName(), publishDto.getToolNum());
+
+        try {
+            // 1. 检查用户登录状态
+            Long currentProviderId = PermissionUtil.getCurrentProviderId(session);
+            if (currentProviderId == null) {
+                log.warn("用户未登录,无法发布工具");
+                return ResponseEntity.status(401).body(new PublishResponse(false, "用户未登录,请先登录"));
+            }
+
+            // 2. 检查用户是否有发布权限(仅pczhou用户)
+            Provider currentProvider = PermissionUtil.getCurrentProvider(session);
+            String username = currentProvider.getUsername();
+            if (!"pczhou".equals(username)) {
+                log.warn("用户无发布权限: username={}", username);
+                return ResponseEntity.status(403).body(new PublishResponse(false, "仅管理员可发布工具"));
+            }
+
+            // 3. 检查权限: 只能发布自己的工具(或 pczhou 可发布所有)
+            if (!"pczhou".equals(username) && !PermissionUtil.hasPermission(session, publishDto.getProviderId())) {
+                log.warn("用户无权限发布此工具: currentProviderId={}, toolProviderId={}",
+                        currentProviderId, publishDto.getProviderId());
+                return ResponseEntity.status(403).body(new PublishResponse(false, "无权限发布此工具"));
+            }
+
+            // 3. 确保目标数据库已初始化
+            mcpToolPublisherService.initializeTargetDatabase();
+
+            // 4. 执行发布
+            mcpToolPublisherService.publishTool(publishDto);
+
+            log.info("工具发布成功: toolName={}, toolNum={}", publishDto.getToolName(), publishDto.getToolNum());
+            return ResponseEntity.ok(new PublishResponse(true, "工具发布成功"));
+
+        } catch (Exception e) {
+            log.error("发布工具失败: toolName={}", publishDto.getToolName(), e);
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && errorMsg.contains("已发布")) {
+                return ResponseEntity.status(409).body(new PublishResponse(false, errorMsg));
+            }
+            return ResponseEntity.status(500).body(new PublishResponse(false, "发布失败: " + errorMsg));
+        }
+    }
+
+    /**
+     * 导入成功响应DTO
+     */
+    public static class ImportSuccessResponse {
+        private boolean success;
+        private String message;
+        private Long toolId;
+        private String toolName;
+        private List<String> warnings;
+
+        public ImportSuccessResponse(boolean success, String message, Long toolId, String toolName,
+                                     List<String> warnings) {
+            this.success = success;
+            this.message = message;
+            this.toolId = toolId;
+            this.toolName = toolName;
+            this.warnings = warnings;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public Long getToolId() {
+            return toolId;
+        }
+
+        public String getToolName() {
+            return toolName;
+        }
+
+        public List<String> getWarnings() {
+            return warnings;
+        }
+    }
+
+    /**
      * 导出工具信息为JSON
      * 包含MCP工具信息、原始接口信息(HTTP/Expo)和转换模板信息
      *
@@ -585,6 +746,48 @@ public class McpToolController {
         } catch (Exception e) {
             log.error("导出MCP工具失败: id=" + id, e);
             return ResponseEntity.status(500).build();
+        }
+    }
+
+    /**
+     * 导入错误响应DTO
+     */
+    public static class ImportErrorResponse {
+        private boolean success;
+        private String message;
+
+        public ImportErrorResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
+    /**
+     * 发布响应DTO
+     */
+    public static class PublishResponse {
+        private boolean success;
+        private String message;
+
+        public PublishResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
         }
     }
 
