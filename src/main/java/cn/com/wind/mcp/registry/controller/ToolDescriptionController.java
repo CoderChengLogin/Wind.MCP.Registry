@@ -102,10 +102,10 @@ public class ToolDescriptionController {
             // 剩余的是参数
             Map<String, Object> arguments = requestBody;
 
-            log.info("测试工具: id={}, sessionId={}, arguments={}", id, sessionId, arguments);
+            log.info("测试工具: id={}, sessionId={}, arguments={}", mcpTool.getToolNum(), sessionId, arguments);
 
             // 使用带 sessionId 的方法调用
-            Map<String, Object> result = mcpClientService.testToolWithSessionId(id, arguments, sessionId);
+            Map<String, Object> result = mcpClientService.testToolWithSessionId(mcpTool.getToolNum(), arguments, sessionId);
             return Result.success(result);
         } catch (Exception e) {
             log.error("测试工具时出错", e);
