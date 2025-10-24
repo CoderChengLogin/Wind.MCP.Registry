@@ -40,17 +40,28 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
         log.info("开始发布工具: toolName={}, toolNum={}", publishDto.getToolName(), publishDto.getToolNum());
 
         try {
-            // 1. 检查工具是否已存在
-            String checkSql = "SELECT COUNT(*) FROM mcp_tool_config WHERE tool_num = ? AND tool_version = ?";
+            // 1. 验证必填字段
+            if (publishDto.getToolName() == null || publishDto.getToolName().trim().isEmpty()) {
+                throw new Exception("工具名称(toolName)不能为空");
+            }
+            if (publishDto.getToolNum() == null) {
+                throw new Exception("工具编号(toolNum)不能为空");
+            }
+            if (publishDto.getToolVersion() == null) {
+                throw new Exception("工具版本(toolVersion)不能为空");
+            }
+
+            // 2. 检查工具是否已存在
+            String checkSql = "SELECT COUNT(*) FROM mcp_tool WHERE tool_num = ? AND tool_version = ?";
             Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class,
                     publishDto.getToolNum(), publishDto.getToolVersion());
 
             if (count != null && count > 0) {
                 log.warn("工具已存在: toolNum={}, version={}", publishDto.getToolNum(), publishDto.getToolVersion());
-                throw new Exception("工具已发布，无法重复发布");
+                throw new Exception("工具已发布,无法重复发布");
             }
 
-            // 2. 插入MCP工具配置
+            // 3. 插入MCP工具配置
             insertMcpToolConfig(publishDto);
 
             // 3. 根据转换类型插入对应的原始工具和模板转换器
@@ -75,7 +86,7 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
      * 插入MCP工具配置
      */
     private void insertMcpToolConfig(McpToolPublishDto dto) {
-        String sql = "INSERT INTO mcp_tool_config (" +
+        String sql = "INSERT INTO mcp_tool (" +
                 "tool_num, tool_version, valid, tool_name, tool_description, " +
                 "name_display, description_display, input_schema, output_schema, " +
                 "stream_output, convert_type, tool_type, " +
@@ -105,7 +116,7 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                 "registry"
         );
 
-        log.debug("插入MCP工具配置成功: toolNum={}", dto.getToolNum());
+        log.warn("插入MCP工具配置成功: toolNum={}", dto.getToolNum());
     }
 
     /**
@@ -114,7 +125,7 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
     private void insertHttpToolAndConverter(McpToolPublishDto dto) {
         // 插入原始HTTP工具
         if (dto.getHttpReqUrl() != null) {
-            String httpSql = "INSERT INTO origin_tool_http_config (" +
+            String httpSql = "INSERT INTO origin_tool_http (" +
                     "provider_tool_num, req_url, req_method, req_headers, " +
                     "input_schema, output_schema, " +
                     "create_time, create_by, update_time, update_by) " +
@@ -137,12 +148,12 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     "registry"
             );
 
-            log.info("插入HTTP工具配置成功: toolNum={}", dto.getToolNum());
+            log.warn("插入HTTP工具配置成功: toolNum={}", dto.getToolNum());
         }
 
         // 插入HTTP模板转换器
         if (dto.getHttpTemplateReqUrl() != null) {
-            String templateSql = "INSERT INTO http_template_converter_config (" +
+            String templateSql = "INSERT INTO http_template_converter (" +
                     "tool_num, tool_version, req_url, req_method, req_headers, " +
                     "req_body, resp_body, provider_tool_num, " +
                     "create_time, create_by, update_time, update_by) " +
@@ -166,7 +177,7 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     "registry"
             );
 
-            log.info("插入HTTP模板转换器配置成功: toolNum={}", dto.getToolNum());
+            log.warn("插入HTTP模板转换器配置成功: toolNum={}", dto.getToolNum());
         }
     }
 
@@ -176,7 +187,7 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
     private void insertExpoToolAndConverter(McpToolPublishDto dto) {
         // 插入原始Expo工具
         if (dto.getExpoAppClass() != null) {
-            String expoSql = "INSERT INTO origin_tool_expo_config (" +
+            String expoSql = "INSERT INTO origin_tool_expo (" +
                     "provider_tool_num, app_class, command_id, function_name, " +
                     "expo_api_define, " +
                     "create_time, create_by, update_time, update_by) " +
@@ -198,12 +209,12 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     "registry"
             );
 
-            log.debug("插入Expo工具配置成功: toolNum={}", dto.getToolNum());
+            log.warn("插入Expo工具配置成功: toolNum={}", dto.getToolNum());
         }
 
         // 插入Expo模板转换器
         if (dto.getExpoTemplateAppClass() != null) {
-            String templateSql = "INSERT INTO expo_template_converter_config (" +
+            String templateSql = "INSERT INTO expo_template_converter (" +
                     "tool_num, tool_version, app_class, command_id, " +
                     "input_args, output_args, provider_tool_num, " +
                     "create_time, create_by, update_time, update_by) " +
@@ -226,7 +237,7 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     "registry"
             );
 
-            log.debug("插入Expo模板转换器配置成功: toolNum={}", dto.getToolNum());
+            log.warn("插入Expo模板转换器配置成功: toolNum={}", dto.getToolNum());
         }
     }
 
@@ -248,15 +259,15 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                 // 创建数据库
 //                jdbcTemplate.execute("CREATE DATABASE wind_mcp_server CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 //                log.info("目标数据库创建成功");
+
+                // 2. 切换到目标数据库并创建必要的表
+//                jdbcTemplate.execute("USE wind_mcp_server");
+//                createTablesIfNotExist();
+//
+//                log.info("目标数据库初始化完成");
+
                 throw new RuntimeException("目标数据库不存在");
             }
-
-            // 2. 切换到目标数据库并创建必要的表
-            jdbcTemplate.execute("USE wind_mcp_server");
-            createTablesIfNotExist();
-
-            log.info("目标数据库初始化完成");
-
         } catch (Exception e) {
             log.error("初始化目标数据库失败: {}", e.getMessage(), e);
             throw new Exception("初始化数据库失败: " + e.getMessage(), e);
@@ -267,8 +278,8 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
      * 创建必要的表（如果不存在）
      */
     private void createTablesIfNotExist() {
-        // 创建mcp_tool_config表
-        String mcpToolTableSql = "CREATE TABLE IF NOT EXISTS mcp_tool_config (" +
+        // 创建mcp_tool表
+        String mcpToolTableSql = "CREATE TABLE IF NOT EXISTS mcp_tool (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "tool_num BIGINT NOT NULL, " +
                 "tool_version BIGINT NOT NULL, " +
@@ -291,8 +302,8 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         jdbcTemplate.execute(mcpToolTableSql);
 
-        // 创建origin_tool_http_config表
-        String httpToolTableSql = "CREATE TABLE IF NOT EXISTS origin_tool_http_config (" +
+        // 创建origin_tool_http表
+        String httpToolTableSql = "CREATE TABLE IF NOT EXISTS origin_tool_http (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "provider_tool_num BIGINT NOT NULL UNIQUE, " +
                 "req_url VARCHAR(500), " +
@@ -308,8 +319,8 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         jdbcTemplate.execute(httpToolTableSql);
 
-        // 创建http_template_converter_config表
-        String httpTemplateTableSql = "CREATE TABLE IF NOT EXISTS http_template_converter_config (" +
+        // 创建http_template_converter表
+        String httpTemplateTableSql = "CREATE TABLE IF NOT EXISTS http_template_converter (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "tool_num BIGINT NOT NULL, " +
                 "tool_version BIGINT NOT NULL, " +
@@ -326,8 +337,8 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         jdbcTemplate.execute(httpTemplateTableSql);
 
-        // 创建origin_tool_expo_config表
-        String expoToolTableSql = "CREATE TABLE IF NOT EXISTS origin_tool_expo_config (" +
+        // 创建origin_tool_expo表
+        String expoToolTableSql = "CREATE TABLE IF NOT EXISTS origin_tool_expo (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "provider_tool_num BIGINT NOT NULL UNIQUE, " +
                 "app_class INT, " +
@@ -342,8 +353,8 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
         jdbcTemplate.execute(expoToolTableSql);
 
-        // 创建expo_template_converter_config表
-        String expoTemplateTableSql = "CREATE TABLE IF NOT EXISTS expo_template_converter_config (" +
+        // 创建expo_template_converter表
+        String expoTemplateTableSql = "CREATE TABLE IF NOT EXISTS expo_template_converter (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "tool_num BIGINT NOT NULL, " +
                 "tool_version BIGINT NOT NULL, " +

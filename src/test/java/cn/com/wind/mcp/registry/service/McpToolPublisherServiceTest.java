@@ -48,8 +48,8 @@ public class McpToolPublisherServiceTest {
      * 为测试环境创建必要的表
      */
     private void createTablesForTest() {
-        // 创建mcp_tool_config表
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS mcp_tool_config (" +
+        // 创建mcp_tool表
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS mcp_tool (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "tool_num BIGINT NOT NULL, " +
                 "tool_version BIGINT NOT NULL, " +
@@ -70,8 +70,8 @@ public class McpToolPublisherServiceTest {
                 "update_by VARCHAR(100), " +
                 "UNIQUE (tool_num, tool_version))");
 
-        // 创建origin_tool_http_config表
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS origin_tool_http_config (" +
+        // 创建origin_tool_http表
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS origin_tool_http (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "provider_tool_num BIGINT NOT NULL UNIQUE, " +
                 "req_url VARCHAR(500), " +
@@ -85,8 +85,8 @@ public class McpToolPublisherServiceTest {
                 "update_time TIMESTAMP, " +
                 "update_by VARCHAR(100))");
 
-        // 创建http_template_converter_config表
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS http_template_converter_config (" +
+        // 创建http_template_converter表
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS http_template_converter (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "tool_num BIGINT NOT NULL, " +
                 "tool_version BIGINT NOT NULL, " +
@@ -101,8 +101,8 @@ public class McpToolPublisherServiceTest {
                 "update_time TIMESTAMP, " +
                 "update_by VARCHAR(100))");
 
-        // 创建origin_tool_expo_config表
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS origin_tool_expo_config (" +
+        // 创建origin_tool_expo表
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS origin_tool_expo (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "provider_tool_num BIGINT NOT NULL UNIQUE, " +
                 "app_class INT, " +
@@ -115,8 +115,8 @@ public class McpToolPublisherServiceTest {
                 "update_time TIMESTAMP, " +
                 "update_by VARCHAR(100))");
 
-        // 创建expo_template_converter_config表
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS expo_template_converter_config (" +
+        // 创建expo_template_converter表
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS expo_template_converter (" +
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                 "tool_num BIGINT NOT NULL, " +
                 "tool_version BIGINT NOT NULL, " +
@@ -144,22 +144,22 @@ public class McpToolPublisherServiceTest {
         assertDoesNotThrow(() -> publisherService.publishTool(publishDto),
                 "发布HTTP工具不应抛出异常");
 
-        // 验证: 检查mcp_tool_config表
-        String checkSql = "SELECT COUNT(*) FROM mcp_tool_config WHERE tool_num = ? AND tool_version = ?";
+        // 验证: 检查mcp_tool表
+        String checkSql = "SELECT COUNT(*) FROM mcp_tool WHERE tool_num = ? AND tool_version = ?";
         Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class,
                 publishDto.getToolNum(), publishDto.getToolVersion());
         assertNotNull(count, "查询结果不应为null");
         assertEquals(1, count, "应该成功插入1条MCP工具配置记录");
 
-        // 验证: 检查origin_tool_http_config表
-        String checkHttpSql = "SELECT COUNT(*) FROM origin_tool_http_config WHERE provider_tool_num = ?";
+        // 验证: 检查origin_tool_http表
+        String checkHttpSql = "SELECT COUNT(*) FROM origin_tool_http WHERE provider_tool_num = ?";
         Integer httpCount = jdbcTemplate.queryForObject(checkHttpSql, Integer.class,
                 publishDto.getToolNum());
         assertNotNull(httpCount, "查询结果不应为null");
         assertEquals(1, httpCount, "应该成功插入1条HTTP工具配置记录");
 
-        // 验证: 检查http_template_converter_config表
-        String checkTemplateSql = "SELECT COUNT(*) FROM http_template_converter_config WHERE tool_num = ?";
+        // 验证: 检查http_template_converter表
+        String checkTemplateSql = "SELECT COUNT(*) FROM http_template_converter WHERE tool_num = ?";
         Integer templateCount = jdbcTemplate.queryForObject(checkTemplateSql, Integer.class,
                 publishDto.getToolNum());
         assertNotNull(templateCount, "查询结果不应为null");
@@ -179,22 +179,22 @@ public class McpToolPublisherServiceTest {
         assertDoesNotThrow(() -> publisherService.publishTool(publishDto),
                 "发布Expo工具不应抛出异常");
 
-        // 验证: 检查mcp_tool_config表
-        String checkSql = "SELECT COUNT(*) FROM mcp_tool_config WHERE tool_num = ? AND tool_version = ?";
+        // 验证: 检查mcp_tool表
+        String checkSql = "SELECT COUNT(*) FROM mcp_tool WHERE tool_num = ? AND tool_version = ?";
         Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class,
                 publishDto.getToolNum(), publishDto.getToolVersion());
         assertNotNull(count, "查询结果不应为null");
         assertEquals(1, count, "应该成功插入1条MCP工具配置记录");
 
-        // 验证: 检查origin_tool_expo_config表
-        String checkExpoSql = "SELECT COUNT(*) FROM origin_tool_expo_config WHERE provider_tool_num = ?";
+        // 验证: 检查origin_tool_expo表
+        String checkExpoSql = "SELECT COUNT(*) FROM origin_tool_expo WHERE provider_tool_num = ?";
         Integer expoCount = jdbcTemplate.queryForObject(checkExpoSql, Integer.class,
                 publishDto.getToolNum());
         assertNotNull(expoCount, "查询结果不应为null");
         assertEquals(1, expoCount, "应该成功插入1条Expo工具配置记录");
 
-        // 验证: 检查expo_template_converter_config表
-        String checkTemplateSql = "SELECT COUNT(*) FROM expo_template_converter_config WHERE tool_num = ?";
+        // 验证: 检查expo_template_converter表
+        String checkTemplateSql = "SELECT COUNT(*) FROM expo_template_converter WHERE tool_num = ?";
         Integer templateCount = jdbcTemplate.queryForObject(checkTemplateSql, Integer.class,
                 publishDto.getToolNum());
         assertNotNull(templateCount, "查询结果不应为null");
@@ -214,20 +214,20 @@ public class McpToolPublisherServiceTest {
         assertDoesNotThrow(() -> publisherService.publishTool(publishDto),
                 "发布Code工具不应抛出异常");
 
-        // 验证: 检查mcp_tool_config表
-        String checkSql = "SELECT COUNT(*) FROM mcp_tool_config WHERE tool_num = ? AND tool_version = ?";
+        // 验证: 检查mcp_tool表
+        String checkSql = "SELECT COUNT(*) FROM mcp_tool WHERE tool_num = ? AND tool_version = ?";
         Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class,
                 publishDto.getToolNum(), publishDto.getToolVersion());
         assertNotNull(count, "查询结果不应为null");
         assertEquals(1, count, "应该成功插入1条MCP工具配置记录");
 
         // 验证: 不应插入HTTP或Expo相关记录
-        String checkHttpSql = "SELECT COUNT(*) FROM origin_tool_http_config WHERE provider_tool_num = ?";
+        String checkHttpSql = "SELECT COUNT(*) FROM origin_tool_http WHERE provider_tool_num = ?";
         Integer httpCount = jdbcTemplate.queryForObject(checkHttpSql, Integer.class,
                 publishDto.getToolNum());
         assertEquals(0, httpCount, "Code类型工具不应插入HTTP工具记录");
 
-        String checkExpoSql = "SELECT COUNT(*) FROM origin_tool_expo_config WHERE provider_tool_num = ?";
+        String checkExpoSql = "SELECT COUNT(*) FROM origin_tool_expo WHERE provider_tool_num = ?";
         Integer expoCount = jdbcTemplate.queryForObject(checkExpoSql, Integer.class,
                 publishDto.getToolNum());
         assertEquals(0, expoCount, "Code类型工具不应插入Expo工具记录");
@@ -315,7 +315,7 @@ public class McpToolPublisherServiceTest {
 
         // 验证: 查询并检查数据完整性
         String querySql = "SELECT tool_name, tool_description, input_schema " +
-                "FROM mcp_tool_config WHERE tool_num = ?";
+                "FROM mcp_tool WHERE tool_num = ?";
 
         jdbcTemplate.query(querySql, rs -> {
             assertEquals("test_integrity_tool", rs.getString("tool_name"),
@@ -342,7 +342,7 @@ public class McpToolPublisherServiceTest {
         publisherService.publishTool(publishDto);
 
         // 验证: 查询并检查HTTP工具URL和Method
-        String querySql = "SELECT req_url, req_method FROM origin_tool_http_config " +
+        String querySql = "SELECT req_url, req_method FROM origin_tool_http " +
                 "WHERE provider_tool_num = ?";
 
         jdbcTemplate.query(querySql, rs -> {
@@ -368,7 +368,7 @@ public class McpToolPublisherServiceTest {
         publisherService.publishTool(publishDto);
 
         // 验证: 查询并检查Expo工具appClass和commandId
-        String querySql = "SELECT app_class, command_id FROM origin_tool_expo_config " +
+        String querySql = "SELECT app_class, command_id FROM origin_tool_expo " +
                 "WHERE provider_tool_num = ?";
 
         jdbcTemplate.query(querySql, rs -> {
@@ -396,7 +396,7 @@ public class McpToolPublisherServiceTest {
 
         // 验证: 查询并检查HTTP模板
         String querySql = "SELECT req_url, req_body, resp_body " +
-                "FROM http_template_converter_config WHERE tool_num = ?";
+                "FROM http_template_converter WHERE tool_num = ?";
 
         jdbcTemplate.query(querySql, rs -> {
             assertTrue(rs.getString("req_url").contains("{{param1}}"),
