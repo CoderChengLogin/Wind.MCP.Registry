@@ -43,15 +43,14 @@ public class OriginToolExpoController {
      *
      * @param model   模型
      * @param page    当前页码
-     * @param size    每页大小
      * @param session 会话
      * @return 列表页面
      */
     @GetMapping
     public String list(Model model,
                        @RequestParam(defaultValue = "1") int page,
-                       @RequestParam(defaultValue = "10") int size,
                        HttpSession session) {
+        int size = 20; // 固定每页20条数据
         log.info("查询原始Expo接口列表: page={}, size={}", page, size);
 
         Page<OriginToolExpo> toolPage = new Page<OriginToolExpo>(page, size);
@@ -267,15 +266,14 @@ public class OriginToolExpoController {
      * @param keyword 搜索关键词
      * @param model   模型
      * @param page    当前页码
-     * @param size    每页大小
      * @param session 会话
      * @return 列表页面
      */
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model,
                          @RequestParam(defaultValue = "1") int page,
-                         @RequestParam(defaultValue = "10") int size,
                          HttpSession session) {
+        int size = 20; // 固定每页20条数据
         log.info("搜索原始Expo接口: keyword={}", keyword);
 
         // 获取当前登录用户ID

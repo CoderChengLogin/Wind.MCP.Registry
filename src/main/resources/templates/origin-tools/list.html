@@ -16,23 +16,86 @@
             font-weight: bold;
         }
 
-        .card {
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-        }
-
-        .tool-card {
-            border-left: 4px solid #28a745;
-        }
-
         .search-box {
             background: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
+        }
+
+        /* 单行布局样式 */
+        .tool-list-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tool-list-table thead {
+            background-color: #f8f9fa;
+        }
+
+        .tool-list-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .tool-list-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .tool-list-table tbody tr {
+            border-left: 4px solid #28a745;
+        }
+
+        .tool-list-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* 文本截断和hover显示全文 */
+        .text-truncate-hover {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .text-truncate-hover:hover {
+            overflow: visible;
+            white-space: normal;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+
+        .tool-name-col {
+            max-width: 180px;
+        }
+
+        .tool-url-col {
+            max-width: 250px;
+        }
+
+        .tool-method-col {
+            width: 90px;
+        }
+
+        .tool-time-col {
+            width: 130px;
+        }
+
+        .tool-actions-col {
+            width: 130px;
         }
     </style>
 </head>
@@ -57,9 +120,12 @@
     <!-- 搜索框 -->
     <div class="search-box">
         <form action="/origin-http-tools" method="get">
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-md-4">
                     <input class="form-control" name="name" placeholder="工具名称" th:value="${param.name}" type="text">
+                </div>
+                <div class="col-md-3">
+                    <input class="form-control" name="url" placeholder="URL地址" th:value="${param.url}" type="text">
                 </div>
                 <div class="col-md-3">
                     <select class="form-select" name="method">
@@ -71,9 +137,6 @@
                         <option th:selected="${param.method == 'PATCH'}" value="PATCH">PATCH</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <input class="form-control" name="url" placeholder="URL地址" th:value="${param.url}" type="text">
-                </div>
                 <div class="col-md-2">
                     <button class="btn btn-primary w-100" type="submit">
                         <i class="fas fa-search me-2"></i>搜索
@@ -84,40 +147,50 @@
     </div>
 
     <!-- 工具列表 -->
-    <div class="row" th:if="${not #lists.isEmpty(tools)}">
-        <div class="col-md-6 col-lg-4 mb-4" th:each="tool : ${tools}">
-            <div class="card tool-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="card-title mb-0" th:text="${tool.nameDisplay}">工具名称</h5>
-                        <span class="badge bg-success" th:text="${tool.reqMethod}">GET</span>
+    <div th:if="${not #lists.isEmpty(tools)}">
+        <table class="table tool-list-table">
+            <thead>
+            <tr>
+                <th class="tool-name-col">工具名称</th>
+                <th class="tool-method-col">App Class</th>
+                <th class="tool-method-col">Command ID</th>
+                <th class="tool-actions-col">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tool : ${tools}">
+                <td>
+                    <div class="text-truncate-hover"
+                         th:attr="data-full-text=${tool.nameDisplay}"
+                         th:text="${tool.nameDisplay}">工具名称
                     </div>
-                    <p class="card-text text-muted small mb-2" th:text="${tool.reqUrl}">http://example.com/api</p>
-                    <p class="card-text" th:text="${#strings.abbreviate(tool.descDisplay, 100)}">工具描述...</p>
-
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <small class="text-muted">
-                            <i class="fas fa-clock me-1"></i>
-                            <span th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd')}">2024-01-01</span>
-                        </small>
+                </td>
+                <td>
+                    <span class="badge bg-info" th:text="${tool.appClass}">app_class</span>
+                </td>
+                <td>
+                    <code th:text="${tool.commandId}">command_id</code>
+                </td>
+                <td>
                         <div class="btn-group btn-group-sm">
-                            <a class="btn btn-outline-primary" th:href="@{/origin-http-tools/{id}(id=${tool.id})}">
+                            <a class="btn btn-outline-primary" th:href="@{/origin-tools-expo/{id}(id=${tool.id})}"
+                               title="查看">
                                 <i class="fas fa-eye"></i>
                             </a>
                             <a class="btn btn-outline-secondary"
-                               th:href="@{/origin-http-tools/edit/{id}(id=${tool.id})}">
+                               th:href="@{/origin-tools-expo/edit/{id}(id=${tool.id})}" title="编辑">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button class="btn btn-outline-danger" data-bs-target="#deleteModal"
                                     data-bs-toggle="modal" th:data-tool-id="${tool.id}"
-                                    th:data-tool-name="${tool.nameDisplay}" type="button">
+                                    th:data-tool-name="${tool.nameDisplay}" title="删除" type="button">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- 空状态 -->
@@ -127,22 +200,39 @@
         <p class="text-muted">当前没有找到任何HTTP工具。</p>
     </div>
 
-    <!-- 分页 -->
-    <nav th:if="${totalPages > 1}">
+    <!-- 分页组件 -->
+    <nav aria-label="Page navigation" class="mt-4" th:if="${not #lists.isEmpty(tools)}">
         <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+            <li class="page-item" th:classappend="${currentPage == 1 or currentPage == null} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/origin-http-tools(page=${currentPage - 1}, name=${param.name}, method=${param.method}, url=${param.url})}">上一页</a>
+                   aria-label="Previous"
+                   th:href="@{/origin-tools-expo(page=${currentPage != null ? currentPage - 1 : 0}, name=${param.name})}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
             </li>
-            <li class="page-item" th:classappend="${i == currentPage} ? 'active'"
-                th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+
+            <th:block th:if="${totalPages != null and totalPages > 0}">
+                <li class="page-item"
+                    th:classappend="${i == currentPage} ? 'active'"
+                    th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a class="page-link" th:href="@{/origin-tools-expo(page=${i}, name=${param.name})}"
+                       th:text="${i}">1</a>
+                </li>
+            </th:block>
+
+            <th:block th:if="${totalPages == null or totalPages == 0}">
+                <li class="page-item active">
+                    <a class="page-link">1</a>
+                </li>
+            </th:block>
+
+            <li class="page-item"
+                th:classappend="${currentPage == totalPages or totalPages == null or totalPages <= 1} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{/origin-http-tools(page=${i}, name=${param.name}, method=${param.method}, url=${param.url})}"
-                   th:text="${i + 1}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{/origin-http-tools(page=${currentPage + 1}, name=${param.name}, method=${param.method}, url=${param.url})}">下一页</a>
+                   aria-label="Next"
+                   th:href="@{/origin-tools-expo(page=${currentPage != null ? currentPage + 1 : 2}, name=${param.name})}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
             </li>
         </ul>
     </nav>

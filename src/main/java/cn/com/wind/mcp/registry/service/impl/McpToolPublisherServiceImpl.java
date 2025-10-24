@@ -78,9 +78,9 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
         String sql = "INSERT INTO mcp_tool_config (" +
                 "tool_num, tool_version, valid, tool_name, tool_description, " +
                 "name_display, description_display, input_schema, output_schema, " +
-                "stream_output, convert_type, tool_type, provider_id, " +
+                "stream_output, convert_type, tool_type, " +
                 "create_time, create_by, update_time, update_by) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?)";
 
         LocalDateTime now = LocalDateTime.now();
         String nowStr = now.format(DATE_FORMATTER);
@@ -98,11 +98,11 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                 dto.getStreamOutput(),
                 dto.getConvertType(),
                 dto.getToolType(),
-                dto.getProviderId(),
+//                dto.getProviderId(),
                 nowStr,
-                "system",
+                "registry",
                 nowStr,
-                "system"
+                "registry"
         );
 
         log.debug("插入MCP工具配置成功: toolNum={}", dto.getToolNum());
@@ -116,9 +116,9 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
         if (dto.getHttpReqUrl() != null) {
             String httpSql = "INSERT INTO origin_tool_http_config (" +
                     "provider_tool_num, req_url, req_method, req_headers, " +
-                    "input_schema, output_schema, provider_id, " +
+                    "input_schema, output_schema, " +
                     "create_time, create_by, update_time, update_by) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?)";
 
             LocalDateTime now = LocalDateTime.now();
             String nowStr = now.format(DATE_FORMATTER);
@@ -130,14 +130,14 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     dto.getHttpReqHeaders(),
                     dto.getHttpInputSchema(),
                     dto.getHttpOutputSchema(),
-                    dto.getProviderId(),
+//                    dto.getProviderId(),
                     nowStr,
-                    "system",
+                    "registry",
                     nowStr,
-                    "system"
+                    "registry"
             );
 
-            log.debug("插入HTTP工具配置成功: toolNum={}", dto.getToolNum());
+            log.info("插入HTTP工具配置成功: toolNum={}", dto.getToolNum());
         }
 
         // 插入HTTP模板转换器
@@ -161,12 +161,12 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     dto.getHttpTemplateRespBody(),
                     dto.getToolNum(),
                     nowStr,
-                    "system",
+                    "registry",
                     nowStr,
-                    "system"
+                    "registry"
             );
 
-            log.debug("插入HTTP模板转换器配置成功: toolNum={}", dto.getToolNum());
+            log.info("插入HTTP模板转换器配置成功: toolNum={}", dto.getToolNum());
         }
     }
 

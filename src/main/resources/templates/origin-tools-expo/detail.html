@@ -80,8 +80,8 @@
                           th:text="${tool.functionName}">functionName</span>
                 </h1>
                 <p class="mb-2 opacity-75">
-                    <i class="fas fa-layer-group me-1"></i> 应用类别: <span th:text="${tool.appClass}">0</span>
-                    <span class="ms-3"><i class="fas fa-terminal me-1"></i> 命令ID: <span
+                    <i class="fas fa-layer-group me-1"></i> appClass: <span th:text="${tool.appClass}">0</span>
+                    <span class="ms-3"><i class="fas fa-terminal me-1"></i> commandId: <span
                             th:text="${tool.commandId}">0</span></span>
                 </p>
                 <p class="mb-0 opacity-75" th:text="${tool.descDisplay}">工具描述</p>
@@ -120,13 +120,13 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-sm-3"><strong>应用类别:</strong></div>
+                        <div class="col-sm-3"><strong>appClass:</strong></div>
                         <div class="col-sm-9">
                             <span th:text="${tool.appClass}">0</span>
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-sm-3"><strong>命令ID:</strong></div>
+                        <div class="col-sm-3"><strong>commandId:</strong></div>
                         <div class="col-sm-9">
                             <span th:text="${tool.commandId}">0</span>
                         </div>

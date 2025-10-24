@@ -43,8 +43,8 @@ public class OriginToolHttpController {
     @GetMapping
     public String list(Model model,
                        @RequestParam(defaultValue = "1") int page,
-                       @RequestParam(defaultValue = "10") int size,
                        HttpSession session) {
+        int size = 20; // 固定每页20条数据
         log.info("查询原始HTTP接口列表: page={}, size={}", page, size);
 
         Page<OriginToolHttp> toolPage = new Page<OriginToolHttp>(page, size);
@@ -238,8 +238,8 @@ public class OriginToolHttpController {
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model,
                          @RequestParam(defaultValue = "1") int page,
-                         @RequestParam(defaultValue = "10") int size,
                          HttpSession session) {
+        int size = 20; // 固定每页20条数据
         log.info("搜索原始HTTP接口: keyword={}", keyword);
 
         // 获取当前登录用户ID

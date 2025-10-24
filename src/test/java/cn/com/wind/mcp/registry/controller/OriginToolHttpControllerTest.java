@@ -68,7 +68,7 @@ class OriginToolHttpControllerTest {
 
         when(originToolHttpService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolHttpController.list(model, 1, 10, session);
+        String viewName = originToolHttpController.list(model, 1, session);
 
         assertEquals("origin-http-tools/list", viewName);
         verify(model).addAttribute("tools", Collections.emptyList());
@@ -97,7 +97,7 @@ class OriginToolHttpControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originToolHttpService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolHttpController.list(model, 1, 10, session);
+        String viewName = originToolHttpController.list(model, 1, session);
 
         assertEquals("origin-http-tools/list", viewName);
         verify(model).addAttribute(eq("tools"), anyList());
@@ -450,7 +450,7 @@ class OriginToolHttpControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(null);
         when(originToolHttpService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolHttpController.search("test", model, 1, 10, session);
+        String viewName = originToolHttpController.search("test", model, 1, session);
 
         assertEquals("origin-http-tools/list", viewName);
         verify(model).addAttribute("tools", Collections.emptyList());
@@ -482,7 +482,7 @@ class OriginToolHttpControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originToolHttpService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolHttpController.search("test", model, 1, 10, session);
+        String viewName = originToolHttpController.search("test", model, 1, session);
 
         assertEquals("origin-http-tools/list", viewName);
         verify(model).addAttribute(eq("tools"), anyList());
@@ -507,7 +507,7 @@ class OriginToolHttpControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originToolHttpService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolHttpController.search("", model, 1, 10, session);
+        String viewName = originToolHttpController.search("", model, 1, session);
 
         assertEquals("origin-http-tools/list", viewName);
         verify(model).addAttribute("keyword", "");

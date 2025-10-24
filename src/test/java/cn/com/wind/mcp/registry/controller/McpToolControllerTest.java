@@ -82,7 +82,7 @@ class McpToolControllerTest {
         when(emptyPage.getTotal()).thenReturn(0L);
         when(mcpToolService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(emptyPage);
 
-        String viewName = mcpToolController.list(model, 1, 10, "all", session);
+        String viewName = mcpToolController.list(model, 1, "all", session);
 
         assertEquals("mcp-tools/list", viewName);
         verify(model).addAttribute(eq("tools"), anyList());
@@ -109,7 +109,7 @@ class McpToolControllerTest {
         when(toolPage.getTotal()).thenReturn(1L);
         when(mcpToolService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(toolPage);
 
-        String viewName = mcpToolController.list(model, 1, 10, "all", session);
+        String viewName = mcpToolController.list(model, 1, "all", session);
 
         assertEquals("mcp-tools/list", viewName);
         verify(model).addAttribute(eq("tools"), anyList());
@@ -447,7 +447,7 @@ class McpToolControllerTest {
         when(emptyPage.getTotal()).thenReturn(0L);
         when(mcpToolService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(emptyPage);
 
-        String viewName = mcpToolController.search("test", model, 1, 10, session);
+        String viewName = mcpToolController.search("test", model, 1, session);
 
         assertEquals("mcp-tools/list", viewName);
         verify(model).addAttribute("keyword", "test");
@@ -473,7 +473,7 @@ class McpToolControllerTest {
         when(toolPage.getTotal()).thenReturn(1L);
         when(mcpToolService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(toolPage);
 
-        String viewName = mcpToolController.search("test", model, 1, 10, session);
+        String viewName = mcpToolController.search("test", model, 1, session);
 
         assertEquals("mcp-tools/list", viewName);
         verify(model).addAttribute(eq("tools"), anyList());

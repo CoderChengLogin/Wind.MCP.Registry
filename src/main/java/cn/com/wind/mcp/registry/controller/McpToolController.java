@@ -67,9 +67,9 @@ public class McpToolController {
     @GetMapping
     public String list(Model model,
                        @RequestParam(defaultValue = "1") int page,
-                       @RequestParam(defaultValue = "10") int size,
                        @RequestParam(defaultValue = "all") String view,
                        HttpSession session) {
+        int size = 20; // 固定每页20条数据
         log.info("查询MCP工具列表: page={}, size={}, view={}", page, size, view);
 
         Page<McpTool> toolPage = new Page<>(page, size);
@@ -458,8 +458,8 @@ public class McpToolController {
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model,
                          @RequestParam(defaultValue = "1") int page,
-                         @RequestParam(defaultValue = "10") int size,
                          HttpSession session) {
+        int size = 20; // 固定每页20条数据
         log.info("搜索MCP工具: keyword={}", keyword);
 
         // 获取当前登录用户ID

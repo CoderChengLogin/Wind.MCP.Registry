@@ -68,7 +68,7 @@ class OriginToolExpoControllerTest {
 
         when(originToolExpoService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolExpoController.list(model, 1, 10, session);
+        String viewName = originToolExpoController.list(model, 1, session);
 
         assertEquals("origin-tools-expo/list", viewName);
         verify(model).addAttribute("tools", Collections.emptyList());
@@ -97,7 +97,7 @@ class OriginToolExpoControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originToolExpoService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolExpoController.list(model, 1, 10, session);
+        String viewName = originToolExpoController.list(model, 1, session);
 
         assertEquals("origin-tools-expo/list", viewName);
         verify(model).addAttribute(eq("tools"), anyList());
@@ -453,7 +453,7 @@ class OriginToolExpoControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(null);
         when(originToolExpoService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolExpoController.search("test", model, 1, 10, session);
+        String viewName = originToolExpoController.search("test", model, 1, session);
 
         assertEquals("origin-tools-expo/list", viewName);
         verify(model).addAttribute("tools", Collections.emptyList());
@@ -485,7 +485,7 @@ class OriginToolExpoControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originToolExpoService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolExpoController.search("test", model, 1, 10, session);
+        String viewName = originToolExpoController.search("test", model, 1, session);
 
         assertEquals("origin-tools-expo/list", viewName);
         verify(model).addAttribute(eq("tools"), anyList());
@@ -510,7 +510,7 @@ class OriginToolExpoControllerTest {
         when(session.getAttribute("currentProvider")).thenReturn(provider);
         when(originToolExpoService.page(any(Page.class), any(QueryWrapper.class))).thenReturn(mockPage);
 
-        String viewName = originToolExpoController.search("", model, 1, 10, session);
+        String viewName = originToolExpoController.search("", model, 1, session);
 
         assertEquals("origin-tools-expo/list", viewName);
         verify(model).addAttribute("keyword", "");

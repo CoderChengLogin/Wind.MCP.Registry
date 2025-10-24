@@ -13,17 +13,126 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <!-- Toast通知组件CSS -->
     <link rel="stylesheet" th:href="@{/css/toast.css}">
+
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .search-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* 单行布局样式 */
+        .tool-list-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tool-list-table thead {
+            background-color: #f8f9fa;
+        }
+
+        .tool-list-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .tool-list-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .tool-list-table tbody tr {
+            border-left: 4px solid #28a745;
+        }
+
+        .tool-list-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* 文本截断和hover显示全文 */
+        .text-truncate-hover {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .text-truncate-hover:hover {
+            overflow: visible;
+            white-space: normal;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+
+        .tool-name-col {
+            max-width: 180px;
+        }
+
+        .tool-desc-col {
+            max-width: 280px;
+        }
+
+        .tool-type-col {
+            width: 100px;
+        }
+
+        .tool-convert-col {
+            width: 110px;
+        }
+
+        .tool-time-col {
+            width: 130px;
+        }
+
+        .tool-status-col {
+            width: 80px;
+        }
+
+        .tool-actions-col {
+            width: 150px;
+        }
+
+        /* 分页信息文本样式 */
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
 <!-- 导航栏 -->
 <nav th:replace="~{fragments/navigation :: navbar}"></nav>
 
-<!-- 主要内容区域 -->
-<main class="container mt-4">
+<div class="container mt-4">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item active">MCP工具</li>
+        </ol>
+    </nav>
+
     <!-- 页面标题 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-cogs me-2"></i>MCP工具列表</h1>
-        <div class="btn-group" role="group">
+        <div>
             <a class="btn btn-primary" th:href="@{/tool-wizard}">
                 <i class="fas fa-plus me-2"></i>分步向导添加
             </a>
@@ -33,199 +142,156 @@
         </div>
     </div>
 
-    <!-- 搜索和过滤区域 -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <input class="form-control" id="searchInput" placeholder="搜索工具名称或描述..." type="text">
-                        <button class="btn btn-primary" id="searchBtn" type="button">
-                            <i class="fas fa-search"></i> 搜索
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn btn-outline-secondary" id="toggleFiltersBtn" type="button">
-                        <i class="fas fa-filter me-1"></i>高级过滤
-                        <i class="fas fa-chevron-down ms-1" id="filterToggleIcon"></i>
-                    </button>
-                    <button class="btn btn-outline-danger" id="clearFiltersBtn" type="button">
-                        <i class="fas fa-times me-1"></i>清除
-                    </button>
-                </div>
+    <!-- 搜索框 -->
+    <div class="search-box">
+        <div class="row align-items-center">
+            <div class="col-md-9">
+                <input class="form-control" id="searchInput" placeholder="搜索工具名称或描述..." type="text">
             </div>
-
-            <!-- 高级过滤器 -->
-            <div class="row" id="advancedFilters" style="display: none;">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label" for="filterConvertType">
-                        <i class="fas fa-exchange-alt me-1"></i>转换类型
-                    </label>
-                    <select class="form-select" id="filterConvertType">
-                        <option value="">全部</option>
-                        <option value="http">HTTP转换模板</option>
-                        <option value="expo">Expo转换模板</option>
-                        <option value="manual">手动转换模板</option>
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label" for="filterValid">
-                        <i class="fas fa-check-circle me-1"></i>状态
-                    </label>
-                    <select class="form-select" id="filterValid">
-                        <option value="">全部</option>
-                        <option value="1">有效</option>
-                        <option value="0">无效</option>
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label" for="filterToolType">
-                        <i class="fas fa-tag me-1"></i>工具类型
-                    </label>
-                    <select class="form-select" id="filterToolType">
-                        <option value="">全部</option>
-                        <option value="1">Tool</option>
-                        <option value="2">Agent</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-12 text-end">
-                    <span class="text-muted">共 <span id="totalCount">[[${totalRecords}]]</span> 个工具</span>
-                </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100" onclick="filterTools()">
+                    <i class="fas fa-search me-2"></i>搜索
+                </button>
             </div>
         </div>
     </div>
 
     <!-- 工具列表 -->
-    <div class="row" id="toolsList" th:if="${tools != null and !tools.empty}">
-        <div class="col-md-6 col-lg-4 mb-4 tool-card" th:data-convert-type="${tool.convertType}"
-             th:data-tool-description="${tool.toolDescription}"
-             th:data-tool-name="${tool.toolName}"
-             th:data-tool-type="${tool.toolType}"
-             th:data-valid="${tool.valid}"
-             th:each="tool : ${tools}">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${tool.toolName}">工具名称</h5>
-                    <p class="card-text text-muted" th:text="${#strings.abbreviate(tool.toolDescription, 100)}">
-                        工具描述</p>
-
-                    <div class="mb-2">
-                        <small class="text-muted">
-                            <i class="fas fa-tag me-1"></i>
-                            <span th:text="${tool.toolType}">工具类型</span>
-                        </small>
+    <div th:if="${not #lists.isEmpty(tools)}">
+        <table class="table tool-list-table">
+            <thead>
+            <tr>
+                <th class="tool-name-col">工具名称</th>
+                <th class="tool-desc-col">描述</th>
+                <th class="tool-type-col">工具类型</th>
+                <th class="tool-convert-col">转换类型</th>
+                <th class="tool-time-col">创建时间</th>
+                <th class="tool-status-col">状态</th>
+                <th class="tool-actions-col">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tool : ${tools}">
+                <td>
+                    <div class="text-truncate-hover"
+                         th:attr="data-full-text=${tool.toolName}"
+                         th:text="${tool.toolName}">工具名称
                     </div>
-
-                    <div class="mb-2">
-                        <small class="text-muted">
-                            <i class="fas fa-clock me-1"></i>
-                            创建时间: <span th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</span>
-                        </small>
+                </td>
+                <td>
+                    <div class="text-truncate-hover"
+                         th:attr="data-full-text=${tool.toolDescription}"
+                         th:text="${tool.toolDescription}">工具描述
                     </div>
-
-                    <div class="mb-2">
-                        <!-- 有效状态徽章 -->
-                        <span class="badge me-1"
-                              th:classappend="${tool.valid == '1' ? 'bg-success' : 'bg-secondary'}"
-                              th:if="${tool.valid != null}"
-                              th:text="${tool.valid == '1' ? '有效' : '无效'}">状态</span>
-
-                        <!-- 转换模板类型徽章 -->
+                </td>
+                <td>
+                    <span class="badge bg-info" th:text="${tool.toolType == '1' ? 'Tool' : 'Agent'}">Tool</span>
+                </td>
+                <td>
                         <span class="badge bg-success"
                               th:if="${tool.convertType != null and (tool.convertType == '1' or tool.convertType.toLowerCase().contains('http'))}">
-                            <i class="fas fa-globe me-1"></i>HTTP转换模板
+                            <i class="fas fa-globe me-1"></i>HTTP
                         </span>
                         <span class="badge bg-primary"
                               th:if="${tool.convertType != null and (tool.convertType == '2' or tool.convertType.equalsIgnoreCase('expo'))}">
-                            <i class="fas fa-server me-1"></i>Expo转换模板
+                            <i class="fas fa-server me-1"></i>Expo
                         </span>
                         <span class="badge bg-warning"
                               th:if="${tool.convertType != null and (tool.convertType == '3' or tool.convertType.equalsIgnoreCase('manual') or tool.convertType.equalsIgnoreCase('code'))}">
-                            <i class="fas fa-code me-1"></i>手动转换模板
+                            <i class="fas fa-code me-1"></i>手动
                         </span>
-                        <span class="badge bg-secondary"
-                              th:if="${tool.convertType == null or (tool.convertType != '1' and tool.convertType != '2' and tool.convertType != '3' and !tool.convertType.toLowerCase().contains('http') and !tool.convertType.equalsIgnoreCase('expo') and !tool.convertType.equalsIgnoreCase('manual') and !tool.convertType.equalsIgnoreCase('code'))}">
-                            <i class="fas fa-question me-1"></i>未知模板
-                        </span>
-                    </div>
-                </div>
-
-                <div class="card-footer bg-transparent">
-                    <div class="btn-group w-100" role="group">
-                        <a class="btn btn-outline-primary btn-sm" th:href="@{/mcp-tools/{id}(id=${tool.id})}">
-                            <i class="fas fa-eye me-1"></i>查看
+                </td>
+                <td>
+                    <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        <span th:text="${#temporals.format(tool.createTime, 'yyyy-MM-dd HH:mm')}">2024-01-01 10:00</span>
+                    </small>
+                </td>
+                <td>
+                    <span class="badge bg-success" th:if="${tool.valid == '1'}">有效</span>
+                    <span class="badge bg-secondary" th:if="${tool.valid != '1'}">无效</span>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a class="btn btn-outline-primary" th:href="@{/mcp-tools/{id}(id=${tool.id})}" title="查看">
+                            <i class="fas fa-eye"></i>
                         </a>
-                        <!-- 判断用户是否有编辑权限 -->
-                        <a class="btn btn-outline-secondary btn-sm"
+                        <a class="btn btn-outline-secondary"
+                           th:if="${currentProviderId != null and (tool.providerId == currentProviderId)}"
                            th:href="@{/mcp-tools/edit/{id}(id=${tool.id})}"
-                           th:if="${currentProviderId != null and (tool.providerId == currentProviderId)}">
-                            <i class="fas fa-edit me-1"></i>编辑
+                           title="编辑">
+                            <i class="fas fa-edit"></i>
                         </a>
-                        <button class="btn btn-outline-secondary btn-sm permission-denied-edit-btn"
-                                th:data-tool-name="${tool.toolName}"
+                        <button class="btn btn-outline-secondary permission-denied-edit-btn"
                                 th:if="${currentProviderId == null or (tool.providerId != currentProviderId)}"
-                                type="button">
-                            <i class="fas fa-edit me-1"></i>编辑
+                                th:data-tool-name="${tool.toolName}"
+                                title="编辑" type="button">
+                            <i class="fas fa-edit"></i>
                         </button>
-
-                        <!-- 判断用户是否有删除权限 -->
-                        <button class="btn btn-outline-danger btn-sm delete-btn"
+                        <button class="btn btn-outline-danger delete-btn"
+                                th:if="${currentProviderId != null and (tool.providerId == currentProviderId)}"
                                 th:data-tool-id="${tool.id}"
                                 th:data-tool-name="${tool.toolName}"
-                                th:if="${currentProviderId != null and (tool.providerId == currentProviderId)}"
-                                type="button">
-                            <i class="fas fa-trash me-1"></i>删除
+                                title="删除" type="button">
+                            <i class="fas fa-trash"></i>
                         </button>
-                        <button class="btn btn-outline-danger btn-sm permission-denied-delete-btn"
-                                th:data-tool-name="${tool.toolName}"
+                        <button class="btn btn-outline-danger permission-denied-delete-btn"
                                 th:if="${currentProviderId == null or (tool.providerId != currentProviderId)}"
-                                type="button">
-                            <i class="fas fa-trash me-1"></i>删除
+                                th:data-tool-name="${tool.toolName}"
+                                title="删除" type="button">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- 空状态 -->
-    <div class="text-center py-5" th:if="${tools == null or tools.empty}">
-        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-        <h4 class="text-muted">暂无工具</h4>
-        <p class="text-muted">还没有注册任何MCP工具</p>
+    <div class="text-center py-5" th:if="${#lists.isEmpty(tools)}">
+        <i class="fas fa-cogs fa-4x text-muted mb-3"></i>
+        <h3 class="text-muted">暂无MCP工具</h3>
+        <p class="text-muted">当前没有找到任何MCP工具。</p>
+        <a class="btn btn-primary" th:href="@{/tool-wizard}">
+            <i class="fas fa-plus me-2"></i>立即创建
+        </a>
     </div>
 
-    <!-- 分页 -->
-    <nav aria-label="工具列表分页" th:if="${totalPages > 1}">
+    <!-- 分页组件 -->
+    <nav aria-label="Page navigation" class="mt-4" th:if="${not #lists.isEmpty(tools)}">
         <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/mcp-tools(page=${currentPage - 1})}"
-                   th:if="${keyword == null}">上一页</a>
-                <a class="page-link" th:href="@{/mcp-tools/search(keyword=${keyword}, page=${currentPage - 1})}"
-                   th:if="${keyword != null}">上一页</a>
+            <li class="page-item" th:classappend="${currentPage == 1 or currentPage == null} ? 'disabled'">
+                <a aria-label="Previous" class="page-link"
+                   th:href="@{/mcp-tools(page=${currentPage != null ? currentPage - 1 : 0})}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
             </li>
 
-            <li class="page-item" th:classappend="${page == currentPage ? 'active' : ''}"
-                th:each="page : ${#numbers.sequence(1, totalPages)}">
-                <a class="page-link" th:href="@{/mcp-tools(page=${page})}"
-                   th:if="${keyword == null}" th:text="${page}">1</a>
-                <a class="page-link" th:href="@{/mcp-tools/search(keyword=${keyword}, page=${page})}"
-                   th:if="${keyword != null}" th:text="${page}">1</a>
-            </li>
+            <th:block th:if="${totalPages != null and totalPages > 0}">
+                <li class="page-item"
+                    th:classappend="${i == currentPage} ? 'active'"
+                    th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a class="page-link" th:href="@{/mcp-tools(page=${i})}" th:text="${i}">1</a>
+                </li>
+            </th:block>
 
-            <li class="page-item" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/mcp-tools(page=${currentPage + 1})}"
-                   th:if="${keyword == null}">下一页</a>
-                <a class="page-link" th:href="@{/mcp-tools/search(keyword=${keyword}, page=${currentPage + 1})}"
-                   th:if="${keyword != null}">下一页</a>
+            <th:block th:if="${totalPages == null or totalPages == 0}">
+                <li class="page-item active">
+                    <a class="page-link">1</a>
+                </li>
+            </th:block>
+
+            <li class="page-item"
+                th:classappend="${currentPage == totalPages or totalPages == null or totalPages <= 1} ? 'disabled'">
+                <a aria-label="Next" class="page-link"
+                   th:href="@{/mcp-tools(page=${currentPage != null ? currentPage + 1 : 2})}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
             </li>
         </ul>
     </nav>
-</main>
+</div>
 
 <!-- 删除确认模态框 -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
@@ -236,8 +302,8 @@
                 <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-                <p>确定要删除工具 "<span id="deleteToolName"></span>" 吗？</p>
-                <p class="text-danger">此操作不可撤销！</p>
+                <p>您确定要删除工具 "<span id="deleteToolName"></span>" 吗？</p>
+                <p class="text-danger">此操作不可撤销!</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
@@ -249,47 +315,18 @@
     </div>
 </div>
 
-<!-- 无权限编辑提示模态框 -->
-<div class="modal fade" id="permissionDeniedEditModal" tabindex="-1">
+<!-- 无权限提示模态框 -->
+<div class="modal fade" id="permissionDeniedModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>无权限操作
-                </h5>
+                <h5 class="modal-title">无权限操作</h5>
                 <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-                <div class="text-center">
-                    <i class="fas fa-lock fa-3x text-muted mb-3"></i>
-                    <h5>无法编辑工具</h5>
-                    <p class="text-muted">您没有编辑工具 "<span id="editToolName"></span>" 的权限。</p>
-                    <p class="text-muted">只有工具的创建者才能编辑该工具。</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" data-bs-dismiss="modal" type="button">我知道了</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 无权限删除提示模态框 -->
-<div class="modal fade" id="permissionDeniedDeleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>无权限操作
-                </h5>
-                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <i class="fas fa-lock fa-3x text-muted mb-3"></i>
-                    <h5>无法删除工具</h5>
-                    <p class="text-muted">您没有删除工具 "<span id="deletePermissionToolName"></span>" 的权限。</p>
-                    <p class="text-muted">只有工具的创建者才能删除该工具。</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-lock me-2"></i>
+                    <span id="permissionMessage">您没有权限执行此操作。只有工具的创建者才能编辑或删除该工具。</span>
                 </div>
             </div>
             <div class="modal-footer">
@@ -307,159 +344,74 @@
 <script src="/js/import-util.js"></script>
 
 <script>
+    /**
+     * 确认删除工具
+     */
     function confirmDelete(toolId, toolName) {
         document.getElementById('deleteToolName').textContent = toolName;
         document.getElementById('deleteForm').action = '/mcp-tools/delete/' + toolId;
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
 
-    function showEditPermissionDenied(toolName) {
-        document.getElementById('editToolName').textContent = toolName;
-        new bootstrap.Modal(document.getElementById('permissionDeniedEditModal')).show();
-    }
-
-    function showDeletePermissionDenied(toolName) {
-        document.getElementById('deletePermissionToolName').textContent = toolName;
-        new bootstrap.Modal(document.getElementById('permissionDeniedDeleteModal')).show();
+    /**
+     * 显示无权限提示
+     */
+    function showPermissionDenied(toolName, action) {
+        const message = `您没有${action}工具 "${toolName}" 的权限。只有工具的创建者才能${action}该工具。`;
+        document.getElementById('permissionMessage').textContent = message;
+        new bootstrap.Modal(document.getElementById('permissionDeniedModal')).show();
     }
 
     /**
-     * 过滤工具列表
-     * 根据搜索关键词和高级过滤条件显示/隐藏工具卡片
+     * 前端搜索过滤
      */
     function filterTools() {
         const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
-        const convertType = document.getElementById('filterConvertType').value.toLowerCase();
-        const valid = document.getElementById('filterValid').value;
-        const toolType = document.getElementById('filterToolType').value;
-
-        const toolCards = document.querySelectorAll('.tool-card');
+        const rows = document.querySelectorAll('tbody tr');
         let visibleCount = 0;
 
-        toolCards.forEach(card => {
-            const toolName = (card.dataset.toolName || '').toLowerCase();
-            const toolDescription = (card.dataset.toolDescription || '').toLowerCase();
-            const cardConvertType = (card.dataset.convertType || '').toLowerCase();
-            const cardValid = card.dataset.valid || '';
-            const cardToolType = card.dataset.toolType || '';
+        rows.forEach(row => {
+            const toolName = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+            const toolDescription = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
 
-            // 搜索关键词匹配
-            const matchesSearch = !searchKeyword ||
+            const matches = !searchKeyword ||
                 toolName.includes(searchKeyword) ||
                 toolDescription.includes(searchKeyword);
 
-            // 转换类型匹配
-            const matchesConvertType = !convertType || cardConvertType.includes(convertType);
-
-            // 状态匹配
-            const matchesValid = !valid || cardValid === valid;
-
-            // 工具类型匹配
-            const matchesToolType = !toolType || cardToolType === toolType;
-
-            // 显示/隐藏卡片
-            if (matchesSearch && matchesConvertType && matchesValid && matchesToolType) {
-                card.style.display = '';
-                visibleCount++;
-            } else {
-                card.style.display = 'none';
-            }
+            row.style.display = matches ? '' : 'none';
+            if (matches) visibleCount++;
         });
-
-        // 更新计数
-        document.getElementById('totalCount').textContent = visibleCount;
-
-        // 如果没有结果，显示提示信息
-        const toolsList = document.getElementById('toolsList');
-        let noResultsDiv = document.getElementById('noResultsMessage');
-
-        if (visibleCount === 0) {
-            if (!noResultsDiv) {
-                noResultsDiv = document.createElement('div');
-                noResultsDiv.id = 'noResultsMessage';
-                noResultsDiv.className = 'col-12 text-center py-5';
-                noResultsDiv.innerHTML = `
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">未找到匹配的工具</h4>
-                    <p class="text-muted">请尝试调整搜索条件或过滤器</p>
-                `;
-                toolsList.appendChild(noResultsDiv);
-            }
-        } else if (noResultsDiv) {
-            noResultsDiv.remove();
-        }
     }
 
-    /**
-     * 清除所有过滤条件
-     */
-    function clearFilters() {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('filterConvertType').value = '';
-        document.getElementById('filterValid').value = '';
-        document.getElementById('filterToolType').value = '';
-        filterTools();
-    }
-
-    /**
-     * 切换高级过滤器显示/隐藏
-     */
-    function toggleFilters() {
-        const filtersDiv = document.getElementById('advancedFilters');
-        const toggleIcon = document.getElementById('filterToggleIcon');
-
-        if (filtersDiv.style.display === 'none') {
-            filtersDiv.style.display = '';
-            toggleIcon.classList.remove('fa-chevron-down');
-            toggleIcon.classList.add('fa-chevron-up');
-        } else {
-            filtersDiv.style.display = 'none';
-            toggleIcon.classList.remove('fa-chevron-up');
-            toggleIcon.classList.add('fa-chevron-down');
-        }
-    }
-
-    // 添加事件监听器
+    // 页面加载完成后初始化
     document.addEventListener('DOMContentLoaded', function () {
-        // 检查URL参数，显示Toast通知
+        // Toast通知
         const urlParams = new URLSearchParams(window.location.search);
         const successMsg = urlParams.get('success');
         const errorMsg = urlParams.get('error');
 
         if (successMsg) {
             showSuccess(decodeURIComponent(successMsg));
-            // 清除URL参数（不刷新页面）
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         if (errorMsg) {
             showError(decodeURIComponent(errorMsg));
-            // 清除URL参数（不刷新页面）
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
-        // 搜索按钮
-        document.getElementById('searchBtn').addEventListener('click', filterTools);
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterTools);
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    filterTools();
+                }
+            });
+        }
 
-        // 搜索框回车键
-        document.getElementById('searchInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                filterTools();
-            }
-        });
-
-        // 过滤器下拉框变化
-        document.getElementById('filterConvertType').addEventListener('change', filterTools);
-        document.getElementById('filterValid').addEventListener('change', filterTools);
-        document.getElementById('filterToolType').addEventListener('change', filterTools);
-
-        // 切换过滤器按钮
-        document.getElementById('toggleFiltersBtn').addEventListener('click', toggleFilters);
-
-        // 清除过滤器按钮
-        document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
-
-        // 删除按钮事件监听器
+        // 删除按钮
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const toolId = this.dataset.toolId;
@@ -468,27 +420,26 @@
             });
         });
 
-        // 无权限编辑按钮事件监听器
+        // 无权限编辑按钮
         document.querySelectorAll('.permission-denied-edit-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const toolName = this.dataset.toolName;
-                showEditPermissionDenied(toolName);
+                showPermissionDenied(toolName, '编辑');
             });
         });
 
-        // 无权限删除按钮事件监听器
+        // 无权限删除按钮
         document.querySelectorAll('.permission-denied-delete-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const toolName = this.dataset.toolName;
-                showDeletePermissionDenied(toolName);
+                showPermissionDenied(toolName, '删除');
             });
         });
 
-        // 导入工具按钮事件监听器
+        // 导入工具按钮
         const importToolBtn = document.getElementById('importToolBtn');
         if (importToolBtn) {
             importToolBtn.addEventListener('click', function () {
-                // 创建隐藏的文件输入框
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
                 fileInput.accept = '.json';
@@ -498,15 +449,12 @@
                     if (!file) return;
 
                     try {
-                        // 使用ImportToolManager处理导入
                         await ImportToolManager.handleImport(file);
                     } catch (error) {
-                        // 显示错误通知
                         ImportToolManager.showNotification(error.message, 'error');
                     }
                 };
 
-                // 触发文件选择
                 fileInput.click();
             });
         }
