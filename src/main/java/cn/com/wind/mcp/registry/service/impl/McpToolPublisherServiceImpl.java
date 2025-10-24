@@ -178,9 +178,9 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
         if (dto.getExpoAppClass() != null) {
             String expoSql = "INSERT INTO origin_tool_expo_config (" +
                     "provider_tool_num, app_class, command_id, function_name, " +
-                    "expo_api_define, provider_id, " +
+                    "expo_api_define, " +
                     "create_time, create_by, update_time, update_by) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             LocalDateTime now = LocalDateTime.now();
             String nowStr = now.format(DATE_FORMATTER);
@@ -191,11 +191,11 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     dto.getExpoCommandId(),
                     dto.getExpoFunctionName(),
                     dto.getExpoApiDefine(),
-                    dto.getProviderId(),
+//                    dto.getProviderId(),
                     nowStr,
-                    "system",
+                    "registry",
                     nowStr,
-                    "system"
+                    "registry"
             );
 
             log.debug("插入Expo工具配置成功: toolNum={}", dto.getToolNum());
@@ -221,9 +221,9 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
                     dto.getExpoTemplateOutputArgs(),
                     dto.getToolNum(),
                     nowStr,
-                    "system",
+                    "registry",
                     nowStr,
-                    "system"
+                    "registry"
             );
 
             log.debug("插入Expo模板转换器配置成功: toolNum={}", dto.getToolNum());
@@ -246,8 +246,9 @@ public class McpToolPublisherServiceImpl implements McpToolPublisherService {
             if (dbName == null) {
                 log.info("目标数据库不存在，开始创建...");
                 // 创建数据库
-                jdbcTemplate.execute("CREATE DATABASE wind_mcp_server CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-                log.info("目标数据库创建成功");
+//                jdbcTemplate.execute("CREATE DATABASE wind_mcp_server CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+//                log.info("目标数据库创建成功");
+                throw new RuntimeException("目标数据库不存在");
             }
 
             // 2. 切换到目标数据库并创建必要的表

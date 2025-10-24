@@ -3,20 +3,38 @@ server:
 
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    type: com.zaxxer.hikari.HikariDataSource
-    hikari:
-      minimum-idle: 1
-      maximum-pool-size: 5
-      connection-test-query: SELECT 1
-      auto-commit: true
-      idle-timeout: 30000
-      pool-name: JenkinsTestHikariCP
-      max-lifetime: 60000
-      connection-timeout: 3000
+    # 动态数据源配置 (测试环境使用H2内存数据库模拟读写分离)
+    dynamic:
+      primary: ds_reader
+      datasource:
+        # 读数据源: H2内存数据库
+        ds-reader:
+          jdbc-url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+          username: sa
+          password:
+          driver-class-name: org.h2.Driver
+          minimum-idle: 1
+          maximum-pool-size: 5
+          connection-test-query: SELECT 1
+          auto-commit: true
+          idle-timeout: 30000
+          pool-name: JenkinsTestReaderHikariCP
+          max-lifetime: 60000
+          connection-timeout: 3000
+        # 写数据源: H2内存数据库 (与读数据源共享同一个数据库)
+        ds-writer:
+          jdbc-url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+          username: sa
+          password:
+          driver-class-name: org.h2.Driver
+          minimum-idle: 1
+          maximum-pool-size: 3
+          connection-test-query: SELECT 1
+          auto-commit: true
+          idle-timeout: 30000
+          pool-name: JenkinsTestWriterHikariCP
+          max-lifetime: 60000
+          connection-timeout: 3000
   sql:
     init:
       mode: always

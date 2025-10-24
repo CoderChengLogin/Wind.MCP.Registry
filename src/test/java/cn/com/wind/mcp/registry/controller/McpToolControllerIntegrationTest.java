@@ -202,11 +202,11 @@ public class McpToolControllerIntegrationTest {
             System.out.println("Card Snippet: " + snippet);
         }
 
-        // 断言应该通过: 显示"手动转换模板"
+        // 断言应该通过: 显示"手动"徽章
         mockMvc.perform(get("/mcp-tools")
                         .session(session))
-                .andExpect(content().string(containsString("手动转换模板")))
-                .andExpect(content().string(not(containsString("未知模板"))));
+                .andExpect(content().string(containsString("手动")))
+                .andExpect(content().string(not(containsString("未知"))));
     }
 
     /**

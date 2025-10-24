@@ -13,13 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 数据源配置类
+ * 数据源配置类 - 生产环境
  * 配置动态数据源,支持读写分离
+ * 仅在非jenkins测试环境下生效
  *
  * @author system
  */
 @Slf4j
 @Configuration
+@org.springframework.context.annotation.Profile("!jenkins")
 public class DataSourceConfig {
 
     /**
